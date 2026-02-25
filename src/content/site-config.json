@@ -1,0 +1,14 @@
+{
+  "siteName": "mamy.liel",
+  "fullName": "ליאל שלמה",
+  "tagline": "אמא של מיה ורנה | יוצרת תוכן",
+  "description": "משתפת דברים שטובים לי ולבית שלי",
+  "siteUrl": "https://mamyliel.co.il",
+  "social": {
+    "instagram": "https://instagram.com/mamy.liel",
+    "whatsapp": "https://chat.whatsapp.com/"
+  },
+  "contact": {
+    "email": "lielshlomo@example.com"
+  }
+}

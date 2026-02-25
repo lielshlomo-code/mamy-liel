@@ -1,0 +1,81 @@
+{
+  "categories": [
+    {
+      "id": "all",
+      "label": "הכל"
+    },
+    {
+      "id": "baby",
+      "label": "לתינוק"
+    },
+    {
+      "id": "home",
+      "label": "לבית"
+    },
+    {
+      "id": "fashion",
+      "label": "אופנה"
+    },
+    {
+      "id": "beauty",
+      "label": "טיפוח"
+    }
+  ],
+  "products": [
+    {
+      "id": "product-1",
+      "name": "סט בגדי תינוק מכותנה אורגנית",
+      "description": "סט רך ונעים לתינוקות, מכותנה אורגנית 100%",
+      "category": "baby",
+      "url": "https://s.click.aliexpress.com/e/_c4SG5HzV",
+      "featured": true,
+      "dateAdded": "2026-02-20"
+    },
+    {
+      "id": "product-2",
+      "name": "מנורת לילה לחדר ילדים",
+      "description": "מנורה עם אור חם ונעים, מושלמת לשגרת שינה",
+      "category": "home",
+      "url": "https://s.click.aliexpress.com/e/_c4SG5HzV",
+      "featured": true,
+      "dateAdded": "2026-02-18",
+      "image": "https://ae01.alicdn.com/kf/S76ad054cc4f14cd487a9fa35f6dc0deez.jpg"
+    },
+    {
+      "id": "product-3",
+      "name": "שמלת קיץ לבנה",
+      "description": "שמלה קלילה ונוחה, מושלמת לימי הקיץ",
+      "category": "fashion",
+      "url": "https://example.com/product-3",
+      "featured": true,
+      "dateAdded": "2026-02-15"
+    },
+    {
+      "id": "product-4",
+      "name": "קרם לחות טבעי",
+      "description": "קרם לחות עשיר על בסיס רכיבים טבעיים",
+      "category": "beauty",
+      "url": "https://example.com/product-4",
+      "featured": false,
+      "dateAdded": "2026-02-10"
+    },
+    {
+      "id": "product-5",
+      "name": "עגלת תינוק קומפקטית",
+      "description": "עגלה קלה ונוחה לקיפול, מושלמת לטיולים",
+      "category": "baby",
+      "url": "https://example.com/product-5",
+      "featured": false,
+      "dateAdded": "2026-02-05"
+    },
+    {
+      "id": "product-6",
+      "name": "סט מגבות במבוק",
+      "description": "מגבות רכות במיוחד מסיבי במבוק טבעיים",
+      "category": "home",
+      "url": "https://example.com/product-6",
+      "featured": false,
+      "dateAdded": "2026-02-01"
+    }
+  ]
+}

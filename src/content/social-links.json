@@ -1,0 +1,37 @@
+{
+  "links": [
+    {
+      "id": "instagram",
+      "label": "עקבו אחריי באינסטגרם",
+      "url": "https://instagram.com/mamy.liel",
+      "icon": "instagram"
+    },
+    {
+      "id": "whatsapp",
+      "label": "הצטרפו לקבוצת הוואטסאפ",
+      "url": "https://chat.whatsapp.com/",
+      "icon": "messageCircle"
+    },
+    {
+      "id": "products",
+      "label": "מוצרים שאני אוהבת",
+      "url": "/products",
+      "icon": "heart",
+      "internal": true
+    },
+    {
+      "id": "blog",
+      "label": "הבלוג שלי",
+      "url": "/blog",
+      "icon": "penLine",
+      "internal": true
+    },
+    {
+      "id": "contact",
+      "label": "שיתופי פעולה",
+      "url": "/contact",
+      "icon": "handshake",
+      "internal": true
+    }
+  ]
+}

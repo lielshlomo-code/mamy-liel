@@ -3,6 +3,7 @@ import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
 async function fetchOgImage(url: string): Promise<string | null> {
+  // Strategy 1: Direct fetch
   try {
     const response = await fetch(url, {
       headers: {
@@ -19,7 +20,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
         "Upgrade-Insecure-Requests": "1",
       },
       redirect: "follow",
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(10000),
     });
     const html = await response.text();
 
@@ -62,12 +63,22 @@ async function fetchOgImage(url: string): Promise<string | null> {
       /<(?:img|meta)[^>]*itemprop=["']image["'][^>]*(?:src|content)=["']([^"']+)["']/i
     );
     if (itempropMatch?.[1]) return normalizeImageUrl(itempropMatch[1], url);
-
-    return null;
-  } catch (error) {
-    console.error("fetchOgImage error:", error);
-    return null;
+  } catch {
+    // Direct fetch failed, try fallback
   }
+
+  // Strategy 2: Microlink API fallback (headless browser)
+  try {
+    const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+    const res = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
+    const data = await res.json();
+    if (data?.data?.image?.url) return data.data.image.url;
+    if (data?.data?.logo?.url) return data.data.logo.url;
+  } catch {
+    // fallback also failed
+  }
+
+  return null;
 }
 
 function extractJsonLdImage(data: unknown): string | null {

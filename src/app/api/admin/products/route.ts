@@ -13,8 +13,26 @@ function extractAliExpressProductId(url: string): string | null {
   const match =
     url.match(/\/item\/(\d+)\.html/i) ||
     url.match(/\/(\d{10,})\.html/i) ||
-    url.match(/productId=(\d+)/i);
+    url.match(/productId=(\d+)/i) ||
+    url.match(/[\/?&](\d{10,})/);
   return match?.[1] || null;
+}
+
+async function resolveRedirects(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: AbortSignal.timeout(10000),
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    });
+    return res.url || url;
+  } catch {
+    return url;
+  }
 }
 
 function isBadImage(src: string): boolean {
@@ -33,8 +51,13 @@ async function fetchOgImage(
   url: string
 ): Promise<{ image: string; affiliateLink?: string } | null> {
   // Strategy 1: For AliExpress, use dedicated API
-  if (isAliExpressUrl(url)) {
-    const productId = extractAliExpressProductId(url);
+  if (isAliExpressUrl(url) || /ali\.ski|s\.click\.aliexpress/i.test(url)) {
+    let resolvedUrl = url;
+    let productId = extractAliExpressProductId(url);
+    if (!productId) {
+      resolvedUrl = await resolveRedirects(url);
+      productId = extractAliExpressProductId(resolvedUrl);
+    }
     if (productId) {
       try {
         const res = await fetch(ALI_API_URL, {

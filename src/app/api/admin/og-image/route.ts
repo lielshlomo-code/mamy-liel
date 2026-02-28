@@ -24,10 +24,30 @@ function isAliExpressUrl(url: string): boolean {
 
 // Extract product ID from AliExpress URL (e.g. /item/1005006597882642.html)
 function extractAliExpressProductId(url: string): string | null {
-  const match = url.match(/\/item\/(\d+)\.html/i) ||
+  const match =
+    url.match(/\/item\/(\d+)\.html/i) ||
     url.match(/\/(\d{10,})\.html/i) ||
-    url.match(/productId=(\d+)/i);
+    url.match(/productId=(\d+)/i) ||
+    url.match(/[\/?&](\d{10,})/);
   return match?.[1] || null;
+}
+
+// Follow redirects to get the final URL (for shortened/affiliate links)
+async function resolveRedirects(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: AbortSignal.timeout(10000),
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    });
+    return res.url || url;
+  } catch {
+    return url;
+  }
 }
 
 // Fetch product info via AliExpress API
@@ -155,8 +175,14 @@ export async function POST(request: Request) {
     }
 
     // Strategy 1: For AliExpress, use dedicated API
-    if (isAliExpressUrl(url)) {
-      const productId = extractAliExpressProductId(url);
+    // First try to extract product ID directly, if not found follow redirects
+    let resolvedUrl = url;
+    if (isAliExpressUrl(url) || /ali\.ski|s\.click\.aliexpress/i.test(url)) {
+      let productId = extractAliExpressProductId(url);
+      if (!productId) {
+        resolvedUrl = await resolveRedirects(url);
+        productId = extractAliExpressProductId(resolvedUrl);
+      }
       if (productId) {
         const result = await fetchAliExpressProduct(productId);
         if (result) {

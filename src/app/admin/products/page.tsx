@@ -86,13 +86,18 @@ export default function AdminProducts() {
         // Call AliExpress API directly from browser (no Vercel timeout)
         let productId = extractProductId(url);
 
-        // If no ID found, try to follow redirects via HEAD request
+        // If no ID found, use server-side redirect resolution (CORS blocks browser redirects)
         if (!productId) {
           try {
-            const redirectRes = await fetch(url, { method: "HEAD", redirect: "follow" });
-            productId = extractProductId(redirectRes.url);
+            const resolveRes = await fetch("/api/admin/resolve-ali", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url }),
+            });
+            const resolveData = await resolveRes.json();
+            productId = resolveData.productId || null;
           } catch {
-            // redirect failed
+            // resolve failed
           }
         }
 

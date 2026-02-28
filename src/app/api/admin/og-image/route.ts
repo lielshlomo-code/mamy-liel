@@ -10,7 +10,8 @@ const BROWSER_HEADERS: Record<string, string> = {
   "Accept-Encoding": "gzip, deflate, br",
   "Cache-Control": "no-cache",
   Pragma: "no-cache",
-  "Sec-Ch-Ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+  "Sec-Ch-Ua":
+    '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
   "Sec-Ch-Ua-Mobile": "?0",
   "Sec-Ch-Ua-Platform": '"Windows"',
   "Sec-Fetch-Dest": "document",
@@ -63,7 +64,7 @@ function extractImageFromHtml(html: string): string | null {
     return itempropMatch[1];
   }
 
-  // 5. Try large images from img tags (common for product pages)
+  // 5. Try large images from img tags
   const imgMatches = [
     ...html.matchAll(/<img[^>]*src=["']([^"']+)["'][^>]*>/gi),
   ];
@@ -90,7 +91,6 @@ function extractImageFromJsonLd(data: unknown): string | null {
 
   const obj = data as Record<string, unknown>;
 
-  // Check for image property
   if (typeof obj.image === "string") return obj.image;
   if (Array.isArray(obj.image) && typeof obj.image[0] === "string")
     return obj.image[0];
@@ -107,7 +107,6 @@ function extractImageFromJsonLd(data: unknown): string | null {
 
 function isLikelyProductImage(src: string): boolean {
   if (!src || src.length < 10) return false;
-  // Filter out tiny icons, tracking pixels, etc.
   const excluded = [
     "icon",
     "logo",
@@ -125,7 +124,6 @@ function isLikelyProductImage(src: string): boolean {
   ];
   const lower = src.toLowerCase();
   if (excluded.some((e) => lower.includes(e))) return false;
-  // Must be an image URL
   if (
     lower.includes(".jpg") ||
     lower.includes(".jpeg") ||
@@ -137,6 +135,35 @@ function isLikelyProductImage(src: string): boolean {
     return true;
   }
   return false;
+}
+
+function normalizeImageUrl(image: string, baseUrl: string): string {
+  if (image.startsWith("//")) return "https:" + image;
+  if (image.startsWith("/")) {
+    const urlObj = new URL(baseUrl);
+    return urlObj.origin + image;
+  }
+  return image;
+}
+
+// Fallback: use Microlink API (free, uses headless browser)
+async function fetchViaMetadataApi(url: string): Promise<string | null> {
+  try {
+    const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+    const res = await fetch(apiUrl, {
+      signal: AbortSignal.timeout(15000),
+    });
+    const data = await res.json();
+    if (data?.data?.image?.url) {
+      return data.data.image.url;
+    }
+    if (data?.data?.logo?.url) {
+      return data.data.logo.url;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(request: Request) {
@@ -151,26 +178,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Try fetching the page with full browser-like headers
-    const response = await fetch(url, {
-      headers: BROWSER_HEADERS,
-      redirect: "follow",
-      signal: AbortSignal.timeout(15000),
-    });
+    // Strategy 1: Direct fetch with browser-like headers
+    try {
+      const response = await fetch(url, {
+        headers: BROWSER_HEADERS,
+        redirect: "follow",
+        signal: AbortSignal.timeout(10000),
+      });
 
-    const html = await response.text();
-    const image = extractImageFromHtml(html);
+      const html = await response.text();
+      const image = extractImageFromHtml(html);
 
-    if (image) {
-      // Make sure it's an absolute URL
-      let absoluteImage = image;
-      if (image.startsWith("//")) {
-        absoluteImage = "https:" + image;
-      } else if (image.startsWith("/")) {
-        const urlObj = new URL(url);
-        absoluteImage = urlObj.origin + image;
+      if (image) {
+        return NextResponse.json({ image: normalizeImageUrl(image, url) });
       }
-      return NextResponse.json({ image: absoluteImage });
+    } catch {
+      // Direct fetch failed, try fallback
+    }
+
+    // Strategy 2: Use Microlink API (headless browser)
+    const apiImage = await fetchViaMetadataApi(url);
+    if (apiImage) {
+      return NextResponse.json({ image: apiImage });
     }
 
     return NextResponse.json({ image: null, message: "לא נמצאה תמונה" });

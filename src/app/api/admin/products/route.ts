@@ -2,7 +2,51 @@ import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
+function isAliExpressUrl(url: string): boolean {
+  return /aliexpress\.com|aliexpress\.us|ali\.ski/i.test(url);
+}
+
+function isBarcodeLikeImage(src: string): boolean {
+  const lower = src.toLowerCase();
+  return (
+    lower.includes("barcode") ||
+    lower.includes("qrcode") ||
+    lower.includes("qr-code") ||
+    lower.includes("bar-code")
+  );
+}
+
+function extractAliExpressImage(html: string): string | null {
+  const patterns = [
+    /"imageUrl"\s*:\s*"([^"]+)"/,
+    /"imgUrl"\s*:\s*"([^"]+)"/,
+    /"productImage"\s*:\s*"([^"]+)"/,
+    /"mainImageUrl"\s*:\s*"([^"]+)"/,
+    /"imagePathList"\s*:\s*\["([^"]+)"/,
+  ];
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (match?.[1] && !isBarcodeLikeImage(match[1])) {
+      let img = match[1];
+      if (img.startsWith("//")) img = "https:" + img;
+      return img;
+    }
+  }
+  // Try any alicdn image URL in the HTML
+  const cdnMatch = html.match(
+    /(https?:)?\/\/[a-z0-9-]+\.(?:alicdn\.com|aliexpress-media\.com)\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/i
+  );
+  if (cdnMatch) {
+    let img = cdnMatch[0];
+    if (img.startsWith("//")) img = "https:" + img;
+    if (!isBarcodeLikeImage(img)) return img;
+  }
+  return null;
+}
+
 async function fetchOgImage(url: string): Promise<string | null> {
+  const isAliExpress = isAliExpressUrl(url);
+
   // Strategy 1: Direct fetch
   try {
     const response = await fetch(url, {
@@ -24,6 +68,12 @@ async function fetchOgImage(url: string): Promise<string | null> {
     });
     const html = await response.text();
 
+    // For AliExpress, try specific extraction first
+    if (isAliExpress) {
+      const aliImage = extractAliExpressImage(html);
+      if (aliImage) return aliImage;
+    }
+
     // 1. Try og:image
     const ogMatch =
       html.match(
@@ -32,7 +82,8 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i
       );
-    if (ogMatch?.[1]) return normalizeImageUrl(ogMatch[1], url);
+    if (ogMatch?.[1] && (!isAliExpress || !isBarcodeLikeImage(ogMatch[1])))
+      return normalizeImageUrl(ogMatch[1], url);
 
     // 2. Try twitter:image
     const twitterMatch =
@@ -42,7 +93,8 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i
       );
-    if (twitterMatch?.[1]) return normalizeImageUrl(twitterMatch[1], url);
+    if (twitterMatch?.[1] && (!isAliExpress || !isBarcodeLikeImage(twitterMatch[1])))
+      return normalizeImageUrl(twitterMatch[1], url);
 
     // 3. Try JSON-LD structured data
     const jsonLdMatches = html.matchAll(
@@ -52,7 +104,8 @@ async function fetchOgImage(url: string): Promise<string | null> {
       try {
         const data = JSON.parse(m[1]);
         const img = extractJsonLdImage(data);
-        if (img) return normalizeImageUrl(img, url);
+        if (img && (!isAliExpress || !isBarcodeLikeImage(img)))
+          return normalizeImageUrl(img, url);
       } catch {
         // ignore
       }
@@ -62,18 +115,43 @@ async function fetchOgImage(url: string): Promise<string | null> {
     const itempropMatch = html.match(
       /<(?:img|meta)[^>]*itemprop=["']image["'][^>]*(?:src|content)=["']([^"']+)["']/i
     );
-    if (itempropMatch?.[1]) return normalizeImageUrl(itempropMatch[1], url);
+    if (itempropMatch?.[1] && (!isAliExpress || !isBarcodeLikeImage(itempropMatch[1])))
+      return normalizeImageUrl(itempropMatch[1], url);
   } catch {
     // Direct fetch failed, try fallback
   }
 
-  // Strategy 2: Microlink API fallback (headless browser)
+  // Strategy 2: For AliExpress, try mobile version
+  if (isAliExpress) {
+    try {
+      const mobileUrl = url.replace(
+        /\/\/(www\.|he\.|[a-z]{2}\.)?aliexpress\.(com|us)/,
+        "//m.aliexpress.$2"
+      );
+      const response = await fetch(mobileUrl, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+        redirect: "follow",
+        signal: AbortSignal.timeout(10000),
+      });
+      const html = await response.text();
+      const aliImage = extractAliExpressImage(html);
+      if (aliImage) return aliImage;
+    } catch {
+      // mobile fetch failed
+    }
+  }
+
+  // Strategy 3: Microlink API fallback (headless browser)
   try {
     const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
     const data = await res.json();
-    if (data?.data?.image?.url) return data.data.image.url;
-    if (data?.data?.logo?.url) return data.data.logo.url;
+    if (data?.data?.image?.url && !isBarcodeLikeImage(data.data.image.url))
+      return data.data.image.url;
   } catch {
     // fallback also failed
   }

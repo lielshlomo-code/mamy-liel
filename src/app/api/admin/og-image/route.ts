@@ -32,7 +32,10 @@ function isAliExpressUrl(url: string): boolean {
   return /aliexpress\.com|aliexpress\.us|ali\.ski/i.test(url);
 }
 
-function isBarcodeLikeImage(src: string): boolean {
+function isBadImage(src: string): boolean {
+  if (!src) return true;
+  // Reject base64/data URLs - product images are always on CDNs
+  if (src.startsWith("data:")) return true;
   const lower = src.toLowerCase();
   return (
     lower.includes("barcode") ||
@@ -54,7 +57,7 @@ function extractImageFromHtml(html: string, filterBarcode = false): string | nul
     html.match(
       /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i
     );
-  if (ogMatch?.[1] && (!filterBarcode || !isBarcodeLikeImage(ogMatch[1]))) {
+  if (ogMatch?.[1] && (!filterBarcode || !isBadImage(ogMatch[1]))) {
     return ogMatch[1];
   }
 
@@ -66,7 +69,7 @@ function extractImageFromHtml(html: string, filterBarcode = false): string | nul
     html.match(
       /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i
     );
-  if (twitterMatch?.[1] && (!filterBarcode || !isBarcodeLikeImage(twitterMatch[1]))) {
+  if (twitterMatch?.[1] && (!filterBarcode || !isBadImage(twitterMatch[1]))) {
     return twitterMatch[1];
   }
 
@@ -78,7 +81,7 @@ function extractImageFromHtml(html: string, filterBarcode = false): string | nul
     try {
       const data = JSON.parse(m[1]);
       const img = extractImageFromJsonLd(data);
-      if (img && (!filterBarcode || !isBarcodeLikeImage(img))) return img;
+      if (img && (!filterBarcode || !isBadImage(img))) return img;
     } catch {
       // ignore
     }
@@ -98,7 +101,7 @@ function extractImageFromHtml(html: string, filterBarcode = false): string | nul
   ];
   for (const imgMatch of imgMatches) {
     const src = imgMatch[1];
-    if (isLikelyProductImage(src) && (!filterBarcode || !isBarcodeLikeImage(src))) {
+    if (isLikelyProductImage(src) && (!filterBarcode || !isBadImage(src))) {
       return src;
     }
   }
@@ -123,7 +126,7 @@ function extractAliExpressImage(html: string): string | null {
 
   for (const pattern of patterns) {
     const match = html.match(pattern);
-    if (match?.[1] && !isBarcodeLikeImage(match[1])) {
+    if (match?.[1] && !isBadImage(match[1])) {
       let img = match[1];
       if (img.startsWith("//")) img = "https:" + img;
       return img;
@@ -137,7 +140,7 @@ function extractAliExpressImage(html: string): string | null {
   if (cdnMatch) {
     let img = cdnMatch[0];
     if (img.startsWith("//")) img = "https:" + img;
-    if (!isBarcodeLikeImage(img)) return img;
+    if (!isBadImage(img)) return img;
   }
 
   return null;
@@ -216,7 +219,7 @@ async function fetchViaMetadataApi(url: string): Promise<string | null> {
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
     const data = await res.json();
     const imageUrl = data?.data?.image?.url;
-    if (imageUrl && !isBarcodeLikeImage(imageUrl)) {
+    if (imageUrl && !isBadImage(imageUrl)) {
       return imageUrl;
     }
     return null;

@@ -6,7 +6,9 @@ function isAliExpressUrl(url: string): boolean {
   return /aliexpress\.com|aliexpress\.us|ali\.ski/i.test(url);
 }
 
-function isBarcodeLikeImage(src: string): boolean {
+function isBadImage(src: string): boolean {
+  if (!src) return true;
+  if (src.startsWith("data:")) return true;
   const lower = src.toLowerCase();
   return (
     lower.includes("barcode") ||
@@ -26,7 +28,7 @@ function extractAliExpressImage(html: string): string | null {
   ];
   for (const pattern of patterns) {
     const match = html.match(pattern);
-    if (match?.[1] && !isBarcodeLikeImage(match[1])) {
+    if (match?.[1] && !isBadImage(match[1])) {
       let img = match[1];
       if (img.startsWith("//")) img = "https:" + img;
       return img;
@@ -39,7 +41,7 @@ function extractAliExpressImage(html: string): string | null {
   if (cdnMatch) {
     let img = cdnMatch[0];
     if (img.startsWith("//")) img = "https:" + img;
-    if (!isBarcodeLikeImage(img)) return img;
+    if (!isBadImage(img)) return img;
   }
   return null;
 }
@@ -82,7 +84,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i
       );
-    if (ogMatch?.[1] && (!isAliExpress || !isBarcodeLikeImage(ogMatch[1])))
+    if (ogMatch?.[1] && (!isAliExpress || !isBadImage(ogMatch[1])))
       return normalizeImageUrl(ogMatch[1], url);
 
     // 2. Try twitter:image
@@ -93,7 +95,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i
       );
-    if (twitterMatch?.[1] && (!isAliExpress || !isBarcodeLikeImage(twitterMatch[1])))
+    if (twitterMatch?.[1] && (!isAliExpress || !isBadImage(twitterMatch[1])))
       return normalizeImageUrl(twitterMatch[1], url);
 
     // 3. Try JSON-LD structured data
@@ -104,7 +106,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
       try {
         const data = JSON.parse(m[1]);
         const img = extractJsonLdImage(data);
-        if (img && (!isAliExpress || !isBarcodeLikeImage(img)))
+        if (img && (!isAliExpress || !isBadImage(img)))
           return normalizeImageUrl(img, url);
       } catch {
         // ignore
@@ -115,7 +117,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
     const itempropMatch = html.match(
       /<(?:img|meta)[^>]*itemprop=["']image["'][^>]*(?:src|content)=["']([^"']+)["']/i
     );
-    if (itempropMatch?.[1] && (!isAliExpress || !isBarcodeLikeImage(itempropMatch[1])))
+    if (itempropMatch?.[1] && (!isAliExpress || !isBadImage(itempropMatch[1])))
       return normalizeImageUrl(itempropMatch[1], url);
   } catch {
     // Direct fetch failed, try fallback
@@ -150,7 +152,7 @@ async function fetchOgImage(url: string): Promise<string | null> {
     const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
     const res = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
     const data = await res.json();
-    if (data?.data?.image?.url && !isBarcodeLikeImage(data.data.image.url))
+    if (data?.data?.image?.url && !isBadImage(data.data.image.url))
       return data.data.image.url;
   } catch {
     // fallback also failed

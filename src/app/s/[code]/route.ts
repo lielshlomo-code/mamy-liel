@@ -18,7 +18,7 @@ export async function GET(
   }
 
   // Increment click count (fire and forget)
-  supabase.rpc("increment_short_link_clicks", { link_code: code }).catch(() => {});
+  supabase.rpc("increment_short_link_clicks", { link_code: code }).then(() => {});
 
   return NextResponse.redirect(data.target_url);
 }

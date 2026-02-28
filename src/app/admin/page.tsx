@@ -2,16 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Package, PenLine, Link2, Eye } from "lucide-react";
+import { Package, PenLine, Link2, Scissors, Eye } from "lucide-react";
 
 interface Stats {
   products: number;
   posts: number;
   links: number;
+  shortLinks: number;
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats>({ products: 0, posts: 0, links: 0 });
+  const [stats, setStats] = useState<Stats>({ products: 0, posts: 0, links: 0, shortLinks: 0 });
 
   useEffect(() => {
     fetch("/api/admin/stats")
@@ -39,6 +40,12 @@ export default function AdminDashboard() {
       href: "/admin/links",
       icon: Link2,
     },
+    {
+      label: "לינקים מקוצרים",
+      count: stats.shortLinks,
+      href: "/admin/short-links",
+      icon: Scissors,
+    },
   ];
 
   return (
@@ -55,7 +62,7 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
@@ -94,6 +101,12 @@ export default function AdminDashboard() {
             className="px-4 py-2 rounded-full bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors"
           >
             + קישור חדש
+          </Link>
+          <Link
+            href="/admin/short-links?new=true"
+            className="px-4 py-2 rounded-full bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors"
+          >
+            + לינק מקוצר
           </Link>
         </div>
       </div>

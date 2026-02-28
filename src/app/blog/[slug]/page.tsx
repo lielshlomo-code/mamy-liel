@@ -16,7 +16,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   try {
     const post = await getBlogPost(slug);
     return {
@@ -24,12 +25,13 @@ export async function generateMetadata({ params }: PageProps) {
       description: post.excerpt,
     };
   } catch {
-    return { title: "פוסט לא נמצא" };
+    return { title: "הדרכה לא נמצאה" };
   }
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
 
   let post;
   try {
@@ -52,7 +54,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           className="group inline-flex items-center gap-2 text-sm text-text-secondary hover:text-foreground transition-colors mb-12"
         >
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          חזרה לבלוג
+          חזרה להדרכות
         </Link>
 
         {/* Header */}
@@ -102,7 +104,7 @@ export default async function BlogPostPage({ params }: PageProps) {
             className="group inline-flex items-center gap-2 text-sm font-semibold hover:gap-3 transition-all"
           >
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            חזרה לכל הפוסטים
+            חזרה לכל ההדרכות
           </Link>
         </div>
       </div>

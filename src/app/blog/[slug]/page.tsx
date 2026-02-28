@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { getAllBlogPosts, getBlogPost } from "@/lib/content";
 import { compileMDX } from "next-mdx-remote/rsc";
+import InstagramEmbed from "@/components/blog/InstagramEmbed";
 
 export const dynamic = "force-dynamic";
 
@@ -36,11 +37,8 @@ function getYouTubeEmbedUrl(url: string): string | null {
   return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 
-function getInstagramEmbedUrl(url: string): string | null {
-  const match = url.match(
-    /instagram\.com\/(?:reel|p|tv)\/([a-zA-Z0-9_-]+)/
-  );
-  return match ? `https://www.instagram.com/reel/${match[1]}/embed/` : null;
+function isInstagramUrl(url: string): boolean {
+  return /instagram\.com\/(?:reel|p|tv)\//i.test(url);
 }
 
 function isVideoUrl(url: string): boolean {
@@ -67,7 +65,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   });
 
   const youtubeEmbed = post.mediaUrl ? getYouTubeEmbedUrl(post.mediaUrl) : null;
-  const instagramEmbed = post.mediaUrl ? getInstagramEmbedUrl(post.mediaUrl) : null;
+  const isInstagram = post.mediaUrl ? isInstagramUrl(post.mediaUrl) : false;
 
   return (
     <article className="pt-28 pb-24">
@@ -146,17 +144,8 @@ export default async function BlogPostPage({ params }: PageProps) {
                   allowFullScreen
                 />
               </div>
-            ) : instagramEmbed ? (
-              <div className="flex justify-center">
-                <iframe
-                  src={instagramEmbed}
-                  title={post.title}
-                  className="rounded-2xl border-0"
-                  width="400"
-                  height="500"
-                  allowFullScreen
-                />
-              </div>
+            ) : isInstagram ? (
+              <InstagramEmbed url={post.mediaUrl} />
             ) : isVideoUrl(post.mediaUrl) ? (
               <video
                 src={post.mediaUrl}

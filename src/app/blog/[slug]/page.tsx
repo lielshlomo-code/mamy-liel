@@ -4,19 +4,21 @@ import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { getAllBlogPosts, getBlogPost } from "@/lib/content";
 import { compileMDX } from "next-mdx-remote/rsc";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
-  const posts = getAllBlogPosts();
+  const posts = await getAllBlogPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   try {
-    const post = getBlogPost(slug);
+    const post = await getBlogPost(slug);
     return {
       title: post.title,
       description: post.excerpt,
@@ -31,7 +33,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   let post;
   try {
-    post = getBlogPost(slug);
+    post = await getBlogPost(slug);
   } catch {
     notFound();
   }

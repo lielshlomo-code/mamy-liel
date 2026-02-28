@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { verifySession } from "@/lib/auth";
-import { getAllBlogPosts, getBlogPost } from "@/lib/content";
-
-const blogDir = path.join(process.cwd(), "src/content/blog");
+import { supabase } from "@/lib/supabase";
+import readingTime from "reading-time";
 
 export async function GET() {
   const isAuth = await verifySession();
@@ -12,7 +9,24 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const posts = getAllBlogPosts();
+  const { data } = await supabase
+    .from("blog_posts")
+    .select("slug, title, date, excerpt, image, tags, content")
+    .order("date", { ascending: false });
+
+  const posts = (data || []).map((post) => {
+    const stats = readingTime(post.content || "");
+    return {
+      slug: post.slug,
+      title: post.title,
+      date: post.date,
+      excerpt: post.excerpt,
+      image: post.image,
+      tags: post.tags,
+      readingTime: stats.text.replace("read", "קריאה"),
+    };
+  });
+
   return NextResponse.json(posts);
 }
 
@@ -25,32 +39,25 @@ export async function POST(request: Request) {
   try {
     const { title, excerpt, tags, content } = await request.json();
 
-    const slug = title
-      .replace(/[^\u0590-\u05FFa-zA-Z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .toLowerCase()
-      || `post-${Date.now()}`;
+    const slug =
+      title
+        .replace(/[^\u0590-\u05FFa-zA-Z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .toLowerCase() || `post-${Date.now()}`;
 
     const date = new Date().toISOString().split("T")[0];
-    const tagsLine = tags && tags.length > 0
-      ? `tags: [${tags.map((t: string) => `"${t}"`).join(", ")}]`
-      : "";
 
-    const mdx = `---
-title: "${title}"
-date: "${date}"
-excerpt: "${excerpt}"
-${tagsLine}
----
+    const { error } = await supabase.from("blog_posts").insert({
+      slug,
+      title,
+      date,
+      excerpt,
+      image: null,
+      tags: tags || [],
+      content: content || "",
+    });
 
-${content}
-`;
-
-    if (!fs.existsSync(blogDir)) {
-      fs.mkdirSync(blogDir, { recursive: true });
-    }
-
-    fs.writeFileSync(path.join(blogDir, `${slug}.mdx`), mdx, "utf8");
+    if (error) throw error;
 
     return NextResponse.json({ slug, title, date });
   } catch {
@@ -67,22 +74,17 @@ export async function PUT(request: Request) {
   try {
     const { slug, title, excerpt, tags, content } = await request.json();
 
-    const post = getBlogPost(slug);
-    const tagsLine = tags && tags.length > 0
-      ? `tags: [${tags.map((t: string) => `"${t}"`).join(", ")}]`
-      : "";
+    const { error } = await supabase
+      .from("blog_posts")
+      .update({
+        title,
+        excerpt,
+        tags: tags || [],
+        content: content || "",
+      })
+      .eq("slug", slug);
 
-    const mdx = `---
-title: "${title}"
-date: "${post.date}"
-excerpt: "${excerpt}"
-${tagsLine}
----
-
-${content}
-`;
-
-    fs.writeFileSync(path.join(blogDir, `${slug}.mdx`), mdx, "utf8");
+    if (error) throw error;
 
     return NextResponse.json({ slug, title });
   } catch {
@@ -98,11 +100,13 @@ export async function DELETE(request: Request) {
 
   try {
     const { slug } = await request.json();
-    const filePath = path.join(blogDir, `${slug}.mdx`);
 
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    const { error } = await supabase
+      .from("blog_posts")
+      .delete()
+      .eq("slug", slug);
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch {

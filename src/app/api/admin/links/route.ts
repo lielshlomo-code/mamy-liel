@@ -1,19 +1,6 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { verifySession } from "@/lib/auth";
-import { getSocialLinks } from "@/lib/content";
-
-const filePath = path.join(process.cwd(), "src/content/social-links.json");
-
-function readLinksFile() {
-  const raw = fs.readFileSync(filePath, "utf8");
-  return JSON.parse(raw);
-}
-
-function writeLinksFile(data: { links: unknown[] }) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
-}
+import { supabase } from "@/lib/supabase";
 
 export async function GET() {
   const isAuth = await verifySession();
@@ -21,8 +8,17 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const links = getSocialLinks();
-  return NextResponse.json(links);
+  const { data } = await supabase.from("social_links").select("*");
+
+  return NextResponse.json(
+    (data || []).map((l) => ({
+      id: l.id,
+      label: l.label,
+      url: l.url,
+      icon: l.icon,
+      internal: l.internal,
+    }))
+  );
 }
 
 export async function POST(request: Request) {
@@ -33,13 +29,23 @@ export async function POST(request: Request) {
 
   try {
     const link = await request.json();
-    const data = readLinksFile();
+    const id = `link-${Date.now()}`;
 
-    link.id = `link-${Date.now()}`;
-    data.links.push(link);
-    writeLinksFile(data);
+    const { data, error } = await supabase
+      .from("social_links")
+      .insert({
+        id,
+        label: link.label,
+        url: link.url,
+        icon: link.icon,
+        internal: link.internal || false,
+      })
+      .select()
+      .single();
 
-    return NextResponse.json(link);
+    if (error) throw error;
+
+    return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: "שגיאה בהוספת קישור" }, { status: 500 });
   }
@@ -53,17 +59,25 @@ export async function PUT(request: Request) {
 
   try {
     const updated = await request.json();
-    const data = readLinksFile();
 
-    const idx = data.links.findIndex((l: { id: string }) => l.id === updated.id);
-    if (idx === -1) {
+    const { data, error } = await supabase
+      .from("social_links")
+      .update({
+        label: updated.label,
+        url: updated.url,
+        icon: updated.icon,
+        internal: updated.internal,
+      })
+      .eq("id", updated.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    if (!data) {
       return NextResponse.json({ error: "קישור לא נמצא" }, { status: 404 });
     }
 
-    data.links[idx] = { ...data.links[idx], ...updated };
-    writeLinksFile(data);
-
-    return NextResponse.json(data.links[idx]);
+    return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: "שגיאה בעדכון קישור" }, { status: 500 });
   }
@@ -77,10 +91,13 @@ export async function DELETE(request: Request) {
 
   try {
     const { id } = await request.json();
-    const data = readLinksFile();
 
-    data.links = data.links.filter((l: { id: string }) => l.id !== id);
-    writeLinksFile(data);
+    const { error } = await supabase
+      .from("social_links")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch {

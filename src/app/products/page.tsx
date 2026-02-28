@@ -3,13 +3,15 @@ import { getProductsData } from "@/lib/content";
 import ProductGrid from "@/components/products/ProductGrid";
 import PageHeader from "@/components/ui/PageHeader";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "מוצרים שאני אוהבת",
   description: "המוצרים שאני משתפת וממליצה עליהם",
 };
 
-export default function ProductsPage() {
-  const { products, categories } = getProductsData();
+export default async function ProductsPage() {
+  const { products, categories } = await getProductsData();
 
   const sorted = [...products].sort(
     (a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime()

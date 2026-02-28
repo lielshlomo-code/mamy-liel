@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   try {
@@ -14,17 +15,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // For now, just log the submission
-    // In production, integrate with an email service like Resend
-    console.log("New contact form submission:", {
-      brandName,
-      contactName,
+    const { error } = await supabase.from("contact_submissions").insert({
+      brand_name: brandName,
+      contact_name: contactName,
       email,
-      phone: body.phone,
+      phone: body.phone || null,
       type,
       message,
-      timestamp: new Date().toISOString(),
     });
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch {

@@ -65,8 +65,8 @@ function FeaturedProductCard({ product, index }: { product: Product; index: numb
   );
 }
 
-export default function FeaturedProducts() {
-  const products = getFeaturedProducts();
+export default async function FeaturedProducts() {
+  const products = await getFeaturedProducts();
 
   if (products.length === 0) return null;
 

@@ -3,13 +3,15 @@ import { getAllBlogPosts } from "@/lib/content";
 import BlogCard from "@/components/blog/BlogCard";
 import PageHeader from "@/components/ui/PageHeader";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "בלוג",
   description: "טיפים, חוויות ותוכן על אמהות, תינוקות וחיים",
 };
 
-export default function BlogPage() {
-  const posts = getAllBlogPosts();
+export default async function BlogPage() {
+  const posts = await getAllBlogPosts();
 
   return (
     <div className="pt-24">

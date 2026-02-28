@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { verifySession } from "@/lib/auth";
-import { getProductsData } from "@/lib/content";
-
-const filePath = path.join(process.cwd(), "src/content/products.json");
+import { supabase } from "@/lib/supabase";
 
 async function fetchOgImage(url: string): Promise<string | null> {
   try {
@@ -48,8 +44,31 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const data = getProductsData();
-  return NextResponse.json(data);
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("*")
+    .order("id");
+
+  const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .order("date_added", { ascending: false });
+
+  const allCategory = { id: "all", label: "הכל" };
+
+  return NextResponse.json({
+    categories: [allCategory, ...(categories || [])],
+    products: (products || []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      category: p.category,
+      url: p.url,
+      image: p.image,
+      featured: p.featured,
+      dateAdded: p.date_added,
+    })),
+  });
 }
 
 export async function POST(request: Request) {
@@ -60,19 +79,36 @@ export async function POST(request: Request) {
 
   try {
     const product = await request.json();
-    const data = getProductsData();
 
-    product.id = `product-${Date.now()}`;
-    product.dateAdded = new Date().toISOString().split("T")[0];
+    const id = `product-${Date.now()}`;
+    const dateAdded = new Date().toISOString().split("T")[0];
 
-    if (!product.image && product.url) {
-      product.image = await fetchOgImage(product.url);
+    let image = product.image || null;
+    if (!image && product.url) {
+      image = await fetchOgImage(product.url);
     }
 
-    data.products.push(product);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+    const { data, error } = await supabase
+      .from("products")
+      .insert({
+        id,
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        url: product.url,
+        image,
+        featured: product.featured || false,
+        date_added: dateAdded,
+      })
+      .select()
+      .single();
 
-    return NextResponse.json(product);
+    if (error) throw error;
+
+    return NextResponse.json({
+      ...data,
+      dateAdded: data.date_added,
+    });
   } catch {
     return NextResponse.json({ error: "שגיאה בהוספת מוצר" }, { status: 500 });
   }
@@ -86,21 +122,35 @@ export async function PUT(request: Request) {
 
   try {
     const updated = await request.json();
-    const data = getProductsData();
 
-    const idx = data.products.findIndex((p) => p.id === updated.id);
-    if (idx === -1) {
+    let image = updated.image || null;
+    if (!image && updated.url) {
+      image = await fetchOgImage(updated.url);
+    }
+
+    const { data, error } = await supabase
+      .from("products")
+      .update({
+        name: updated.name,
+        description: updated.description,
+        category: updated.category,
+        url: updated.url,
+        image,
+        featured: updated.featured,
+      })
+      .eq("id", updated.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    if (!data) {
       return NextResponse.json({ error: "מוצר לא נמצא" }, { status: 404 });
     }
 
-    if (!updated.image && updated.url) {
-      updated.image = await fetchOgImage(updated.url);
-    }
-
-    data.products[idx] = { ...data.products[idx], ...updated };
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
-
-    return NextResponse.json(data.products[idx]);
+    return NextResponse.json({
+      ...data,
+      dateAdded: data.date_added,
+    });
   } catch {
     return NextResponse.json({ error: "שגיאה בעדכון מוצר" }, { status: 500 });
   }
@@ -114,10 +164,13 @@ export async function DELETE(request: Request) {
 
   try {
     const { id } = await request.json();
-    const data = getProductsData();
 
-    data.products = data.products.filter((p) => p.id !== id);
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch {

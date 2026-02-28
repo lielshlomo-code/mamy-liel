@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
 import readingTime from "reading-time";
+import { supabase } from "./supabase";
 import type {
   ProductsData,
   Product,
@@ -17,71 +17,110 @@ export function getSiteConfig(): SiteConfig {
   return JSON.parse(raw);
 }
 
-export function getProductsData(): ProductsData {
-  const raw = fs.readFileSync(path.join(contentDir, "products.json"), "utf8");
-  return JSON.parse(raw);
-}
+export async function getProductsData(): Promise<ProductsData> {
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("*")
+    .order("id");
 
-export function getProducts(): Product[] {
-  return getProductsData().products.sort(
-    (a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime()
-  );
-}
+  const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .order("date_added", { ascending: false });
 
-export function getFeaturedProducts(): Product[] {
-  return getProducts().filter((p) => p.featured);
-}
-
-export function getSocialLinks(): SocialLink[] {
-  const raw = fs.readFileSync(
-    path.join(contentDir, "social-links.json"),
-    "utf8"
-  );
-  return JSON.parse(raw).links;
-}
-
-const blogDir = path.join(contentDir, "blog");
-
-export function getAllBlogPosts(): BlogPost[] {
-  if (!fs.existsSync(blogDir)) return [];
-
-  const files = fs.readdirSync(blogDir).filter((f) => f.endsWith(".mdx"));
-
-  return files
-    .map((filename) => {
-      const slug = filename.replace(/\.mdx$/, "");
-      const raw = fs.readFileSync(path.join(blogDir, filename), "utf8");
-      const { data, content } = matter(raw);
-      const stats = readingTime(content);
-
-      return {
-        slug,
-        title: data.title || "",
-        date: data.date || "",
-        excerpt: data.excerpt || "",
-        image: data.image,
-        tags: data.tags,
-        readingTime: stats.text.replace("read", "קריאה"),
-      };
-    })
-    .sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-}
-
-export function getBlogPost(slug: string): BlogPost & { content: string } {
-  const raw = fs.readFileSync(path.join(blogDir, `${slug}.mdx`), "utf8");
-  const { data, content } = matter(raw);
-  const stats = readingTime(content);
+  const allCategory = { id: "all", label: "הכל" };
 
   return {
-    slug,
-    title: data.title || "",
-    date: data.date || "",
-    excerpt: data.excerpt || "",
+    categories: [allCategory, ...(categories || [])],
+    products: (products || []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      category: p.category,
+      url: p.url,
+      image: p.image,
+      featured: p.featured,
+      dateAdded: p.date_added,
+    })),
+  };
+}
+
+export async function getProducts(): Promise<Product[]> {
+  const data = await getProductsData();
+  return data.products;
+}
+
+export async function getFeaturedProducts(): Promise<Product[]> {
+  const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .eq("featured", true)
+    .order("date_added", { ascending: false });
+
+  return (products || []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    category: p.category,
+    url: p.url,
+    image: p.image,
+    featured: p.featured,
+    dateAdded: p.date_added,
+  }));
+}
+
+export async function getSocialLinks(): Promise<SocialLink[]> {
+  const { data } = await supabase.from("social_links").select("*");
+  return (data || []).map((l) => ({
+    id: l.id,
+    label: l.label,
+    url: l.url,
+    icon: l.icon,
+    internal: l.internal,
+  }));
+}
+
+export async function getAllBlogPosts(): Promise<BlogPost[]> {
+  const { data } = await supabase
+    .from("blog_posts")
+    .select("slug, title, date, excerpt, image, tags, content")
+    .order("date", { ascending: false });
+
+  return (data || []).map((post) => {
+    const stats = readingTime(post.content || "");
+    return {
+      slug: post.slug,
+      title: post.title,
+      date: post.date,
+      excerpt: post.excerpt,
+      image: post.image,
+      tags: post.tags,
+      readingTime: stats.text.replace("read", "קריאה"),
+    };
+  });
+}
+
+export async function getBlogPost(
+  slug: string
+): Promise<BlogPost & { content: string }> {
+  const { data } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  if (!data) throw new Error(`Blog post not found: ${slug}`);
+
+  const stats = readingTime(data.content || "");
+
+  return {
+    slug: data.slug,
+    title: data.title,
+    date: data.date,
+    excerpt: data.excerpt,
     image: data.image,
     tags: data.tags,
     readingTime: stats.text.replace("read", "קריאה"),
-    content,
+    content: data.content,
   };
 }

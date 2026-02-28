@@ -201,7 +201,7 @@ export default function AdminProducts() {
                 ) : (
                   <ImageIcon className="w-4 h-4" />
                 )}
-                שליפה מהקישור
+                מוצר מאלי
               </button>
             </div>
             {editing.image && (

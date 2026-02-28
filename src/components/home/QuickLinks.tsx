@@ -15,8 +15,8 @@ const quickLinks = [
   },
   {
     href: "/blog",
-    label: "בלוג",
-    description: "טיפים, חוויות ותוכן אישי",
+    label: "הדרכות ומתכונים",
+    description: "הדרכות, מתכונים וטיפים",
     icon: PenLine,
     num: "02",
   },

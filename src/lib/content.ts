@@ -83,7 +83,7 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
   const { data } = await supabase
     .from("blog_posts")
-    .select("slug, title, date, excerpt, image, tags, content")
+    .select("slug, title, date, excerpt, image, media_url, tags, content")
     .order("date", { ascending: false });
 
   return (data || []).map((post) => {
@@ -94,6 +94,7 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
       date: post.date,
       excerpt: post.excerpt,
       image: post.image,
+      mediaUrl: post.media_url,
       tags: post.tags,
       readingTime: stats.text.replace("read", "קריאה"),
     };
@@ -119,6 +120,7 @@ export async function getBlogPost(
     date: data.date,
     excerpt: data.excerpt,
     image: data.image,
+    mediaUrl: data.media_url,
     tags: data.tags,
     readingTime: stats.text.replace("read", "קריאה"),
     content: data.content,

@@ -11,7 +11,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from("blog_posts")
-    .select("slug, title, date, excerpt, image, tags, content")
+    .select("slug, title, date, excerpt, image, media_url, tags, content")
     .order("date", { ascending: false });
 
   const posts = (data || []).map((post) => {
@@ -22,6 +22,7 @@ export async function GET() {
       date: post.date,
       excerpt: post.excerpt,
       image: post.image,
+      mediaUrl: post.media_url,
       tags: post.tags,
       readingTime: stats.text.replace("read", "קריאה"),
     };
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { title, excerpt, tags, content } = await request.json();
+    const { title, excerpt, tags, content, image, mediaUrl } = await request.json();
 
     const slug =
       title
@@ -52,7 +53,8 @@ export async function POST(request: Request) {
       title,
       date,
       excerpt,
-      image: null,
+      image: image || null,
+      media_url: mediaUrl || null,
       tags: tags || [],
       content: content || "",
     });
@@ -61,7 +63,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ slug, title, date });
   } catch {
-    return NextResponse.json({ error: "שגיאה ביצירת פוסט" }, { status: 500 });
+    return NextResponse.json({ error: "שגיאה ביצירת הדרכה" }, { status: 500 });
   }
 }
 
@@ -72,13 +74,15 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { slug, title, excerpt, tags, content } = await request.json();
+    const { slug, title, excerpt, tags, content, image, mediaUrl } = await request.json();
 
     const { error } = await supabase
       .from("blog_posts")
       .update({
         title,
         excerpt,
+        image: image || null,
+        media_url: mediaUrl || null,
         tags: tags || [],
         content: content || "",
       })
@@ -88,7 +92,7 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({ slug, title });
   } catch {
-    return NextResponse.json({ error: "שגיאה בעדכון פוסט" }, { status: 500 });
+    return NextResponse.json({ error: "שגיאה בעדכון הדרכה" }, { status: 500 });
   }
 }
 
@@ -110,6 +114,6 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json({ error: "שגיאה במחיקת פוסט" }, { status: 500 });
+    return NextResponse.json({ error: "שגיאה במחיקת הדרכה" }, { status: 500 });
   }
 }

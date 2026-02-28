@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, ImageIcon } from "lucide-react";
 import type { BlogPost } from "@/lib/types";
 
 const emptyPost = {
   title: "",
   excerpt: "",
+  image: "",
+  mediaUrl: "",
   tags: [] as string[],
   content: "",
 };
@@ -17,6 +19,8 @@ export default function AdminBlog() {
     slug?: string;
     title: string;
     excerpt: string;
+    image: string;
+    mediaUrl: string;
     tags: string[];
     content: string;
   } | null>(null);
@@ -59,7 +63,7 @@ export default function AdminBlog() {
   };
 
   const handleDelete = async (slug: string) => {
-    if (!confirm("למחוק את הפוסט?")) return;
+    if (!confirm("למחוק את ההדרכה?")) return;
 
     await fetch("/api/admin/blog", {
       method: "DELETE",
@@ -78,6 +82,8 @@ export default function AdminBlog() {
         slug: post.slug,
         title: post.title,
         excerpt: post.excerpt,
+        image: post.image || "",
+        mediaUrl: data.mediaUrl || "",
         tags: post.tags || [],
         content: data.content || "",
       });
@@ -86,10 +92,15 @@ export default function AdminBlog() {
     }
   };
 
+  const isVideoUrl = (url: string) => {
+    return /\.(mp4|webm|mov)(\?|$)/i.test(url) ||
+      /youtube\.com|youtu\.be|vimeo\.com/i.test(url);
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">ניהול פוסטים</h1>
+        <h1 className="text-2xl font-bold">ניהול הדרכות ומתכונים</h1>
         <button
           onClick={() => {
             setEditing({ ...emptyPost });
@@ -99,7 +110,7 @@ export default function AdminBlog() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors"
         >
           <Plus className="w-4 h-4" />
-          פוסט חדש
+          הדרכה חדשה
         </button>
       </div>
 
@@ -108,7 +119,7 @@ export default function AdminBlog() {
         <div className="bg-white rounded-xl border border-border p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">
-              {isNew ? "פוסט חדש" : "עריכת פוסט"}
+              {isNew ? "הדרכה חדשה" : "עריכת הדרכה"}
             </h2>
             <button
               onClick={() => {
@@ -145,6 +156,34 @@ export default function AdminBlog() {
               />
             </div>
 
+            {/* Cover image */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">תמונת נושא (קישור לתמונה)</label>
+              <input
+                type="url"
+                dir="ltr"
+                placeholder="https://example.com/image.jpg"
+                value={editing.image}
+                onChange={(e) =>
+                  setEditing({ ...editing, image: e.target.value })
+                }
+                className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+              />
+              {editing.image && (
+                <div className="mt-2 relative w-40 h-24 rounded-lg overflow-hidden border border-border bg-muted">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={editing.image}
+                    alt="תמונת נושא"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">
                 תגיות (מופרדות בפסיק)
@@ -172,6 +211,43 @@ export default function AdminBlog() {
                 dir="rtl"
               />
             </div>
+
+            {/* Media at end of tutorial */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">תמונה / סרטון בסוף ההדרכה</label>
+              <p className="text-xs text-text-secondary">קישור לתמונה או סרטון (YouTube, mp4 וכו&#39;)</p>
+              <input
+                type="url"
+                dir="ltr"
+                placeholder="https://example.com/video.mp4 או קישור YouTube"
+                value={editing.mediaUrl}
+                onChange={(e) =>
+                  setEditing({ ...editing, mediaUrl: e.target.value })
+                }
+                className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+              />
+              {editing.mediaUrl && (
+                <div className="mt-2">
+                  {isVideoUrl(editing.mediaUrl) ? (
+                    <p className="text-xs text-green-600 flex items-center gap-1">
+                      סרטון יוצג בסוף ההדרכה
+                    </p>
+                  ) : (
+                    <div className="relative w-40 h-24 rounded-lg overflow-hidden border border-border bg-muted">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={editing.mediaUrl}
+                        alt="מדיה בסוף ההדרכה"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           <button
@@ -188,7 +264,7 @@ export default function AdminBlog() {
       <div className="bg-white rounded-xl border border-border overflow-hidden">
         {posts.length === 0 ? (
           <p className="text-center text-text-secondary py-12">
-            אין פוסטים עדיין
+            אין הדרכות עדיין
           </p>
         ) : (
           <table className="w-full text-sm">
@@ -207,7 +283,23 @@ export default function AdminBlog() {
                   key={post.slug}
                   className="border-b border-border last:border-0"
                 >
-                  <td className="px-4 py-3 font-medium">{post.title}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <div className="flex items-center gap-3">
+                      {post.image ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                          <ImageIcon className="w-4 h-4 text-text-secondary" />
+                        </div>
+                      )}
+                      {post.title}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary">
                     {new Date(post.date).toLocaleDateString("he-IL")}
                   </td>

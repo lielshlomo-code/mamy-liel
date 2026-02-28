@@ -34,6 +34,7 @@ export async function GET(request: Request) {
     date: data.date,
     excerpt: data.excerpt,
     image: data.image,
+    mediaUrl: data.media_url,
     tags: data.tags,
     readingTime: stats.text.replace("read", "קריאה"),
     content: data.content,

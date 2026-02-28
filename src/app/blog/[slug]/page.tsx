@@ -29,6 +29,20 @@ export async function generateMetadata({ params }: PageProps) {
   }
 }
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+  );
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+}
+
+function isVideoUrl(url: string): boolean {
+  return (
+    /\.(mp4|webm|mov)(\?|$)/i.test(url) ||
+    /youtube\.com|youtu\.be|vimeo\.com/i.test(url)
+  );
+}
+
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
@@ -44,6 +58,8 @@ export default async function BlogPostPage({ params }: PageProps) {
     source: post.content,
     options: { parseFrontmatter: false },
   });
+
+  const youtubeEmbed = post.mediaUrl ? getYouTubeEmbedUrl(post.mediaUrl) : null;
 
   return (
     <article className="pt-28 pb-24">
@@ -92,10 +108,53 @@ export default async function BlogPostPage({ params }: PageProps) {
           <div className="w-16 h-[2px] bg-foreground mt-8" />
         </header>
 
+        {/* Cover image */}
+        {post.image && (
+          <div className="mb-12 rounded-2xl overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        )}
+
         {/* Content */}
         <div className="prose prose-lg max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-foreground prose-p:text-text-secondary prose-p:leading-relaxed prose-p:text-base prose-a:text-foreground prose-a:underline prose-a:underline-offset-4 prose-strong:text-foreground prose-li:text-text-secondary prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-ul:my-6 prose-li:my-1">
           {content}
         </div>
+
+        {/* Media at end of tutorial */}
+        {post.mediaUrl && (
+          <div className="mt-12 rounded-2xl overflow-hidden">
+            {youtubeEmbed ? (
+              <div className="aspect-video">
+                <iframe
+                  src={youtubeEmbed}
+                  title={post.title}
+                  className="w-full h-full rounded-2xl"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : isVideoUrl(post.mediaUrl) ? (
+              <video
+                src={post.mediaUrl}
+                controls
+                className="w-full rounded-2xl"
+                preload="metadata"
+              />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={post.mediaUrl}
+                alt="תמונה נוספת"
+                className="w-full h-auto object-cover rounded-2xl"
+              />
+            )}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="border-t border-black/5 mt-16 pt-10">

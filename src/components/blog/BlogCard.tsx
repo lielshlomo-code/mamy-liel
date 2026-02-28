@@ -26,14 +26,28 @@ export default function BlogCard({
         href={`/blog/${post.slug}`}
         className="group block relative"
       >
-        {/* Image placeholder */}
+        {/* Cover image */}
         <div className="aspect-[16/10] rounded-2xl bg-muted overflow-hidden mb-5 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/[0.04] group-hover:to-black/[0.08] transition-colors duration-500" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[10rem] font-black text-black/[0.03] group-hover:scale-110 transition-transform duration-700 select-none">
-              {post.title.charAt(0)}
-            </span>
-          </div>
+          {post.image ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={post.image}
+                alt={post.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/[0.08] group-hover:to-black/[0.15] transition-colors duration-500" />
+            </>
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/[0.04] group-hover:to-black/[0.08] transition-colors duration-500" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-[10rem] font-black text-black/[0.03] group-hover:scale-110 transition-transform duration-700 select-none">
+                  {post.title.charAt(0)}
+                </span>
+              </div>
+            </>
+          )}
 
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (

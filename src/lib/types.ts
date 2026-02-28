@@ -48,9 +48,19 @@ export interface BlogPost {
   date: string;
   excerpt: string;
   image?: string;
+  mediaUrl?: string;
   tags?: string[];
   readingTime?: string;
   content?: string;
+}
+
+export interface ShortLink {
+  id: string;
+  code: string;
+  targetUrl: string;
+  title?: string;
+  clicks: number;
+  createdAt: string;
 }
 
 export interface Course {

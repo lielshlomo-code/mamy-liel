@@ -8,7 +8,7 @@ import { Menu, X } from "lucide-react";
 const navLinks = [
   { href: "/", label: "בית" },
   { href: "/products", label: "מוצרים" },
-  { href: "/blog", label: "בלוג" },
+  { href: "/blog", label: "הדרכות ומתכונים" },
   { href: "/contact", label: "שיתופי פעולה" },
   { href: "/links", label: "קישורים" },
 ];

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   date date NOT NULL,
   excerpt text NOT NULL,
   image text,
+  media_url text,
   tags text[],
   content text NOT NULL
 );

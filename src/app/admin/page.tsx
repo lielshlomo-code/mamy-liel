@@ -28,7 +28,7 @@ export default function AdminDashboard() {
       icon: Package,
     },
     {
-      label: "פוסטים",
+      label: "הדרכות ומתכונים",
       count: stats.posts,
       href: "/admin/blog",
       icon: PenLine,
@@ -87,7 +87,7 @@ export default function AdminDashboard() {
             href="/admin/blog?new=true"
             className="px-4 py-2 rounded-full bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors"
           >
-            + פוסט חדש
+            + הדרכה חדשה
           </Link>
           <Link
             href="/admin/links?new=true"

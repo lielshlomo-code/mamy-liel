@@ -8,6 +8,7 @@ import {
   Package,
   PenLine,
   Link2,
+  Scissors,
   LogOut,
   Menu,
   X,
@@ -16,8 +17,9 @@ import {
 const sidebarLinks = [
   { href: "/admin", label: "דשבורד", icon: LayoutDashboard },
   { href: "/admin/products", label: "מוצרים", icon: Package },
-  { href: "/admin/blog", label: "פוסטים", icon: PenLine },
+  { href: "/admin/blog", label: "הדרכות ומתכונים", icon: PenLine },
   { href: "/admin/links", label: "קישורים", icon: Link2 },
+  { href: "/admin/short-links", label: "קיצור לינקים", icon: Scissors },
 ];
 
 export default function AdminLayout({

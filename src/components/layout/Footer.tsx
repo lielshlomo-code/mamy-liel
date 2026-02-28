@@ -25,7 +25,7 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 {[
                   { href: "/products", label: "מוצרים" },
-                  { href: "/blog", label: "בלוג" },
+                  { href: "/blog", label: "הדרכות ומתכונים" },
                   { href: "/contact", label: "שיתופי פעולה" },
                   { href: "/links", label: "קישורים" },
                 ].map((link) => (

@@ -151,7 +151,7 @@ export default function ContactForm() {
           className="px-4 py-3 rounded-lg border border-border bg-white focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground transition-colors text-base"
         >
           <option value="">בחרו סוג</option>
-          <option value="sponsored">פוסט ממומן</option>
+          <option value="sponsored">הדרכה ממומנת</option>
           <option value="review">סקירת מוצר</option>
           <option value="ambassador">שגרירות מותג</option>
           <option value="other">אחר</option>

@@ -6,8 +6,8 @@ import PageHeader from "@/components/ui/PageHeader";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "בלוג",
-  description: "טיפים, חוויות ותוכן על אמהות, תינוקות וחיים",
+  title: "הדרכות ומתכונים",
+  description: "הדרכות, מתכונים וטיפים על אמהות, תינוקות וחיים",
 };
 
 export default async function BlogPage() {
@@ -16,8 +16,8 @@ export default async function BlogPage() {
   return (
     <div className="pt-24">
       <PageHeader
-        title="הבלוג"
-        subtitle="טיפים, חוויות והמלצות מהחיים שלי כאמא"
+        title="הדרכות ומתכונים"
+        subtitle="הדרכות, מתכונים וטיפים מהחיים שלי כאמא"
         num="02"
       />
       <div className="max-w-7xl mx-auto px-6 md:px-10 py-16">
@@ -29,7 +29,7 @@ export default async function BlogPage() {
           </div>
         ) : (
           <p className="text-center text-text-secondary py-24 text-lg">
-            פוסטים חדשים בקרוב...
+            הדרכות ומתכונים חדשים בקרוב...
           </p>
         )}
       </div>

@@ -74,7 +74,12 @@ export default function AdminProducts() {
       });
       const data = await res.json();
       if (data.image) {
-        setEditing({ ...editing, image: data.image });
+        const updates: Partial<typeof editing> = { image: data.image };
+        // If AliExpress API returned an affiliate link, replace the URL
+        if (data.affiliateLink) {
+          updates.url = data.affiliateLink;
+        }
+        setEditing({ ...editing, ...updates });
       } else {
         alert("לא נמצאה תמונה בקישור הזה. אפשר להדביק לינק לתמונה ידנית.");
       }

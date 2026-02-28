@@ -2,8 +2,19 @@ import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
+const ALI_API_URL =
+  "https://aliexpress-services-2-barshlom95.onrender.com/api/ali/product-info";
+
 function isAliExpressUrl(url: string): boolean {
   return /aliexpress\.com|aliexpress\.us|ali\.ski/i.test(url);
+}
+
+function extractAliExpressProductId(url: string): string | null {
+  const match =
+    url.match(/\/item\/(\d+)\.html/i) ||
+    url.match(/\/(\d{10,})\.html/i) ||
+    url.match(/productId=(\d+)/i);
+  return match?.[1] || null;
 }
 
 function isBadImage(src: string): boolean {
@@ -18,38 +29,36 @@ function isBadImage(src: string): boolean {
   );
 }
 
-function extractAliExpressImage(html: string): string | null {
-  const patterns = [
-    /"imageUrl"\s*:\s*"([^"]+)"/,
-    /"imgUrl"\s*:\s*"([^"]+)"/,
-    /"productImage"\s*:\s*"([^"]+)"/,
-    /"mainImageUrl"\s*:\s*"([^"]+)"/,
-    /"imagePathList"\s*:\s*\["([^"]+)"/,
-  ];
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    if (match?.[1] && !isBadImage(match[1])) {
-      let img = match[1];
-      if (img.startsWith("//")) img = "https:" + img;
-      return img;
+async function fetchOgImage(
+  url: string
+): Promise<{ image: string; affiliateLink?: string } | null> {
+  // Strategy 1: For AliExpress, use dedicated API
+  if (isAliExpressUrl(url)) {
+    const productId = extractAliExpressProductId(url);
+    if (productId) {
+      try {
+        const res = await fetch(ALI_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId, reviews: false }),
+          signal: AbortSignal.timeout(30000),
+        });
+        const data = await res.json();
+        const item = Array.isArray(data) ? data[0] : data;
+        const image = item?.productInfo?.product_main_image_url;
+        if (image) {
+          return {
+            image,
+            affiliateLink: item?.affiliateLink || undefined,
+          };
+        }
+      } catch {
+        // API failed, try fallback
+      }
     }
   }
-  // Try any alicdn image URL in the HTML
-  const cdnMatch = html.match(
-    /(https?:)?\/\/[a-z0-9-]+\.(?:alicdn\.com|aliexpress-media\.com)\/[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/i
-  );
-  if (cdnMatch) {
-    let img = cdnMatch[0];
-    if (img.startsWith("//")) img = "https:" + img;
-    if (!isBadImage(img)) return img;
-  }
-  return null;
-}
 
-async function fetchOgImage(url: string): Promise<string | null> {
-  const isAliExpress = isAliExpressUrl(url);
-
-  // Strategy 1: Direct fetch
+  // Strategy 2: Direct fetch with browser headers
   try {
     const response = await fetch(url, {
       headers: {
@@ -58,25 +67,14 @@ async function fetchOgImage(url: string): Promise<string | null> {
         Accept:
           "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
-        "Cache-Control": "no-cache",
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "none",
-        "Sec-Fetch-User": "?1",
-        "Upgrade-Insecure-Requests": "1",
       },
       redirect: "follow",
       signal: AbortSignal.timeout(10000),
     });
     const html = await response.text();
 
-    // For AliExpress, try specific extraction first
-    if (isAliExpress) {
-      const aliImage = extractAliExpressImage(html);
-      if (aliImage) return aliImage;
-    }
-
-    // 1. Try og:image
     const ogMatch =
       html.match(
         /<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i
@@ -84,10 +82,9 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i
       );
-    if (ogMatch?.[1] && (!isAliExpress || !isBadImage(ogMatch[1])))
-      return normalizeImageUrl(ogMatch[1], url);
+    if (ogMatch?.[1] && !isBadImage(ogMatch[1]))
+      return { image: normalizeImageUrl(ogMatch[1], url) };
 
-    // 2. Try twitter:image
     const twitterMatch =
       html.match(
         /<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i
@@ -95,10 +92,10 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i
       );
-    if (twitterMatch?.[1] && (!isAliExpress || !isBadImage(twitterMatch[1])))
-      return normalizeImageUrl(twitterMatch[1], url);
+    if (twitterMatch?.[1] && !isBadImage(twitterMatch[1]))
+      return { image: normalizeImageUrl(twitterMatch[1], url) };
 
-    // 3. Try JSON-LD structured data
+    // Try JSON-LD
     const jsonLdMatches = html.matchAll(
       /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
     );
@@ -106,56 +103,14 @@ async function fetchOgImage(url: string): Promise<string | null> {
       try {
         const data = JSON.parse(m[1]);
         const img = extractJsonLdImage(data);
-        if (img && (!isAliExpress || !isBadImage(img)))
-          return normalizeImageUrl(img, url);
+        if (img && !isBadImage(img))
+          return { image: normalizeImageUrl(img, url) };
       } catch {
         // ignore
       }
     }
-
-    // 4. Try itemprop="image"
-    const itempropMatch = html.match(
-      /<(?:img|meta)[^>]*itemprop=["']image["'][^>]*(?:src|content)=["']([^"']+)["']/i
-    );
-    if (itempropMatch?.[1] && (!isAliExpress || !isBadImage(itempropMatch[1])))
-      return normalizeImageUrl(itempropMatch[1], url);
   } catch {
-    // Direct fetch failed, try fallback
-  }
-
-  // Strategy 2: For AliExpress, try mobile version
-  if (isAliExpress) {
-    try {
-      const mobileUrl = url.replace(
-        /\/\/(www\.|he\.|[a-z]{2}\.)?aliexpress\.(com|us)/,
-        "//m.aliexpress.$2"
-      );
-      const response = await fetch(mobileUrl, {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
-          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        },
-        redirect: "follow",
-        signal: AbortSignal.timeout(10000),
-      });
-      const html = await response.text();
-      const aliImage = extractAliExpressImage(html);
-      if (aliImage) return aliImage;
-    } catch {
-      // mobile fetch failed
-    }
-  }
-
-  // Strategy 3: Microlink API fallback (headless browser)
-  try {
-    const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
-    const res = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
-    const data = await res.json();
-    if (data?.data?.image?.url && !isBadImage(data.data.image.url))
-      return data.data.image.url;
-  } catch {
-    // fallback also failed
+    // Direct fetch failed
   }
 
   return null;
@@ -239,8 +194,13 @@ export async function POST(request: Request) {
     const dateAdded = new Date().toISOString().split("T")[0];
 
     let image = product.image || null;
-    if (!image && product.url) {
-      image = await fetchOgImage(product.url);
+    let productUrl = product.url;
+    if (!image && productUrl) {
+      const result = await fetchOgImage(productUrl);
+      if (result) {
+        image = result.image;
+        if (result.affiliateLink) productUrl = result.affiliateLink;
+      }
     }
 
     const { data, error } = await supabase
@@ -250,7 +210,7 @@ export async function POST(request: Request) {
         name: product.name,
         description: product.description,
         category: product.category,
-        url: product.url,
+        url: productUrl,
         image,
         featured: product.featured || false,
         date_added: dateAdded,
@@ -279,8 +239,13 @@ export async function PUT(request: Request) {
     const updated = await request.json();
 
     let image = updated.image || null;
-    if (!image && updated.url) {
-      image = await fetchOgImage(updated.url);
+    let productUrl = updated.url;
+    if (!image && productUrl) {
+      const result = await fetchOgImage(productUrl);
+      if (result) {
+        image = result.image;
+        if (result.affiliateLink) productUrl = result.affiliateLink;
+      }
     }
 
     const { data, error } = await supabase
@@ -289,7 +254,7 @@ export async function PUT(request: Request) {
         name: updated.name,
         description: updated.description,
         category: updated.category,
-        url: updated.url,
+        url: productUrl,
         image,
         featured: updated.featured,
       })

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save, ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, ImageIcon, Upload, Loader2 } from "lucide-react";
 import type { BlogPost } from "@/lib/types";
 
 const emptyPost = {
@@ -26,6 +26,7 @@ export default function AdminBlog() {
   } | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [tagsInput, setTagsInput] = useState("");
+  const [uploading, setUploading] = useState<"image" | "media" | null>(null);
 
   const load = () => {
     fetch("/api/admin/blog")
@@ -90,6 +91,39 @@ export default function AdminBlog() {
       setTagsInput((post.tags || []).join(", "));
       setIsNew(false);
     }
+  };
+
+  const handleUpload = async (field: "image" | "media") => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      setUploading(field);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.url && editing) {
+          if (field === "image") {
+            setEditing({ ...editing, image: data.url });
+          } else {
+            setEditing({ ...editing, mediaUrl: data.url });
+          }
+        } else {
+          alert(data.error || "שגיאה בהעלאה");
+        }
+      } catch {
+        alert("שגיאה בהעלאת הקובץ");
+      }
+      setUploading(null);
+    };
+    input.click();
   };
 
   const isVideoUrl = (url: string) => {
@@ -158,17 +192,32 @@ export default function AdminBlog() {
 
             {/* Cover image */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium">תמונת נושא (קישור לתמונה)</label>
-              <input
-                type="url"
-                dir="ltr"
-                placeholder="https://example.com/image.jpg"
-                value={editing.image}
-                onChange={(e) =>
-                  setEditing({ ...editing, image: e.target.value })
-                }
-                className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-              />
+              <label className="text-sm font-medium">תמונת נושא</label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  dir="ltr"
+                  placeholder="קישור לתמונה או העלאה מהמחשב"
+                  value={editing.image}
+                  onChange={(e) =>
+                    setEditing({ ...editing, image: e.target.value })
+                  }
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleUpload("image")}
+                  disabled={uploading === "image"}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {uploading === "image" ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4" />
+                  )}
+                  העלאה
+                </button>
+              </div>
               {editing.image && (
                 <div className="mt-2 relative w-40 h-24 rounded-lg overflow-hidden border border-border bg-muted">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -215,17 +264,32 @@ export default function AdminBlog() {
             {/* Media at end of tutorial */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">תמונה / סרטון בסוף ההדרכה</label>
-              <p className="text-xs text-text-secondary">קישור לתמונה או סרטון (YouTube, mp4 וכו&#39;)</p>
-              <input
-                type="url"
-                dir="ltr"
-                placeholder="https://example.com/video.mp4 או קישור YouTube"
-                value={editing.mediaUrl}
-                onChange={(e) =>
-                  setEditing({ ...editing, mediaUrl: e.target.value })
-                }
-                className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-              />
+              <p className="text-xs text-text-secondary">קישור לתמונה או סרטון (YouTube, mp4 וכו&#39;) או העלאת תמונה מהמחשב</p>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  dir="ltr"
+                  placeholder="https://example.com/video.mp4 או קישור YouTube"
+                  value={editing.mediaUrl}
+                  onChange={(e) =>
+                    setEditing({ ...editing, mediaUrl: e.target.value })
+                  }
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleUpload("media")}
+                  disabled={uploading === "media"}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {uploading === "media" ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4" />
+                  )}
+                  העלאה
+                </button>
+              </div>
               {editing.mediaUrl && (
                 <div className="mt-2">
                   {isVideoUrl(editing.mediaUrl) ? (

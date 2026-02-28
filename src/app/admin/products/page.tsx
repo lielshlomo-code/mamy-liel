@@ -220,15 +220,31 @@ export default function AdminProducts() {
 
           <div className="flex flex-col gap-1.5 mb-4">
             <label className="text-sm font-medium">קישור למוצר</label>
-            <input
-              type="url"
-              dir="ltr"
-              value={editing.url || ""}
-              onChange={(e) =>
-                setEditing({ ...editing, url: e.target.value })
-              }
-              className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-            />
+            <div className="flex gap-2">
+              <input
+                type="url"
+                dir="ltr"
+                placeholder="הדביקי לינק לאלי אקספרס או לאתר אחר"
+                value={editing.url || ""}
+                onChange={(e) =>
+                  setEditing({ ...editing, url: e.target.value })
+                }
+                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+              />
+              <button
+                type="button"
+                onClick={fetchImage}
+                disabled={!editing.url || fetchingImage}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-orange-50 border border-orange-200 text-orange-700 text-sm font-medium hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {fetchingImage ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ImageIcon className="w-4 h-4" />
+                )}
+                שליפה מאלי אקספרס
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5 mb-4">
@@ -237,26 +253,13 @@ export default function AdminProducts() {
               <input
                 type="url"
                 dir="ltr"
-                placeholder="קישור לתמונה (או לחצי על שליפה אוטומטית)"
+                placeholder="קישור ישיר לתמונה (או השתמשי בכפתור שליפה למעלה)"
                 value={editing.image || ""}
                 onChange={(e) =>
                   setEditing({ ...editing, image: e.target.value })
                 }
                 className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
               />
-              <button
-                type="button"
-                onClick={fetchImage}
-                disabled={!editing.url || fetchingImage}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-              >
-                {fetchingImage ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ImageIcon className="w-4 h-4" />
-                )}
-                מוצר מאלי
-              </button>
             </div>
             {editing.image && (
               <div className="mt-2 relative w-32 h-32 rounded-lg overflow-hidden border border-border bg-muted">

@@ -18,11 +18,30 @@ export default function ProductCard({
   product: Product;
   index?: number;
 }) {
+  const handleClick = () => {
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(
+        "/api/track/product-click",
+        new Blob([JSON.stringify({ productId: product.id })], {
+          type: "application/json",
+        })
+      );
+    } else {
+      fetch("/api/track/product-click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+        keepalive: true,
+      });
+    }
+  };
+
   return (
     <motion.a
       href={product.url}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{

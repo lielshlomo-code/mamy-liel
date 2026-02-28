@@ -8,17 +8,22 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [products, posts, links, shortLinks] = await Promise.all([
-    supabase.from("products").select("id", { count: "exact", head: true }),
-    supabase.from("blog_posts").select("slug", { count: "exact", head: true }),
-    supabase.from("social_links").select("id", { count: "exact", head: true }),
-    supabase.from("short_links").select("id", { count: "exact", head: true }),
-  ]);
+  const [products, posts, links, shortLinks, totalClicks, contactCount] =
+    await Promise.all([
+      supabase.from("products").select("id", { count: "exact", head: true }),
+      supabase.from("blog_posts").select("slug", { count: "exact", head: true }),
+      supabase.from("social_links").select("id", { count: "exact", head: true }),
+      supabase.from("short_links").select("id", { count: "exact", head: true }),
+      supabase.from("click_events").select("id", { count: "exact", head: true }),
+      supabase.from("contact_submissions").select("id", { count: "exact", head: true }),
+    ]);
 
   return NextResponse.json({
     products: products.count || 0,
     posts: posts.count || 0,
     links: links.count || 0,
     shortLinks: shortLinks.count || 0,
+    totalClicks: totalClicks.count || 0,
+    contactSubmissions: contactCount.count || 0,
   });
 }

@@ -2,8 +2,86 @@ import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 
-async function fetchOgImage(url: string): Promise<string | null> {
-  // Strategy 1: Direct fetch
+const ALI_API_URL =
+  "https://aliexpress-services-2-barshlom95.onrender.com/api/ali/product-info";
+
+function isAliExpressUrl(url: string): boolean {
+  return /aliexpress\.com|aliexpress\.us|ali\.ski/i.test(url);
+}
+
+function extractAliExpressProductId(url: string): string | null {
+  const match =
+    url.match(/\/item\/(\d+)\.html/i) ||
+    url.match(/\/(\d{10,})\.html/i) ||
+    url.match(/productId=(\d+)/i) ||
+    url.match(/[\/?&](\d{10,})/);
+  return match?.[1] || null;
+}
+
+async function resolveRedirects(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: AbortSignal.timeout(10000),
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    });
+    return res.url || url;
+  } catch {
+    return url;
+  }
+}
+
+function isBadImage(src: string): boolean {
+  if (!src) return true;
+  if (src.startsWith("data:")) return true;
+  const lower = src.toLowerCase();
+  return (
+    lower.includes("barcode") ||
+    lower.includes("qrcode") ||
+    lower.includes("qr-code") ||
+    lower.includes("bar-code")
+  );
+}
+
+async function fetchOgImage(
+  url: string
+): Promise<{ image: string; affiliateLink?: string } | null> {
+  // Strategy 1: For AliExpress, use dedicated API
+  if (isAliExpressUrl(url) || /ali\.ski|s\.click\.aliexpress/i.test(url)) {
+    let resolvedUrl = url;
+    let productId = extractAliExpressProductId(url);
+    if (!productId) {
+      resolvedUrl = await resolveRedirects(url);
+      productId = extractAliExpressProductId(resolvedUrl);
+    }
+    if (productId) {
+      try {
+        const res = await fetch(ALI_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId, reviews: false }),
+          signal: AbortSignal.timeout(30000),
+        });
+        const data = await res.json();
+        const item = Array.isArray(data) ? data[0] : data;
+        const image = item?.productInfo?.product_main_image_url;
+        if (image) {
+          return {
+            image,
+            affiliateLink: item?.affiliateLink || undefined,
+          };
+        }
+      } catch {
+        // API failed, try fallback
+      }
+    }
+  }
+
+  // Strategy 2: Direct fetch with browser headers
   try {
     const response = await fetch(url, {
       headers: {
@@ -12,19 +90,14 @@ async function fetchOgImage(url: string): Promise<string | null> {
         Accept:
           "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
-        "Cache-Control": "no-cache",
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "none",
-        "Sec-Fetch-User": "?1",
-        "Upgrade-Insecure-Requests": "1",
       },
       redirect: "follow",
       signal: AbortSignal.timeout(10000),
     });
     const html = await response.text();
 
-    // 1. Try og:image
     const ogMatch =
       html.match(
         /<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i
@@ -32,9 +105,9 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i
       );
-    if (ogMatch?.[1]) return normalizeImageUrl(ogMatch[1], url);
+    if (ogMatch?.[1] && !isBadImage(ogMatch[1]))
+      return { image: normalizeImageUrl(ogMatch[1], url) };
 
-    // 2. Try twitter:image
     const twitterMatch =
       html.match(
         /<meta[^>]*name=["']twitter:image["'][^>]*content=["']([^"']+)["']/i
@@ -42,9 +115,10 @@ async function fetchOgImage(url: string): Promise<string | null> {
       html.match(
         /<meta[^>]*content=["']([^"']+)["'][^>]*name=["']twitter:image["']/i
       );
-    if (twitterMatch?.[1]) return normalizeImageUrl(twitterMatch[1], url);
+    if (twitterMatch?.[1] && !isBadImage(twitterMatch[1]))
+      return { image: normalizeImageUrl(twitterMatch[1], url) };
 
-    // 3. Try JSON-LD structured data
+    // Try JSON-LD
     const jsonLdMatches = html.matchAll(
       /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
     );
@@ -52,30 +126,14 @@ async function fetchOgImage(url: string): Promise<string | null> {
       try {
         const data = JSON.parse(m[1]);
         const img = extractJsonLdImage(data);
-        if (img) return normalizeImageUrl(img, url);
+        if (img && !isBadImage(img))
+          return { image: normalizeImageUrl(img, url) };
       } catch {
         // ignore
       }
     }
-
-    // 4. Try itemprop="image"
-    const itempropMatch = html.match(
-      /<(?:img|meta)[^>]*itemprop=["']image["'][^>]*(?:src|content)=["']([^"']+)["']/i
-    );
-    if (itempropMatch?.[1]) return normalizeImageUrl(itempropMatch[1], url);
   } catch {
-    // Direct fetch failed, try fallback
-  }
-
-  // Strategy 2: Microlink API fallback (headless browser)
-  try {
-    const apiUrl = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
-    const res = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
-    const data = await res.json();
-    if (data?.data?.image?.url) return data.data.image.url;
-    if (data?.data?.logo?.url) return data.data.logo.url;
-  } catch {
-    // fallback also failed
+    // Direct fetch failed
   }
 
   return null;
@@ -159,8 +217,13 @@ export async function POST(request: Request) {
     const dateAdded = new Date().toISOString().split("T")[0];
 
     let image = product.image || null;
-    if (!image && product.url) {
-      image = await fetchOgImage(product.url);
+    let productUrl = product.url;
+    if (!image && productUrl) {
+      const result = await fetchOgImage(productUrl);
+      if (result) {
+        image = result.image;
+        if (result.affiliateLink) productUrl = result.affiliateLink;
+      }
     }
 
     const { data, error } = await supabase
@@ -170,7 +233,7 @@ export async function POST(request: Request) {
         name: product.name,
         description: product.description,
         category: product.category,
-        url: product.url,
+        url: productUrl,
         image,
         featured: product.featured || false,
         date_added: dateAdded,
@@ -199,8 +262,13 @@ export async function PUT(request: Request) {
     const updated = await request.json();
 
     let image = updated.image || null;
-    if (!image && updated.url) {
-      image = await fetchOgImage(updated.url);
+    let productUrl = updated.url;
+    if (!image && productUrl) {
+      const result = await fetchOgImage(productUrl);
+      if (result) {
+        image = result.image;
+        if (result.affiliateLink) productUrl = result.affiliateLink;
+      }
     }
 
     const { data, error } = await supabase
@@ -209,7 +277,7 @@ export async function PUT(request: Request) {
         name: updated.name,
         description: updated.description,
         category: updated.category,
-        url: updated.url,
+        url: productUrl,
         image,
         featured: updated.featured,
       })

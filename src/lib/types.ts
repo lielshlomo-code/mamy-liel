@@ -73,3 +73,57 @@ export interface Course {
   status: "coming_soon" | "available" | "sold_out";
   purchaseUrl?: string;
 }
+
+// Analytics types
+
+export interface DailyCount {
+  date: string;
+  count: number;
+}
+
+export interface TopShortLink {
+  code: string;
+  title?: string;
+  clicks: number;
+}
+
+export interface TopProduct {
+  productId: string;
+  productName: string;
+  clickCount: number;
+}
+
+export interface ContactSummary {
+  id: string;
+  brandName: string;
+  contactName: string;
+  email: string;
+  type: string;
+  createdAt: string;
+}
+
+export interface ActivityItem {
+  id: string;
+  type: "short_link" | "product";
+  targetId: string;
+  createdAt: string;
+}
+
+export interface AnalyticsData {
+  shortLinks: {
+    daily: DailyCount[];
+    top: TopShortLink[];
+    total: number;
+  };
+  products: {
+    daily: DailyCount[];
+    top: TopProduct[];
+    total: number;
+  };
+  contacts: {
+    daily: DailyCount[];
+    recent: ContactSummary[];
+    total: number;
+  };
+  activity: ActivityItem[];
+}

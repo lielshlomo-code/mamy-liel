@@ -128,7 +128,7 @@ export default function AdminBlog() {
 
   const isVideoUrl = (url: string) => {
     return /\.(mp4|webm|mov)(\?|$)/i.test(url) ||
-      /youtube\.com|youtu\.be|vimeo\.com/i.test(url);
+      /youtube\.com|youtu\.be|vimeo\.com|instagram\.com\/(?:reel|p|tv)\//i.test(url);
   };
 
   return (

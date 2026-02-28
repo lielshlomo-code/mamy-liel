@@ -36,10 +36,17 @@ function getYouTubeEmbedUrl(url: string): string | null {
   return match ? `https://www.youtube.com/embed/${match[1]}` : null;
 }
 
+function getInstagramEmbedUrl(url: string): string | null {
+  const match = url.match(
+    /instagram\.com\/(?:reel|p|tv)\/([a-zA-Z0-9_-]+)/
+  );
+  return match ? `https://www.instagram.com/reel/${match[1]}/embed/` : null;
+}
+
 function isVideoUrl(url: string): boolean {
   return (
     /\.(mp4|webm|mov)(\?|$)/i.test(url) ||
-    /youtube\.com|youtu\.be|vimeo\.com/i.test(url)
+    /youtube\.com|youtu\.be|vimeo\.com|instagram\.com\/(?:reel|p|tv)\//i.test(url)
   );
 }
 
@@ -60,6 +67,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   });
 
   const youtubeEmbed = post.mediaUrl ? getYouTubeEmbedUrl(post.mediaUrl) : null;
+  const instagramEmbed = post.mediaUrl ? getInstagramEmbedUrl(post.mediaUrl) : null;
 
   return (
     <article className="pt-28 pb-24">
@@ -135,6 +143,17 @@ export default async function BlogPostPage({ params }: PageProps) {
                   title={post.title}
                   className="w-full h-full rounded-2xl"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : instagramEmbed ? (
+              <div className="flex justify-center">
+                <iframe
+                  src={instagramEmbed}
+                  title={post.title}
+                  className="rounded-2xl border-0"
+                  width="400"
+                  height="500"
                   allowFullScreen
                 />
               </div>

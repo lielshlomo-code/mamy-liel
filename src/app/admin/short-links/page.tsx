@@ -83,8 +83,8 @@ export default function AdminShortLinks() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">קיצור לינקים</h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">קיצור לינקים</h1>
         <button
           onClick={() => {
             setEditing({ ...emptyLink });
@@ -99,7 +99,7 @@ export default function AdminShortLinks() {
 
       {/* Create form */}
       {editing && (
-        <div className="bg-white rounded-xl border border-border p-6 mb-6">
+        <div className="bg-white rounded-xl border border-border p-4 sm:p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">קישור מקוצר חדש</h2>
             <button onClick={() => setEditing(null)}>

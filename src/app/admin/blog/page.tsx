@@ -133,8 +133,8 @@ export default function AdminBlog() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">ניהול הדרכות ומתכונים</h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">ניהול הדרכות ומתכונים</h1>
         <button
           onClick={() => {
             setEditing({ ...emptyPost });
@@ -150,7 +150,7 @@ export default function AdminBlog() {
 
       {/* Edit form */}
       {editing && (
-        <div className="bg-white rounded-xl border border-border p-6 mb-6">
+        <div className="bg-white rounded-xl border border-border p-4 sm:p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">
               {isNew ? "הדרכה חדשה" : "עריכת הדרכה"}
@@ -193,7 +193,7 @@ export default function AdminBlog() {
             {/* Cover image */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">תמונת נושא</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="url"
                   dir="ltr"
@@ -208,7 +208,7 @@ export default function AdminBlog() {
                   type="button"
                   onClick={() => handleUpload("image")}
                   disabled={uploading === "image"}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 >
                   {uploading === "image" ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -265,7 +265,7 @@ export default function AdminBlog() {
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">תמונה / סרטון בסוף ההדרכה</label>
               <p className="text-xs text-text-secondary">קישור לתמונה או סרטון (YouTube, mp4 וכו&#39;) או העלאת תמונה מהמחשב</p>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="url"
                   dir="ltr"
@@ -280,7 +280,7 @@ export default function AdminBlog() {
                   type="button"
                   onClick={() => handleUpload("media")}
                   disabled={uploading === "media"}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 >
                   {uploading === "media" ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -325,13 +325,13 @@ export default function AdminBlog() {
       )}
 
       {/* Posts list */}
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="bg-white rounded-xl border border-border overflow-hidden overflow-x-auto">
         {posts.length === 0 ? (
           <p className="text-center text-text-secondary py-12">
             אין הדרכות עדיין
           </p>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-0">
             <thead>
               <tr className="border-b border-border bg-muted">
                 <th className="text-right px-4 py-3 font-medium">כותרת</th>
@@ -347,21 +347,21 @@ export default function AdminBlog() {
                   key={post.slug}
                   className="border-b border-border last:border-0"
                 >
-                  <td className="px-4 py-3 font-medium">
-                    <div className="flex items-center gap-3">
+                  <td className="px-3 sm:px-4 py-3 font-medium max-w-[200px] sm:max-w-none">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       {post.image ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                           src={post.image}
                           alt={post.title}
-                          className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover flex-shrink-0"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                           <ImageIcon className="w-4 h-4 text-text-secondary" />
                         </div>
                       )}
-                      {post.title}
+                      <span className="truncate">{post.title}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary">

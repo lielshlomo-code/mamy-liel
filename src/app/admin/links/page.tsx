@@ -67,8 +67,8 @@ export default function AdminLinks() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">ניהול קישורים</h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">ניהול קישורים</h1>
         <button
           onClick={() => {
             setEditing({ ...emptyLink });
@@ -83,7 +83,7 @@ export default function AdminLinks() {
 
       {/* Edit form */}
       {editing && (
-        <div className="bg-white rounded-xl border border-border p-6 mb-6">
+        <div className="bg-white rounded-xl border border-border p-4 sm:p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">
               {isNew ? "קישור חדש" : "עריכת קישור"}
@@ -168,13 +168,13 @@ export default function AdminLinks() {
       )}
 
       {/* Links list */}
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="bg-white rounded-xl border border-border overflow-hidden overflow-x-auto">
         {links.length === 0 ? (
           <p className="text-center text-text-secondary py-12">
             אין קישורים עדיין
           </p>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-0">
             <thead>
               <tr className="border-b border-border bg-muted">
                 <th className="text-right px-4 py-3 font-medium">טקסט</th>

@@ -14,24 +14,28 @@ export default async function BlogPage() {
   const posts = await getAllBlogPosts();
 
   return (
-    <div className="pt-24">
+    <div className="pt-24 relative">
       <PageHeader
         title="הדרכות ומתכונים"
         subtitle="הדרכות, מתכונים וטיפים מהחיים שלי כאמא"
         num="02"
       />
-      <div className="max-w-7xl mx-auto px-6 md:px-10 py-16">
-        {posts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {posts.map((post, i) => (
-              <BlogCard key={post.slug} post={post} index={i} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-text-secondary py-24 text-lg">
-            הדרכות ומתכונים חדשים בקרוב...
-          </p>
-        )}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 diagonal-lines pointer-events-none" />
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-16">
+          {posts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {posts.map((post, i) => (
+                <BlogCard key={post.slug} post={post} index={i} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-text-secondary py-24 text-lg">
+              הדרכות ומתכונים חדשים בקרוב...
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -4,8 +4,11 @@ import Logo from "@/components/ui/Logo";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-black/5">
-      <div className="max-w-7xl mx-auto px-6 md:px-10 py-10 md:py-16">
+    <footer className="border-t border-black/5 relative overflow-hidden bg-muted/40">
+      {/* Decorative background */}
+      <div className="absolute inset-0 radial-glow pointer-events-none" />
+      <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-10 md:py-16">
         <div className="flex flex-col md:flex-row justify-between gap-10">
           {/* Brand */}
           <div>

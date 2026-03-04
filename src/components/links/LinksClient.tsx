@@ -77,9 +77,12 @@ export default function LinksClient({
   config: SiteConfig;
 }) {
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-20 pt-28 relative overflow-hidden">
-      {/* Background effect */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen flex flex-col items-center px-4 py-20 pt-28 relative overflow-hidden bg-muted/50">
+      {/* Background effects */}
+      <div className="absolute inset-0 dot-grid opacity-[0.02] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-black/[0.025] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 -right-20 w-80 h-80 bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 -left-20 w-72 h-72 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md flex flex-col items-center gap-8 relative z-10">
         {/* Profile */}

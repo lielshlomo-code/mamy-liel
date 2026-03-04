@@ -71,8 +71,15 @@ export default async function FeaturedProducts() {
   if (products.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-10">
+    <section className="py-24 md:py-32 bg-muted relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 radial-glow pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-black/10 to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-black/10 to-transparent" />
+      <div className="absolute top-20 right-10 w-72 h-72 bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10">
         <div className="flex items-end justify-between mb-12">
           <AnimatedSection>
             <p className="text-sm font-medium tracking-widest uppercase text-text-light mb-3">

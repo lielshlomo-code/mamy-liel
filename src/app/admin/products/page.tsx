@@ -320,7 +320,7 @@ export default function AdminProducts() {
 
             {/* Add new category */}
             {newCategory ? (
-              <div className="flex items-center gap-3 px-3 py-2 mt-2 rounded-lg border border-dashed border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 px-3 py-2 mt-2 rounded-lg border border-dashed border-border">
                 <input
                   type="text"
                   dir="ltr"
@@ -329,7 +329,7 @@ export default function AdminProducts() {
                   onChange={(e) =>
                     setNewCategory({ ...newCategory, id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "") })
                   }
-                  className="w-24 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 font-mono"
+                  className="w-full sm:w-24 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 font-mono"
                   autoFocus
                 />
                 <input
@@ -341,21 +341,23 @@ export default function AdminProducts() {
                   }
                   className="flex-1 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
                 />
-                <button
-                  onClick={() => handleSaveCategory(newCategory, true)}
-                  disabled={!newCategory.id || !newCategory.label}
-                  className="p-1.5 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-40"
-                  title="שמירה"
-                >
-                  <Save className="w-4 h-4 text-green-600" />
-                </button>
-                <button
-                  onClick={() => setNewCategory(null)}
-                  className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-                  title="ביטול"
-                >
-                  <X className="w-4 h-4 text-text-secondary" />
-                </button>
+                <div className="flex items-center gap-2 self-end">
+                  <button
+                    onClick={() => handleSaveCategory(newCategory, true)}
+                    disabled={!newCategory.id || !newCategory.label}
+                    className="p-1.5 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-40"
+                    title="שמירה"
+                  >
+                    <Save className="w-4 h-4 text-green-600" />
+                  </button>
+                  <button
+                    onClick={() => setNewCategory(null)}
+                    className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                    title="ביטול"
+                  >
+                    <X className="w-4 h-4 text-text-secondary" />
+                  </button>
+                </div>
               </div>
             ) : (
               <button
@@ -542,14 +544,14 @@ export default function AdminProducts() {
           <table className="w-full text-sm min-w-0">
             <thead>
               <tr className="border-b border-border bg-muted">
-                <th className="text-right px-4 py-3 font-medium">שם</th>
-                <th className="text-right px-4 py-3 font-medium hidden sm:table-cell">
+                <th className="text-right px-2 sm:px-4 py-3 font-medium">שם</th>
+                <th className="text-right px-2 sm:px-4 py-3 font-medium hidden sm:table-cell">
                   קטגוריה
                 </th>
-                <th className="text-right px-4 py-3 font-medium hidden md:table-cell">
+                <th className="text-right px-2 sm:px-4 py-3 font-medium hidden md:table-cell">
                   מומלץ
                 </th>
-                <th className="px-4 py-3 w-24"></th>
+                <th className="px-2 sm:px-4 py-3 w-20 sm:w-24"></th>
               </tr>
             </thead>
             <tbody>
@@ -578,8 +580,8 @@ export default function AdminProducts() {
                   <td className="px-4 py-3 hidden md:table-cell">
                     {p.featured ? "✓" : ""}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 justify-end">
+                  <td className="px-2 sm:px-4 py-3">
+                    <div className="flex items-center gap-1 sm:gap-2 justify-end">
                       <button
                         onClick={() => {
                           setEditing({ ...p });

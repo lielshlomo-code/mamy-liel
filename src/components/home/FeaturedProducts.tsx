@@ -71,12 +71,14 @@ export default async function FeaturedProducts() {
   if (products.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-warm-mesh section-curve-top section-curve-bottom">
+    <section className="py-24 md:py-32 relative overflow-hidden bg-animated-gradient section-curve-top section-curve-bottom">
       {/* Decorative background elements */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-warm-300/50 to-transparent" />
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-warm-300/50 to-transparent" />
-      <div className="absolute top-20 right-10 w-72 h-72 bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-warm-300/60 to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-warm-300/60 to-transparent" />
+      <div className="absolute -top-10 right-10 w-[350px] h-[350px] bg-rose-200/25 rounded-full blur-3xl pointer-events-none animate-float-slow" />
+      <div className="absolute -bottom-10 left-10 w-[400px] h-[400px] bg-warm-200/30 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-rose-100/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10">
         <div className="flex items-end justify-between mb-12">

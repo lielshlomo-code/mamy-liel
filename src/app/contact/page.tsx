@@ -16,11 +16,11 @@ export default function ContactPage() {
         num="03"
       />
       <div className="relative overflow-hidden bg-warm-gradient-reverse min-h-[50vh]">
-        <div className="absolute inset-0 dot-grid opacity-15 pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />
+        <div className="absolute top-10 right-1/4 w-[500px] h-[500px] bg-rose-100/30 rounded-full blur-3xl pointer-events-none animate-float-slow" />
+        <div className="absolute bottom-10 left-1/4 w-[400px] h-[400px] bg-warm-200/35 rounded-full blur-3xl pointer-events-none animate-float" />
         <div className="relative z-10 max-w-2xl mx-auto px-6 md:px-10 pt-12">
-          <div className="rounded-3xl border border-warm-300/50 p-5 sm:p-8 md:p-10 bg-white/80 backdrop-blur-sm shadow-lg shadow-warm-200/20">
+          <div className="rounded-3xl border border-warm-300/40 p-5 sm:p-8 md:p-10 bg-white/70 backdrop-blur-md shadow-xl shadow-warm-200/25">
             <ContactForm />
           </div>
         </div>

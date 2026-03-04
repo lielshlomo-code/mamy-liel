@@ -24,11 +24,11 @@ export default async function ProductsPage() {
         subtitle="דברים שאני משתמשת בהם ובאמת אוהבת — הכל נבדק ומומלץ אישית"
         num="06"
       />
-      <div className="relative overflow-hidden bg-warm-gradient-reverse">
-        <div className="absolute inset-0 dot-grid opacity-15 pointer-events-none" />
-        <div className="absolute top-40 -right-20 w-[500px] h-[500px] bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-40 -left-20 w-[400px] h-[400px] bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-warm-100/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-warm-gradient-reverse min-h-[60vh]">
+        <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />
+        <div className="absolute top-40 -right-20 w-[500px] h-[500px] bg-rose-100/25 rounded-full blur-3xl pointer-events-none animate-float-slow" />
+        <div className="absolute bottom-40 -left-20 w-[400px] h-[400px] bg-warm-200/35 rounded-full blur-3xl pointer-events-none animate-float" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-rose-50/30 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-16">
           <ProductGrid products={sorted} categories={categories} />
         </div>

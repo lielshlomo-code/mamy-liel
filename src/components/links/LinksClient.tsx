@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import FloatingShapes from "@/components/ui/FloatingShapes";
 import {
   Instagram,
   MessageCircle,
@@ -77,12 +78,17 @@ export default function LinksClient({
   config: SiteConfig;
 }) {
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-20 pt-28 relative overflow-hidden bg-warm-mesh">
-      {/* Background effects */}
-      <div className="absolute inset-0 dot-grid opacity-15 pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 -right-20 w-[400px] h-[400px] bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 -left-20 w-[350px] h-[350px] bg-warm-200/25 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen flex flex-col items-center px-4 py-20 pt-28 relative overflow-hidden bg-animated-gradient">
+      {/* Animated floating shapes */}
+      <FloatingShapes
+        shapes={[
+          { className: "bg-rose-200/30", x: "5%", y: "15%", size: "250px", duration: 10, delay: 0 },
+          { className: "bg-warm-200/40", x: "70%", y: "10%", size: "200px", duration: 8, delay: 2 },
+          { className: "bg-rose-100/25", x: "60%", y: "65%", size: "220px", duration: 12, delay: 1 },
+          { className: "bg-warm-100/35", x: "15%", y: "70%", size: "180px", duration: 9, delay: 3 },
+        ]}
+      />
+      <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />
 
       <div className="w-full max-w-md flex flex-col items-center gap-8 relative z-10">
         {/* Profile */}

@@ -236,7 +236,7 @@ export default function AdminProducts() {
       <div className="bg-white rounded-xl border border-border mb-6">
         <button
           onClick={() => setShowCategories(!showCategories)}
-          className="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold hover:bg-muted/50 transition-colors rounded-xl"
+          className="w-full flex items-center justify-between px-4 sm:px-6 py-4 text-sm font-semibold hover:bg-muted/50 transition-colors rounded-xl"
         >
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4" />
@@ -250,7 +250,7 @@ export default function AdminProducts() {
         </button>
 
         {showCategories && (
-          <div className="px-6 pb-5 border-t border-border pt-4">
+          <div className="px-3 sm:px-6 pb-5 border-t border-border pt-4">
             {categoryError && (
               <div className="mb-3 px-3 py-2 rounded-lg bg-red-50 text-red-700 text-sm">
                 {categoryError}
@@ -555,21 +555,21 @@ export default function AdminProducts() {
             <tbody>
               {products.map((p) => (
                 <tr key={p.id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 font-medium">
-                    <div className="flex items-center gap-3">
+                  <td className="px-3 sm:px-4 py-3 font-medium max-w-[200px] sm:max-w-none">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       {p.image ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                           src={p.image}
                           alt={p.name}
-                          className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover flex-shrink-0"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                           <ImageIcon className="w-4 h-4 text-text-secondary" />
                         </div>
                       )}
-                      {p.name}
+                      <span className="truncate">{p.name}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary">

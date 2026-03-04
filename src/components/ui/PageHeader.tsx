@@ -23,7 +23,7 @@ export default function PageHeader({ title, subtitle, num }: PageHeaderProps) {
         </motion.span>
       )}
 
-      <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-4">
+      <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-4">
         <TextReveal>{title}</TextReveal>
       </h1>
 

@@ -36,9 +36,9 @@ export default function ClicksChart({
   }
 
   return (
-    <div className="h-64 w-full" dir="ltr">
+    <div className="h-48 sm:h-64 w-full" dir="ltr">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+        <AreaChart data={data} margin={{ top: 5, right: 5, left: -10, bottom: 5 }}>
           <defs>
             <linearGradient id={`gradient-${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={color} stopOpacity={0.15} />
@@ -49,15 +49,17 @@ export default function ClicksChart({
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
-            tick={{ fontSize: 11, fill: "#555" }}
+            tick={{ fontSize: 10, fill: "#555" }}
             tickLine={false}
             axisLine={{ stroke: "#e0e0e0" }}
+            interval="preserveStartEnd"
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "#555" }}
+            tick={{ fontSize: 10, fill: "#555" }}
             tickLine={false}
             axisLine={false}
             allowDecimals={false}
+            width={30}
           />
           <Tooltip
             labelFormatter={(v) => formatDate(String(v))}

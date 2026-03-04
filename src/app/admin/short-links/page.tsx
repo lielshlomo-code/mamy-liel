@@ -190,9 +190,9 @@ export default function AdminShortLinks() {
         ) : (
           <div className="divide-y divide-border">
             {links.map((link) => (
-              <div key={link.id} className="p-4 flex items-center gap-4">
+              <div key={link.id} className="p-3 sm:p-4 flex items-start sm:items-center gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     {link.title && (
                       <span className="font-medium text-sm">
                         {link.title}
@@ -203,7 +203,7 @@ export default function AdminShortLinks() {
                     </span>
                   </div>
                   <div
-                    className="text-sm font-mono text-foreground truncate"
+                    className="text-xs sm:text-sm font-mono text-foreground truncate"
                     dir="ltr"
                   >
                     {siteUrl}/s/{link.code}
@@ -216,7 +216,7 @@ export default function AdminShortLinks() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                   <button
                     onClick={() => copyToClipboard(link.code, link.id)}
                     className="p-2 rounded-lg hover:bg-muted transition-colors"

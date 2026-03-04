@@ -71,8 +71,8 @@ export default function AdminDashboard() {
     <div>
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-8">
-        <h1 className="text-2xl font-bold">דשבורד</h1>
-        <div className="flex items-center gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold">דשבורד</h1>
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <DateRangeSelector value={days} onChange={setDays} />
           <Link
             href="/"
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
                 />
               </ChartCard>
             </div>
-            <div className="bg-white rounded-xl border border-border p-6">
+            <div className="bg-white rounded-xl border border-border p-4 sm:p-6">
               <h3 className="font-semibold mb-4">פעולות מהירות</h3>
               <div className="flex flex-col gap-2">
                 <Link

@@ -5,7 +5,7 @@ import Logo from "@/components/ui/Logo";
 export default function Footer() {
   return (
     <footer className="border-t border-black/5">
-      <div className="max-w-7xl mx-auto px-6 md:px-10 py-16">
+      <div className="max-w-7xl mx-auto px-6 md:px-10 py-10 md:py-16">
         <div className="flex flex-col md:flex-row justify-between gap-10">
           {/* Brand */}
           <div>
@@ -16,7 +16,7 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          <div className="flex gap-16">
+          <div className="flex gap-10 sm:gap-16">
             <div>
               <p className="text-xs font-bold tracking-widest uppercase mb-4">
                 ניווט
@@ -59,7 +59,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-16 pt-8 border-t border-black/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-black/5 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-xs text-text-light">
             &copy; {new Date().getFullYear()} mamy.liel | ליאל שלמה
           </p>

@@ -94,12 +94,12 @@ export default async function BlogPostPage({ params }: PageProps) {
             )}
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] tracking-tight mb-6">
             {post.title}
           </h1>
 
           {post.tags && post.tags.length > 0 && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               {post.tags.map((tag) => (
                 <span
                   key={tag}

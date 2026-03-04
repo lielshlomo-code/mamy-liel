@@ -422,7 +422,7 @@ export default function AdminProducts() {
           <div className="flex flex-col gap-1.5 mb-4">
             <label className="text-sm font-medium">תיאור</label>
             <textarea
-              rows={3}
+              rows={10}
               value={editing.description || ""}
               onChange={(e) =>
                 setEditing({ ...editing, description: e.target.value })

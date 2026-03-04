@@ -16,7 +16,7 @@ export default function ContactPage() {
         num="03"
       />
       <div className="max-w-2xl mx-auto px-6 md:px-10 pt-12">
-        <div className="rounded-3xl border-2 border-black/5 p-8 sm:p-10 bg-white">
+        <div className="rounded-3xl border-2 border-black/5 p-5 sm:p-8 md:p-10 bg-white">
           <ContactForm />
         </div>
       </div>

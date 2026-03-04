@@ -10,6 +10,12 @@
   --color-accent: #000000;
   --color-accent-hover: #1a1a1a;
 
+  /* Warm palette */
+  --color-warm-50: #faf8f5;
+  --color-warm-100: #f5f0ea;
+  --color-warm-200: #ede5d8;
+  --color-warm-300: #e0d5c4;
+
   --font-sans: var(--font-heebo);
 }
 
@@ -124,55 +130,57 @@ body {
   to { transform: scaleX(1); }
 }
 
+/* Warm section backgrounds */
+.bg-warm-gradient {
+  background: linear-gradient(180deg, var(--color-warm-50) 0%, #ffffff 100%);
+}
+.bg-warm-gradient-reverse {
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-warm-50) 100%);
+}
+.bg-warm-mesh {
+  background:
+    radial-gradient(ellipse at 20% 50%, var(--color-warm-100) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, var(--color-warm-50) 0%, transparent 40%),
+    radial-gradient(ellipse at 40% 80%, var(--color-warm-100) 0%, transparent 45%),
+    var(--color-warm-50);
+}
+.bg-warm-solid {
+  background: var(--color-warm-50);
+}
+
 /* Dot grid background */
 .dot-grid {
-  background-image: radial-gradient(circle, #0a0a0a 0.5px, transparent 0.5px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(circle, var(--color-warm-300) 0.7px, transparent 0.7px);
+  background-size: 20px 20px;
 }
 
-/* Subtle radial gradient */
-.radial-glow {
-  background: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 70%);
+/* Organic curve section divider */
+.section-curve-top {
+  position: relative;
 }
-.radial-glow-bottom {
-  background: radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.04) 0%, transparent 60%);
-}
-
-/* Diagonal lines pattern */
-.diagonal-lines {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    transparent,
-    transparent 20px,
-    rgba(0,0,0,0.015) 20px,
-    rgba(0,0,0,0.015) 21px
-  );
-}
-
-/* Cross hatch subtle */
-.cross-hatch {
-  background-image:
-    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-/* Fade section edges */
-.fade-edges-y::before,
-.fade-edges-y::after {
+.section-curve-top::before {
   content: "";
   position: absolute;
+  top: -1px;
   left: 0;
   right: 0;
-  height: 80px;
-  pointer-events: none;
-  z-index: 1;
+  height: 60px;
+  background: var(--color-background);
+  clip-path: ellipse(55% 100% at 50% 0%);
+  z-index: 2;
 }
-.fade-edges-y::before {
-  top: 0;
-  background: linear-gradient(to bottom, var(--color-background), transparent);
+
+.section-curve-bottom {
+  position: relative;
 }
-.fade-edges-y::after {
-  bottom: 0;
-  background: linear-gradient(to top, var(--color-background), transparent);
+.section-curve-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--color-background);
+  clip-path: ellipse(55% 100% at 50% 100%);
+  z-index: 2;
 }

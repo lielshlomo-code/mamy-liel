@@ -25,7 +25,7 @@ function LinkButton({ link, index }: { link: SocialLink; index: number }) {
   const Icon = iconMap[link.icon] || ExternalLink;
 
   const className =
-    "group flex items-center gap-4 w-full px-6 py-5 rounded-2xl border-2 border-black/5 bg-white hover:border-foreground hover:bg-foreground hover:text-white transition-all duration-300";
+    "group flex items-center gap-4 w-full px-6 py-5 rounded-2xl border border-warm-300/50 bg-white/80 backdrop-blur-sm shadow-sm shadow-warm-200/20 hover:border-foreground hover:bg-foreground hover:text-white transition-all duration-300";
 
   const content = (
     <>
@@ -77,12 +77,12 @@ export default function LinksClient({
   config: SiteConfig;
 }) {
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-20 pt-28 relative overflow-hidden bg-muted/50">
+    <div className="min-h-screen flex flex-col items-center px-4 py-20 pt-28 relative overflow-hidden bg-warm-mesh">
       {/* Background effects */}
-      <div className="absolute inset-0 dot-grid opacity-[0.02] pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-black/[0.025] rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 -right-20 w-80 h-80 bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 -left-20 w-72 h-72 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 dot-grid opacity-15 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 -right-20 w-[400px] h-[400px] bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 -left-20 w-[350px] h-[350px] bg-warm-200/25 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-md flex flex-col items-center gap-8 relative z-10">
         {/* Profile */}

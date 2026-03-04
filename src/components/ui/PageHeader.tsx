@@ -11,23 +11,27 @@ interface PageHeaderProps {
 
 export default function PageHeader({ title, subtitle, num }: PageHeaderProps) {
   return (
-    <div className="relative overflow-hidden">
-      {/* Decorative background */}
-      <div className="absolute inset-0 radial-glow-bottom pointer-events-none" />
-      <div className="absolute -top-20 -right-20 w-80 h-80 bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-10 -left-10 w-60 h-60 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-black/5 to-transparent" />
+    <div className="relative overflow-hidden bg-warm-gradient">
+      {/* Dot pattern overlay */}
+      <div className="absolute inset-0 dot-grid opacity-30 pointer-events-none" />
+
+      {/* Warm decorative blobs */}
+      <div className="absolute -top-20 -right-20 w-[400px] h-[400px] bg-warm-200/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-10 left-1/4 w-[300px] h-[300px] bg-warm-100/50 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Bottom gradient fade to white */}
+      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent pointer-events-none" />
 
       {/* Large background number */}
       {num && (
         <div className="absolute top-0 left-6 md:left-10 pointer-events-none select-none">
-          <span className="text-[12rem] md:text-[16rem] font-black text-black/[0.02] leading-none">
+          <span className="text-[12rem] md:text-[16rem] font-black text-warm-200/60 leading-none">
             {num}
           </span>
         </div>
       )}
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-12 pb-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-12 pb-12">
         {num && (
           <motion.span
             initial={{ opacity: 0 }}

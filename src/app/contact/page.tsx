@@ -15,12 +15,12 @@ export default function ContactPage() {
         subtitle="מעוניינים בשיתוף פעולה? מלאו את הטופס ואחזור אליכם בהקדם"
         num="03"
       />
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 dot-grid opacity-[0.025] pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-warm-gradient-reverse min-h-[50vh]">
+        <div className="absolute inset-0 dot-grid opacity-15 pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-2xl mx-auto px-6 md:px-10 pt-12">
-          <div className="rounded-3xl border-2 border-black/5 p-5 sm:p-8 md:p-10 bg-white shadow-sm">
+          <div className="rounded-3xl border border-warm-300/50 p-5 sm:p-8 md:p-10 bg-white/80 backdrop-blur-sm shadow-lg shadow-warm-200/20">
             <ContactForm />
           </div>
         </div>

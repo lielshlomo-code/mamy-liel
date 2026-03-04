@@ -20,9 +20,10 @@ export default async function BlogPage() {
         subtitle="הדרכות, מתכונים וטיפים מהחיים שלי כאמא"
         num="02"
       />
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 diagonal-lines pointer-events-none" />
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-warm-gradient-reverse">
+        <div className="absolute inset-0 dot-grid opacity-15 pointer-events-none" />
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-warm-200/25 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-20 -right-20 w-[400px] h-[400px] bg-warm-100/30 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-16">
           {posts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

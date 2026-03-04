@@ -24,10 +24,11 @@ export default async function ProductsPage() {
         subtitle="דברים שאני משתמשת בהם ובאמת אוהבת — הכל נבדק ומומלץ אישית"
         num="06"
       />
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 cross-hatch opacity-40 pointer-events-none" />
-        <div className="absolute top-40 -right-20 w-96 h-96 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-40 -left-20 w-80 h-80 bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-warm-gradient-reverse">
+        <div className="absolute inset-0 dot-grid opacity-15 pointer-events-none" />
+        <div className="absolute top-40 -right-20 w-[500px] h-[500px] bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-40 -left-20 w-[400px] h-[400px] bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-warm-100/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-16">
           <ProductGrid products={sorted} categories={categories} />
         </div>

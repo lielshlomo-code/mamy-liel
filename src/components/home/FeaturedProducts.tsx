@@ -18,7 +18,7 @@ function FeaturedProductCard({ product, index }: { product: Product; index: numb
         href={product.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="group relative block bg-muted rounded-2xl overflow-hidden"
+        className="group relative block bg-white rounded-2xl overflow-hidden shadow-sm shadow-warm-200/30 border border-warm-300/20"
       >
         {/* Image area */}
         <div className="aspect-[4/5] bg-gradient-to-b from-black/[0.02] to-black/[0.06] flex items-center justify-center relative overflow-hidden">
@@ -71,13 +71,12 @@ export default async function FeaturedProducts() {
   if (products.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32 bg-muted relative overflow-hidden">
+    <section className="py-24 md:py-32 relative overflow-hidden bg-warm-mesh section-curve-top section-curve-bottom">
       {/* Decorative background elements */}
-      <div className="absolute inset-0 radial-glow pointer-events-none" />
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-black/10 to-transparent" />
-      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-black/10 to-transparent" />
-      <div className="absolute top-20 right-10 w-72 h-72 bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-black/[0.015] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-warm-300/50 to-transparent" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-warm-300/50 to-transparent" />
+      <div className="absolute top-20 right-10 w-72 h-72 bg-warm-200/30 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-warm-100/40 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10">
         <div className="flex items-end justify-between mb-12">

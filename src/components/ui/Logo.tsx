@@ -17,36 +17,40 @@ export default function Logo({ size = "md", asLink = true, className = "" }: Log
 
   const content = (
     <span className={`inline-flex items-center ${s.gap} ${className}`}>
-      {/* Icon: stylized leaf/heart shape */}
+      {/* Icon: botanical leaf with heart */}
       <svg
         width={s.icon}
         height={s.icon}
-        viewBox="0 0 48 48"
+        viewBox="0 0 40 40"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="flex-shrink-0"
       >
-        {/* Outer circle */}
-        <circle
-          cx="24"
-          cy="24"
-          r="22"
+        {/* Main leaf shape */}
+        <path
+          d="M20 4C20 4 8 12 8 24C8 30 13 36 20 36C27 36 32 30 32 24C32 12 20 4 20 4Z"
           stroke="currentColor"
           strokeWidth="1.5"
           fill="none"
-        />
-        {/* Stylized M with heart curve */}
-        <path
-          d="M14 32V20L24 28L34 20V32"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
           strokeLinejoin="round"
-          fill="none"
         />
-        {/* Small heart dot above */}
+        {/* Center vein */}
         <path
-          d="M24 14C24 14 21 11 19 13C17 15 19 17 24 20C29 17 31 15 29 13C27 11 24 14 24 14Z"
+          d="M20 10V32"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+        {/* Side veins */}
+        <path
+          d="M20 16L13 21M20 21L12 27M20 16L27 21M20 21L28 27"
+          stroke="currentColor"
+          strokeWidth="1"
+          strokeLinecap="round"
+        />
+        {/* Small heart at top of leaf */}
+        <path
+          d="M20 11C20 11 18 9.5 17 10.5C16 11.5 17.5 12.5 20 14.5C22.5 12.5 24 11.5 23 10.5C22 9.5 20 11 20 11Z"
           fill="currentColor"
         />
       </svg>

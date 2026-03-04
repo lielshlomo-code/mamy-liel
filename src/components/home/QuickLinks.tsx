@@ -38,8 +38,13 @@ const quickLinks = [
 
 export default function QuickLinks() {
   return (
-    <section className="py-24 md:py-32">
-      <div className="max-w-7xl mx-auto px-6 md:px-10">
+    <section className="py-24 md:py-32 relative overflow-hidden">
+      {/* Decorative background */}
+      <div className="absolute inset-0 dot-grid opacity-[0.03] pointer-events-none" />
+      <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-[400px] h-[400px] bg-black/[0.02] rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10">
         <AnimatedSection>
           <p className="text-sm font-medium tracking-widest uppercase text-text-light mb-4">
             מה תמצאו כאן

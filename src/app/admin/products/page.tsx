@@ -111,79 +111,24 @@ export default function AdminProducts() {
     load();
   };
 
-  const ALI_API_URL =
-    "https://aliexpress-services-2-barshlom95.onrender.com/api/ali/product-info";
-
-  const extractProductId = (url: string): string | null => {
-    const match =
-      url.match(/\/item\/(\d+)\.html/i) ||
-      url.match(/\/(\d{10,})\.html/i) ||
-      url.match(/productId=(\d+)/i) ||
-      url.match(/[\/?&](\d{10,})/);
-    return match?.[1] || null;
-  };
-
   const fetchImage = async () => {
     if (!editing?.url) return;
     setFetchingImage(true);
     try {
-      const url = editing.url;
-      const isAli = /aliexpress\.com|aliexpress\.us|ali\.ski|s\.click\.aliexpress/i.test(url);
-
-      if (isAli) {
-        // Call AliExpress API directly from browser (no Vercel timeout)
-        let productId = extractProductId(url);
-
-        // If no ID found, use server-side redirect resolution (CORS blocks browser redirects)
-        if (!productId) {
-          try {
-            const resolveRes = await fetch("/api/admin/resolve-ali", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ url }),
-            });
-            const resolveData = await resolveRes.json();
-            productId = resolveData.productId || null;
-          } catch {
-            // resolve failed
-          }
-        }
-
-        if (productId) {
-          const res = await fetch(ALI_API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId, reviews: false }),
-          });
-          const data = await res.json();
-          const item = Array.isArray(data) ? data[0] : data;
-          const image = item?.productInfo?.product_main_image_url;
-          const affiliateLink = item?.affiliateLink;
-
-          if (image) {
-            setEditing({
-              ...editing,
-              image,
-              url: affiliateLink || editing.url,
-            });
-            setFetchingImage(false);
-            return;
-          }
-        }
-        alert("לא נמצא מוצר. בדקי שהלינק תקין.");
-      } else {
-        // Non-AliExpress: use server-side OG image extraction
-        const res = await fetch("/api/admin/og-image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url }),
+      const res = await fetch("/api/admin/og-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: editing.url }),
+      });
+      const data = await res.json();
+      if (data.image) {
+        setEditing({
+          ...editing,
+          image: data.image,
+          url: data.affiliateLink || editing.url,
         });
-        const data = await res.json();
-        if (data.image) {
-          setEditing({ ...editing, image: data.image });
-        } else {
-          alert("לא נמצאה תמונה בקישור הזה. אפשר להדביק לינק לתמונה ידנית.");
-        }
+      } else {
+        alert("לא נמצאה תמונה בקישור הזה. אפשר להדביק לינק לתמונה ידנית.");
       }
     } catch {
       alert("שגיאה בשליפת תמונה");

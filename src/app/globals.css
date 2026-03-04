@@ -123,3 +123,56 @@ body {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
 }
+
+/* Dot grid background */
+.dot-grid {
+  background-image: radial-gradient(circle, #0a0a0a 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+}
+
+/* Subtle radial gradient */
+.radial-glow {
+  background: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,0.03) 0%, transparent 70%);
+}
+.radial-glow-bottom {
+  background: radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.04) 0%, transparent 60%);
+}
+
+/* Diagonal lines pattern */
+.diagonal-lines {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 20px,
+    rgba(0,0,0,0.015) 20px,
+    rgba(0,0,0,0.015) 21px
+  );
+}
+
+/* Cross hatch subtle */
+.cross-hatch {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Fade section edges */
+.fade-edges-y::before,
+.fade-edges-y::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 80px;
+  pointer-events: none;
+  z-index: 1;
+}
+.fade-edges-y::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--color-background), transparent);
+}
+.fade-edges-y::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--color-background), transparent);
+}

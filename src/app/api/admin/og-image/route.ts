@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 
-const ALI_API_URL =
-  "https://aliexpress-services-2-barshlom95.onrender.com/api/ali/product-info";
+// Allow up to 30 seconds for AliExpress redirect resolution + HTML fetch
+export const maxDuration = 30;
 
 const BROWSER_HEADERS: Record<string, string> = {
   "User-Agent":
@@ -19,17 +19,9 @@ const BROWSER_HEADERS: Record<string, string> = {
 };
 
 function isAliExpressUrl(url: string): boolean {
-  return /aliexpress\.com|aliexpress\.us|ali\.ski/i.test(url);
-}
-
-// Extract product ID from AliExpress URL (e.g. /item/1005006597882642.html)
-function extractAliExpressProductId(url: string): string | null {
-  const match =
-    url.match(/\/item\/(\d+)\.html/i) ||
-    url.match(/\/(\d{10,})\.html/i) ||
-    url.match(/productId=(\d+)/i) ||
-    url.match(/[\/?&](\d{10,})/);
-  return match?.[1] || null;
+  return /aliexpress\.com|aliexpress\.us|ali\.ski|s\.click\.aliexpress/i.test(
+    url
+  );
 }
 
 // Follow redirects to get the final URL (for shortened/affiliate links)
@@ -47,30 +39,6 @@ async function resolveRedirects(url: string): Promise<string> {
     return res.url || url;
   } catch {
     return url;
-  }
-}
-
-// Fetch product info via AliExpress API
-async function fetchAliExpressProduct(
-  productId: string
-): Promise<{ image: string; affiliateLink: string } | null> {
-  try {
-    const res = await fetch(ALI_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId, reviews: false }),
-      signal: AbortSignal.timeout(30000),
-    });
-    const data = await res.json();
-    const item = Array.isArray(data) ? data[0] : data;
-    const image = item?.productInfo?.product_main_image_url;
-    const affiliateLink = item?.affiliateLink;
-    if (image) {
-      return { image, affiliateLink: affiliateLink || "" };
-    }
-    return null;
-  } catch {
-    return null;
   }
 }
 
@@ -125,7 +93,34 @@ function extractImageFromHtml(html: string): string | null {
   const itempropMatch = html.match(
     /<(?:img|meta)[^>]*itemprop=["']image["'][^>]*(?:src|content)=["']([^"']+)["']/i
   );
-  if (itempropMatch?.[1] && !isBadImage(itempropMatch[1])) return itempropMatch[1];
+  if (itempropMatch?.[1] && !isBadImage(itempropMatch[1]))
+    return itempropMatch[1];
+
+  return null;
+}
+
+// Extract main product image from AliExpress HTML page data
+function extractAliExpressImage(html: string): string | null {
+  // Try to find image in the page's embedded JSON data (window.runParams or similar)
+  const imagePatterns = [
+    // Look for imageUrl in JSON data
+    /"imageUrl"\s*:\s*"(https?:\/\/[^"]+\.(?:jpg|jpeg|png|webp)[^"]*)"/i,
+    // Look for product main image
+    /"product_main_image_url"\s*:\s*"(https?:\/\/[^"]+)"/i,
+    // Look for imagePathList
+    /"imagePathList"\s*:\s*\[\s*"(https?:\/\/[^"]+)"/i,
+    // AliExpress img tags with product images
+    /class="magnifier-image"[^>]*src="(https?:\/\/[^"]+)"/i,
+    // General AliExpress CDN image pattern
+    /"(https?:\/\/ae\d+\.alicdn\.com\/kf\/[^"]+)"/i,
+  ];
+
+  for (const pattern of imagePatterns) {
+    const match = html.match(pattern);
+    if (match?.[1] && !isBadImage(match[1])) {
+      return match[1];
+    }
+  }
 
   return null;
 }
@@ -174,37 +169,37 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Strategy 1: For AliExpress, use dedicated API
-    // First try to extract product ID directly, if not found follow redirects
-    let resolvedUrl = url;
-    if (isAliExpressUrl(url) || /ali\.ski|s\.click\.aliexpress/i.test(url)) {
-      let productId = extractAliExpressProductId(url);
-      if (!productId) {
-        resolvedUrl = await resolveRedirects(url);
-        productId = extractAliExpressProductId(resolvedUrl);
-      }
-      if (productId) {
-        const result = await fetchAliExpressProduct(productId);
-        if (result) {
+    // For AliExpress shortened links, resolve redirects first
+    let fetchUrl = url;
+    if (isAliExpressUrl(url) && !/\/item\/\d+/i.test(url)) {
+      fetchUrl = await resolveRedirects(url);
+    }
+
+    // Fetch the page HTML directly
+    try {
+      const response = await fetch(fetchUrl, {
+        headers: BROWSER_HEADERS,
+        redirect: "follow",
+        signal: AbortSignal.timeout(15000),
+      });
+      const html = await response.text();
+
+      // For AliExpress, try AliExpress-specific extraction first
+      if (isAliExpressUrl(fetchUrl) || isAliExpressUrl(response.url)) {
+        const aliImage = extractAliExpressImage(html);
+        if (aliImage) {
           return NextResponse.json({
-            image: result.image,
-            affiliateLink: result.affiliateLink,
+            image: normalizeImageUrl(aliImage, fetchUrl),
           });
         }
       }
-    }
 
-    // Strategy 2: Direct fetch with browser headers (for non-AliExpress or as fallback)
-    try {
-      const response = await fetch(url, {
-        headers: BROWSER_HEADERS,
-        redirect: "follow",
-        signal: AbortSignal.timeout(10000),
-      });
-      const html = await response.text();
+      // Generic OG/meta extraction (works for all sites including AliExpress)
       const image = extractImageFromHtml(html);
       if (image) {
-        return NextResponse.json({ image: normalizeImageUrl(image, url) });
+        return NextResponse.json({
+          image: normalizeImageUrl(image, fetchUrl),
+        });
       }
     } catch {
       // Direct fetch failed

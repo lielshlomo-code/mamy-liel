@@ -20,10 +20,7 @@ export default function AdminShortLinks() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const siteUrl =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "https://mamy-liel.com";
+  const siteUrl = "https://mamy-liel.com";
 
   const load = () => {
     fetch("/api/admin/short-links")
@@ -146,8 +143,8 @@ export default function AdminShortLinks() {
                   </span>
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-text-secondary whitespace-nowrap" dir="ltr">
-                    /s/
+                  <span className="text-xs sm:text-sm text-text-secondary whitespace-nowrap" dir="ltr">
+                    mamy-liel.com/s/
                   </span>
                   <input
                     type="text"
@@ -190,60 +187,59 @@ export default function AdminShortLinks() {
         ) : (
           <div className="divide-y divide-border">
             {links.map((link) => (
-              <div key={link.id} className="p-3 sm:p-4 flex items-start sm:items-center gap-3 sm:gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <div key={link.id} className="p-3 sm:p-4">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 flex-wrap min-w-0">
                     {link.title && (
-                      <span className="font-medium text-sm">
+                      <span className="font-medium text-sm truncate">
                         {link.title}
                       </span>
                     )}
-                    <span className="text-xs text-text-secondary bg-muted px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-text-secondary bg-muted px-2 py-0.5 rounded-full shrink-0">
                       {link.clicks} לחיצות
                     </span>
                   </div>
-                  <div
-                    className="text-xs sm:text-sm font-mono text-foreground truncate"
-                    dir="ltr"
-                  >
-                    {siteUrl}/s/{link.code}
-                  </div>
-                  <div
-                    className="text-xs text-text-secondary truncate mt-0.5"
-                    dir="ltr"
-                  >
-                    → {link.targetUrl}
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => copyToClipboard(link.code, link.id)}
+                      className="p-2 rounded-lg hover:bg-muted transition-colors"
+                      title="העתקת קישור"
+                    >
+                      {copiedId === link.id ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-text-secondary" />
+                      )}
+                    </button>
+                    <a
+                      href={link.targetUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg hover:bg-muted transition-colors"
+                      title="פתיחת היעד"
+                    >
+                      <ExternalLink className="w-4 h-4 text-text-secondary" />
+                    </a>
+                    <button
+                      onClick={() => handleDelete(link.id)}
+                      className="p-2 rounded-lg hover:bg-red-50 transition-colors"
+                      title="מחיקה"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                  <button
-                    onClick={() => copyToClipboard(link.code, link.id)}
-                    className="p-2 rounded-lg hover:bg-muted transition-colors"
-                    title="העתקת קישור"
-                  >
-                    {copiedId === link.id ? (
-                      <Check className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-text-secondary" />
-                    )}
-                  </button>
-                  <a
-                    href={link.targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-muted transition-colors"
-                    title="פתיחת היעד"
-                  >
-                    <ExternalLink className="w-4 h-4 text-text-secondary" />
-                  </a>
-                  <button
-                    onClick={() => handleDelete(link.id)}
-                    className="p-2 rounded-lg hover:bg-red-50 transition-colors"
-                    title="מחיקה"
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </button>
+                <div
+                  className="text-xs sm:text-sm font-mono text-foreground break-all"
+                  dir="ltr"
+                >
+                  mamy-liel.com/s/{link.code}
+                </div>
+                <div
+                  className="text-xs text-text-secondary break-all mt-0.5"
+                  dir="ltr"
+                >
+                  → {link.targetUrl}
                 </div>
               </div>
             ))}

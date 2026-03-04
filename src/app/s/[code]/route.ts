@@ -20,14 +20,13 @@ export async function GET(
   // Record click event with metadata (fire and forget)
   const referrer = request.headers.get("referer") || null;
   const userAgent = request.headers.get("user-agent") || null;
-  const country = request.headers.get("x-vercel-ip-country") || null;
 
   supabase
     .rpc("record_short_link_click", {
       link_code: code,
       click_referrer: referrer,
       click_user_agent: userAgent,
-      click_country: country,
+      click_country: null,
     })
     .then(() => {});
 

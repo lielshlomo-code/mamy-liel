@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save, Loader2, ImageIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Plus, Pencil, Trash2, X, Save, Loader2, ImageIcon, Upload, Tag, ChevronDown, ChevronUp } from "lucide-react";
 import type { Product } from "@/lib/types";
 
 const emptyProduct = {
@@ -19,6 +19,14 @@ export default function AdminProducts() {
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Category management state
+  const [showCategories, setShowCategories] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<{ id: string; label: string } | null>(null);
+  const [newCategory, setNewCategory] = useState<{ id: string; label: string } | null>(null);
+  const [categoryError, setCategoryError] = useState("");
 
   const load = () => {
     fetch("/api/admin/products")
@@ -60,6 +68,46 @@ export default function AdminProducts() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
     });
+    load();
+  };
+
+  // Category CRUD handlers
+  const handleSaveCategory = async (category: { id: string; label: string }, isNewCat: boolean) => {
+    setCategoryError("");
+    const method = isNewCat ? "POST" : "PUT";
+    const res = await fetch("/api/admin/categories", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(category),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setCategoryError(data.error || "שגיאה בשמירת קטגוריה");
+      return;
+    }
+
+    setEditingCategory(null);
+    setNewCategory(null);
+    load();
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    setCategoryError("");
+    if (!confirm("למחוק את הקטגוריה?")) return;
+
+    const res = await fetch("/api/admin/categories", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setCategoryError(data.error || "שגיאה במחיקת קטגוריה");
+      return;
+    }
+
     load();
   };
 
@@ -143,10 +191,35 @@ export default function AdminProducts() {
     setFetchingImage(false);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editing) return;
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setEditing({ ...editing, image: data.url });
+      } else {
+        alert(data.error || "שגיאה בהעלאת התמונה");
+      }
+    } catch {
+      alert("שגיאה בהעלאת התמונה");
+    }
+    setUploadingImage(false);
+    // Reset file input so same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">ניהול מוצרים</h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">ניהול מוצרים</h1>
         <button
           onClick={() => {
             setEditing({ ...emptyProduct });
@@ -159,9 +232,147 @@ export default function AdminProducts() {
         </button>
       </div>
 
+      {/* Category Management Section */}
+      <div className="bg-white rounded-xl border border-border mb-6">
+        <button
+          onClick={() => setShowCategories(!showCategories)}
+          className="w-full flex items-center justify-between px-6 py-4 text-sm font-semibold hover:bg-muted/50 transition-colors rounded-xl"
+        >
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4" />
+            ניהול קטגוריות
+          </div>
+          {showCategories ? (
+            <ChevronUp className="w-4 h-4 text-text-secondary" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-text-secondary" />
+          )}
+        </button>
+
+        {showCategories && (
+          <div className="px-6 pb-5 border-t border-border pt-4">
+            {categoryError && (
+              <div className="mb-3 px-3 py-2 rounded-lg bg-red-50 text-red-700 text-sm">
+                {categoryError}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              {categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/50"
+                >
+                  {editingCategory?.id === cat.id ? (
+                    <>
+                      <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
+                        {cat.id}
+                      </span>
+                      <input
+                        type="text"
+                        value={editingCategory.label}
+                        onChange={(e) =>
+                          setEditingCategory({ ...editingCategory, label: e.target.value })
+                        }
+                        className="flex-1 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => handleSaveCategory(editingCategory, false)}
+                        className="p-1.5 rounded-lg hover:bg-green-50 transition-colors"
+                        title="שמירה"
+                      >
+                        <Save className="w-4 h-4 text-green-600" />
+                      </button>
+                      <button
+                        onClick={() => setEditingCategory(null)}
+                        className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                        title="ביטול"
+                      >
+                        <X className="w-4 h-4 text-text-secondary" />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
+                        {cat.id}
+                      </span>
+                      <span className="flex-1 text-sm">{cat.label}</span>
+                      <button
+                        onClick={() => setEditingCategory({ ...cat })}
+                        className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                        title="עריכה"
+                      >
+                        <Pencil className="w-3.5 h-3.5 text-text-secondary" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCategory(cat.id)}
+                        className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                        title="מחיקה"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Add new category */}
+            {newCategory ? (
+              <div className="flex items-center gap-3 px-3 py-2 mt-2 rounded-lg border border-dashed border-border">
+                <input
+                  type="text"
+                  dir="ltr"
+                  placeholder="מזהה (אנגלית)"
+                  value={newCategory.id}
+                  onChange={(e) =>
+                    setNewCategory({ ...newCategory, id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "") })
+                  }
+                  className="w-24 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 font-mono"
+                  autoFocus
+                />
+                <input
+                  type="text"
+                  placeholder="שם הקטגוריה"
+                  value={newCategory.label}
+                  onChange={(e) =>
+                    setNewCategory({ ...newCategory, label: e.target.value })
+                  }
+                  className="flex-1 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                />
+                <button
+                  onClick={() => handleSaveCategory(newCategory, true)}
+                  disabled={!newCategory.id || !newCategory.label}
+                  className="p-1.5 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-40"
+                  title="שמירה"
+                >
+                  <Save className="w-4 h-4 text-green-600" />
+                </button>
+                <button
+                  onClick={() => setNewCategory(null)}
+                  className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                  title="ביטול"
+                >
+                  <X className="w-4 h-4 text-text-secondary" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setNewCategory({ id: "", label: "" })}
+                className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border text-sm text-text-secondary hover:bg-muted/50 hover:text-foreground transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                קטגוריה חדשה
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Edit form */}
       {editing && (
-        <div className="bg-white rounded-xl border border-border p-6 mb-6">
+        <div className="bg-white rounded-xl border border-border p-4 sm:p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">
               {isNew ? "מוצר חדש" : "עריכת מוצר"}
@@ -208,19 +419,19 @@ export default function AdminProducts() {
 
           <div className="flex flex-col gap-1.5 mb-4">
             <label className="text-sm font-medium">תיאור</label>
-            <input
-              type="text"
+            <textarea
+              rows={3}
               value={editing.description || ""}
               onChange={(e) =>
                 setEditing({ ...editing, description: e.target.value })
               }
-              className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+              className="w-full px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 resize-y"
             />
           </div>
 
           <div className="flex flex-col gap-1.5 mb-4">
             <label className="text-sm font-medium">קישור למוצר</label>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="url"
                 dir="ltr"
@@ -235,7 +446,7 @@ export default function AdminProducts() {
                 type="button"
                 onClick={fetchImage}
                 disabled={!editing.url || fetchingImage}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-orange-50 border border-orange-200 text-orange-700 text-sm font-medium hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-orange-50 border border-orange-200 text-orange-700 text-sm font-medium hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 {fetchingImage ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -261,6 +472,26 @@ export default function AdminProducts() {
                 className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
               />
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingImage}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1 self-start"
+            >
+              {uploadingImage ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Upload className="w-4 h-4" />
+              )}
+              {editing.image ? "החלפת תמונה" : "העלאת תמונה"}
+            </button>
             {editing.image && (
               <div className="mt-2 relative w-32 h-32 rounded-lg overflow-hidden border border-border bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -302,13 +533,13 @@ export default function AdminProducts() {
       )}
 
       {/* Products list */}
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
+      <div className="bg-white rounded-xl border border-border overflow-hidden overflow-x-auto">
         {products.length === 0 ? (
           <p className="text-center text-text-secondary py-12">
             אין מוצרים עדיין
           </p>
         ) : (
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-0">
             <thead>
               <tr className="border-b border-border bg-muted">
                 <th className="text-right px-4 py-3 font-medium">שם</th>
@@ -342,7 +573,7 @@ export default function AdminProducts() {
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary">
-                    {p.category}
+                    {categories.find((c) => c.id === p.category)?.label || p.category}
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     {p.featured ? "✓" : ""}

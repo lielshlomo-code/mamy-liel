@@ -8,55 +8,24 @@ interface LogoProps {
 
 export default function Logo({ size = "md", asLink = true, className = "" }: LogoProps) {
   const sizes = {
-    sm: { icon: 24, text: "text-lg", gap: "gap-2" },
-    md: { icon: 30, text: "text-2xl", gap: "gap-2.5" },
-    lg: { icon: 38, text: "text-3xl", gap: "gap-3" },
+    sm: { text: "text-lg", dot: "w-1.5 h-1.5", line: "w-4" },
+    md: { text: "text-2xl", dot: "w-2 h-2", line: "w-5" },
+    lg: { text: "text-3xl", dot: "w-2.5 h-2.5", line: "w-6" },
   };
 
   const s = sizes[size];
 
   const content = (
-    <span className={`inline-flex items-center ${s.gap} ${className}`}>
-      {/* Icon: botanical leaf with heart */}
-      <svg
-        width={s.icon}
-        height={s.icon}
-        viewBox="0 0 40 40"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="flex-shrink-0"
-      >
-        {/* Main leaf shape */}
-        <path
-          d="M20 4C20 4 8 12 8 24C8 30 13 36 20 36C27 36 32 30 32 24C32 12 20 4 20 4Z"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinejoin="round"
-        />
-        {/* Center vein */}
-        <path
-          d="M20 10V32"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-        />
-        {/* Side veins */}
-        <path
-          d="M20 16L13 21M20 21L12 27M20 16L27 21M20 21L28 27"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeLinecap="round"
-        />
-        {/* Small heart at top of leaf */}
-        <path
-          d="M20 11C20 11 18 9.5 17 10.5C16 11.5 17.5 12.5 20 14.5C22.5 12.5 24 11.5 23 10.5C22 9.5 20 11 20 11Z"
-          fill="currentColor"
-        />
-      </svg>
-      {/* Text */}
-      <span className={`${s.text} font-black tracking-tighter leading-none`}>
-        mamy<span className="text-text-secondary font-light">.liel</span>
+    <span className={`inline-flex items-baseline ${className}`}>
+      {/* "mamy" - bold uppercase with wide tracking */}
+      <span className={`${s.text} font-black tracking-wide uppercase`}>
+        mamy
+      </span>
+      {/* Decorative dot separator */}
+      <span className={`${s.dot} rounded-full bg-foreground mx-1 mb-[0.2em] inline-block`} />
+      {/* "liel" - thin italic lowercase */}
+      <span className={`${s.text} font-extralight tracking-widest lowercase italic`}>
+        liel
       </span>
     </span>
   );

@@ -10,11 +10,17 @@
   --color-accent: #000000;
   --color-accent-hover: #1a1a1a;
 
-  /* Warm palette */
-  --color-warm-50: #faf8f5;
-  --color-warm-100: #f5f0ea;
-  --color-warm-200: #ede5d8;
-  --color-warm-300: #e0d5c4;
+  /* Warm palette — visible tones */
+  --color-warm-50: #f7f3ee;
+  --color-warm-100: #efe8de;
+  --color-warm-200: #e4d8c8;
+  --color-warm-300: #d4c4ad;
+
+  /* Rose accent — soft pink */
+  --color-rose-50: #fdf2f4;
+  --color-rose-100: #fce4e8;
+  --color-rose-200: #f9ced5;
+  --color-rose-300: #f2a5b3;
 
   --font-sans: var(--font-heebo);
 }
@@ -132,26 +138,61 @@ body {
 
 /* Warm section backgrounds */
 .bg-warm-gradient {
-  background: linear-gradient(180deg, var(--color-warm-50) 0%, #ffffff 100%);
+  background: linear-gradient(180deg, var(--color-warm-100) 0%, var(--color-warm-50) 50%, #ffffff 100%);
 }
 .bg-warm-gradient-reverse {
-  background: linear-gradient(180deg, #ffffff 0%, var(--color-warm-50) 100%);
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-warm-50) 40%, var(--color-warm-100) 100%);
 }
 .bg-warm-mesh {
   background:
-    radial-gradient(ellipse at 20% 50%, var(--color-warm-100) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, var(--color-warm-50) 0%, transparent 40%),
-    radial-gradient(ellipse at 40% 80%, var(--color-warm-100) 0%, transparent 45%),
+    radial-gradient(ellipse at 15% 50%, var(--color-rose-100) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 20%, var(--color-warm-100) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 90%, var(--color-rose-50) 0%, transparent 45%),
     var(--color-warm-50);
 }
 .bg-warm-solid {
   background: var(--color-warm-50);
 }
 
+/* Animated gradient background */
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.bg-animated-gradient {
+  background: linear-gradient(
+    -45deg,
+    var(--color-warm-50),
+    var(--color-rose-50),
+    var(--color-warm-100),
+    var(--color-rose-100),
+    var(--color-warm-50)
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
 /* Dot grid background */
 .dot-grid {
-  background-image: radial-gradient(circle, var(--color-warm-300) 0.7px, transparent 0.7px);
+  background-image: radial-gradient(circle, var(--color-warm-300) 0.8px, transparent 0.8px);
   background-size: 20px 20px;
+}
+
+/* Floating animation for decorative elements */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-15px) rotate(2deg); }
+  66% { transform: translateY(10px) rotate(-1deg); }
+}
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-25px) scale(1.05); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-float-slow {
+  animation: floatSlow 10s ease-in-out infinite;
 }
 
 /* Organic curve section divider */

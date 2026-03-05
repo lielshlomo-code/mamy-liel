@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Plus, Pencil, Trash2, X, Save, Loader2, ImageIcon, Upload, Tag, ChevronDown, ChevronUp } from "lucide-react";
-import type { Product } from "@/lib/types";
+import type { Product, Subcategory } from "@/lib/types";
 
 const emptyProduct = {
   name: "",
   description: "",
   category: "baby",
+  subcategory: "",
   url: "",
   image: "",
   featured: false,
@@ -15,7 +16,7 @@ const emptyProduct = {
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<{ id: string; label: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; label: string; subcategories?: Subcategory[] }[]>([]);
   const [editing, setEditing] = useState<Partial<Product> | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [fetchingImage, setFetchingImage] = useState(false);
@@ -27,6 +28,12 @@ export default function AdminProducts() {
   const [editingCategory, setEditingCategory] = useState<{ id: string; label: string } | null>(null);
   const [newCategory, setNewCategory] = useState<{ id: string; label: string } | null>(null);
   const [categoryError, setCategoryError] = useState("");
+
+  // Subcategory management state
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [editingSubcategory, setEditingSubcategory] = useState<{ id: string; label: string; categoryId: string } | null>(null);
+  const [newSubcategory, setNewSubcategory] = useState<{ id: string; label: string; categoryId: string } | null>(null);
+  const [subcategoryError, setSubcategoryError] = useState("");
 
   const load = () => {
     fetch("/api/admin/products")
@@ -111,6 +118,46 @@ export default function AdminProducts() {
     load();
   };
 
+  // Subcategory CRUD handlers
+  const handleSaveSubcategory = async (sub: { id: string; label: string; categoryId: string }, isNewSub: boolean) => {
+    setSubcategoryError("");
+    const method = isNewSub ? "POST" : "PUT";
+    const res = await fetch("/api/admin/subcategories", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sub),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setSubcategoryError(data.error || "שגיאה בשמירת תת-קטגוריה");
+      return;
+    }
+
+    setEditingSubcategory(null);
+    setNewSubcategory(null);
+    load();
+  };
+
+  const handleDeleteSubcategory = async (id: string) => {
+    setSubcategoryError("");
+    if (!confirm("למחוק את תת-הקטגוריה?")) return;
+
+    const res = await fetch("/api/admin/subcategories", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setSubcategoryError(data.error || "שגיאה במחיקת תת-קטגוריה");
+      return;
+    }
+
+    load();
+  };
+
   const fetchImage = async () => {
     if (!editing?.url) return;
     setFetchingImage(true);
@@ -161,6 +208,21 @@ export default function AdminProducts() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  // Get subcategories for the currently selected category in the edit form
+  const currentCategorySubcategories = categories.find(
+    (c) => c.id === editing?.category
+  )?.subcategories || [];
+
+  // Get subcategory label for display in the products table
+  const getSubcategoryLabel = (subcategoryId: string | undefined) => {
+    if (!subcategoryId) return null;
+    for (const cat of categories) {
+      const sub = cat.subcategories?.find((s) => s.id === subcategoryId);
+      if (sub) return sub.label;
+    }
+    return subcategoryId;
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between gap-3 flex-wrap mb-6">
@@ -185,7 +247,7 @@ export default function AdminProducts() {
         >
           <div className="flex items-center gap-2">
             <Tag className="w-4 h-4" />
-            ניהול קטגוריות
+            ניהול קטגוריות ותת-קטגוריות
           </div>
           {showCategories ? (
             <ChevronUp className="w-4 h-4 text-text-secondary" />
@@ -201,63 +263,198 @@ export default function AdminProducts() {
                 {categoryError}
               </div>
             )}
+            {subcategoryError && (
+              <div className="mb-3 px-3 py-2 rounded-lg bg-red-50 text-red-700 text-sm">
+                {subcategoryError}
+              </div>
+            )}
 
             <div className="space-y-2">
               {categories.map((cat) => (
-                <div
-                  key={cat.id}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/50"
-                >
-                  {editingCategory?.id === cat.id ? (
-                    <>
-                      <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
-                        {cat.id}
-                      </span>
-                      <input
-                        type="text"
-                        value={editingCategory.label}
-                        onChange={(e) =>
-                          setEditingCategory({ ...editingCategory, label: e.target.value })
-                        }
-                        className="flex-1 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-                        autoFocus
-                      />
-                      <button
-                        onClick={() => handleSaveCategory(editingCategory, false)}
-                        className="p-1.5 rounded-lg hover:bg-green-50 transition-colors"
-                        title="שמירה"
-                      >
-                        <Save className="w-4 h-4 text-green-600" />
-                      </button>
-                      <button
-                        onClick={() => setEditingCategory(null)}
-                        className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-                        title="ביטול"
-                      >
-                        <X className="w-4 h-4 text-text-secondary" />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
-                        {cat.id}
-                      </span>
-                      <span className="flex-1 text-sm">{cat.label}</span>
-                      <button
-                        onClick={() => setEditingCategory({ ...cat })}
-                        className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-                        title="עריכה"
-                      >
-                        <Pencil className="w-3.5 h-3.5 text-text-secondary" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteCategory(cat.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
-                        title="מחיקה"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 text-red-500" />
-                      </button>
-                    </>
+                <div key={cat.id}>
+                  {/* Category row */}
+                  <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/50">
+                    {editingCategory?.id === cat.id ? (
+                      <>
+                        <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
+                          {cat.id}
+                        </span>
+                        <input
+                          type="text"
+                          value={editingCategory.label}
+                          onChange={(e) =>
+                            setEditingCategory({ ...editingCategory, label: e.target.value })
+                          }
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => handleSaveCategory(editingCategory, false)}
+                          className="p-1.5 rounded-lg hover:bg-green-50 transition-colors"
+                          title="שמירה"
+                        >
+                          <Save className="w-4 h-4 text-green-600" />
+                        </button>
+                        <button
+                          onClick={() => setEditingCategory(null)}
+                          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                          title="ביטול"
+                        >
+                          <X className="w-4 h-4 text-text-secondary" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setExpandedCategory(expandedCategory === cat.id ? null : cat.id)}
+                          className="p-1 rounded hover:bg-muted transition-colors"
+                        >
+                          {expandedCategory === cat.id ? (
+                            <ChevronUp className="w-3.5 h-3.5 text-text-secondary" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5 text-text-secondary" />
+                          )}
+                        </button>
+                        <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
+                          {cat.id}
+                        </span>
+                        <span className="flex-1 text-sm font-medium">{cat.label}</span>
+                        {cat.subcategories && cat.subcategories.length > 0 && (
+                          <span className="text-xs text-text-secondary bg-muted px-2 py-0.5 rounded-full">
+                            {cat.subcategories.length} תת-קטגוריות
+                          </span>
+                        )}
+                        <button
+                          onClick={() => setEditingCategory({ ...cat })}
+                          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
+                          title="עריכה"
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-text-secondary" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(cat.id)}
+                          className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                          title="מחיקה"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 text-red-500" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Subcategories for this category */}
+                  {expandedCategory === cat.id && (
+                    <div className="mr-6 sm:mr-10 mt-1 mb-2 space-y-1.5">
+                      {cat.subcategories?.map((sub) => (
+                        <div
+                          key={sub.id}
+                          className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-muted/30 border border-border/50"
+                        >
+                          {editingSubcategory?.id === sub.id ? (
+                            <>
+                              <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
+                                {sub.id}
+                              </span>
+                              <input
+                                type="text"
+                                value={editingSubcategory.label}
+                                onChange={(e) =>
+                                  setEditingSubcategory({ ...editingSubcategory, label: e.target.value })
+                                }
+                                className="flex-1 px-3 py-1 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => handleSaveSubcategory(editingSubcategory, false)}
+                                className="p-1 rounded-lg hover:bg-green-50 transition-colors"
+                                title="שמירה"
+                              >
+                                <Save className="w-3.5 h-3.5 text-green-600" />
+                              </button>
+                              <button
+                                onClick={() => setEditingSubcategory(null)}
+                                className="p-1 rounded-lg hover:bg-muted transition-colors"
+                                title="ביטול"
+                              >
+                                <X className="w-3.5 h-3.5 text-text-secondary" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
+                                {sub.id}
+                              </span>
+                              <span className="flex-1 text-sm">{sub.label}</span>
+                              <button
+                                onClick={() => setEditingSubcategory({ id: sub.id, label: sub.label, categoryId: sub.categoryId })}
+                                className="p-1 rounded-lg hover:bg-muted transition-colors"
+                                title="עריכה"
+                              >
+                                <Pencil className="w-3 h-3 text-text-secondary" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteSubcategory(sub.id)}
+                                className="p-1 rounded-lg hover:bg-red-50 transition-colors"
+                                title="מחיקה"
+                              >
+                                <Trash2 className="w-3 h-3 text-red-500" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* Add new subcategory */}
+                      {newSubcategory && newSubcategory.categoryId === cat.id ? (
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 px-3 py-1.5 rounded-lg border border-dashed border-border">
+                          <input
+                            type="text"
+                            dir="ltr"
+                            placeholder="מזהה (אנגלית)"
+                            value={newSubcategory.id}
+                            onChange={(e) =>
+                              setNewSubcategory({ ...newSubcategory, id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "") })
+                            }
+                            className="w-full sm:w-24 px-3 py-1 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 font-mono"
+                            autoFocus
+                          />
+                          <input
+                            type="text"
+                            placeholder="שם תת-הקטגוריה"
+                            value={newSubcategory.label}
+                            onChange={(e) =>
+                              setNewSubcategory({ ...newSubcategory, label: e.target.value })
+                            }
+                            className="flex-1 px-3 py-1 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                          />
+                          <div className="flex items-center gap-2 self-end">
+                            <button
+                              onClick={() => handleSaveSubcategory(newSubcategory, true)}
+                              disabled={!newSubcategory.id || !newSubcategory.label}
+                              className="p-1 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-40"
+                              title="שמירה"
+                            >
+                              <Save className="w-3.5 h-3.5 text-green-600" />
+                            </button>
+                            <button
+                              onClick={() => setNewSubcategory(null)}
+                              className="p-1 rounded-lg hover:bg-muted transition-colors"
+                              title="ביטול"
+                            >
+                              <X className="w-3.5 h-3.5 text-text-secondary" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setNewSubcategory({ id: "", label: "", categoryId: cat.id })}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-border text-xs text-text-secondary hover:bg-muted/50 hover:text-foreground transition-colors"
+                        >
+                          <Plus className="w-3 h-3" />
+                          תת-קטגוריה חדשה
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               ))}
@@ -351,7 +548,7 @@ export default function AdminProducts() {
               <select
                 value={editing.category || "baby"}
                 onChange={(e) =>
-                  setEditing({ ...editing, category: e.target.value })
+                  setEditing({ ...editing, category: e.target.value, subcategory: "" })
                 }
                 className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
               >
@@ -363,6 +560,27 @@ export default function AdminProducts() {
               </select>
             </div>
           </div>
+
+          {/* Subcategory dropdown - only show if current category has subcategories */}
+          {currentCategorySubcategories.length > 0 && (
+            <div className="flex flex-col gap-1.5 mb-4">
+              <label className="text-sm font-medium">תת-קטגוריה</label>
+              <select
+                value={editing.subcategory || ""}
+                onChange={(e) =>
+                  setEditing({ ...editing, subcategory: e.target.value })
+                }
+                className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+              >
+                <option value="">ללא תת-קטגוריה</option>
+                {currentCategorySubcategories.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="flex flex-col gap-1.5 mb-4">
             <label className="text-sm font-medium">תיאור</label>
@@ -518,7 +736,14 @@ export default function AdminProducts() {
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary">
-                    {categories.find((c) => c.id === p.category)?.label || p.category}
+                    <div className="flex flex-col">
+                      <span>{categories.find((c) => c.id === p.category)?.label || p.category}</span>
+                      {p.subcategory && (
+                        <span className="text-xs text-text-secondary/70">
+                          {getSubcategoryLabel(p.subcategory)}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     {p.featured ? "✓" : ""}

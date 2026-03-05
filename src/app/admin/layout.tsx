@@ -9,6 +9,9 @@ import {
   PenLine,
   Link2,
   Scissors,
+  GraduationCap,
+  Users,
+  Mail,
   LogOut,
   Menu,
   X,
@@ -16,6 +19,9 @@ import {
 
 const sidebarLinks = [
   { href: "/admin", label: "דשבורד", icon: LayoutDashboard },
+  { href: "/admin/academy", label: "המכללה", icon: GraduationCap },
+  { href: "/admin/users", label: "משתמשים", icon: Users },
+  { href: "/admin/mailing", label: "דיוור", icon: Mail },
   { href: "/admin/products", label: "מוצרים", icon: Package },
   { href: "/admin/blog", label: "הדרכות ומתכונים", icon: PenLine },
   { href: "/admin/links", label: "קישורים", icon: Link2 },

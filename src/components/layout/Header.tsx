@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import UserMenu from "@/components/auth/UserMenu";
 
 const navLinks = [
   { href: "/", label: "בית" },
@@ -67,6 +68,7 @@ export default function Header() {
                 </Link>
               </motion.div>
             ))}
+            <UserMenu />
           </nav>
 
           {/* Mobile menu button */}

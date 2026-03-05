@@ -3,15 +3,23 @@ export interface Product {
   name: string;
   description: string;
   category: string;
+  subcategory?: string;
   url: string;
   image?: string;
   featured?: boolean;
   dateAdded: string;
 }
 
+export interface Subcategory {
+  id: string;
+  label: string;
+  categoryId: string;
+}
+
 export interface ProductCategory {
   id: string;
   label: string;
+  subcategories?: Subcategory[];
 }
 
 export interface ProductsData {
@@ -63,15 +71,43 @@ export interface ShortLink {
   createdAt: string;
 }
 
+export interface CourseCategory {
+  id: string;
+  label: string;
+}
+
 export interface Course {
   id: string;
   title: string;
+  slug: string;
   description: string;
-  price: number;
-  currency: "ILS";
-  image: string;
-  status: "coming_soon" | "available" | "sold_out";
-  purchaseUrl?: string;
+  category: string;
+  image?: string;
+  isFree: boolean;
+  price?: string;
+  paymentUrl?: string;
+  featured?: boolean;
+  published: boolean;
+  dateAdded: string;
+  orderIndex: number;
+  lessonCount?: number;
+}
+
+export interface CourseLesson {
+  id: string;
+  courseId: string;
+  title: string;
+  description?: string;
+  videoUrl: string;
+  duration?: string;
+  isPreview: boolean;
+  orderIndex: number;
+  published: boolean;
+}
+
+export interface AcademyData {
+  categories: CourseCategory[];
+  courses: Course[];
 }
 
 // Analytics types

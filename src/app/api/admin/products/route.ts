@@ -182,6 +182,11 @@ export async function GET() {
     .select("*")
     .order("id");
 
+  const { data: subcategories } = await supabase
+    .from("subcategories")
+    .select("*")
+    .order("id");
+
   const { data: products } = await supabase
     .from("products")
     .select("*")
@@ -189,13 +194,21 @@ export async function GET() {
 
   const allCategory = { id: "all", label: "הכל" };
 
+  const categoriesWithSubs = (categories || []).map((cat) => ({
+    ...cat,
+    subcategories: (subcategories || [])
+      .filter((s) => s.category_id === cat.id)
+      .map((s) => ({ id: s.id, label: s.label, categoryId: s.category_id })),
+  }));
+
   return NextResponse.json({
-    categories: [allCategory, ...(categories || [])],
+    categories: [allCategory, ...categoriesWithSubs],
     products: (products || []).map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description,
       category: p.category,
+      subcategory: p.subcategory || null,
       url: p.url,
       image: p.image,
       featured: p.featured,
@@ -233,6 +246,7 @@ export async function POST(request: Request) {
         name: product.name,
         description: product.description,
         category: product.category,
+        subcategory: product.subcategory || null,
         url: productUrl,
         image,
         featured: product.featured || false,
@@ -277,6 +291,7 @@ export async function PUT(request: Request) {
         name: updated.name,
         description: updated.description,
         category: updated.category,
+        subcategory: updated.subcategory || null,
         url: productUrl,
         image,
         featured: updated.featured,

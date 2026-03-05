@@ -1,22 +1,16 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Product } from "@/lib/types";
-
-const categoryLabels: Record<string, string> = {
-  baby: "לתינוק",
-  home: "לבית",
-  fashion: "אופנה",
-  beauty: "טיפוח",
-};
+import type { Product, Subcategory } from "@/lib/types";
 
 export default function ProductCard({
   product,
   index = 0,
+  subcategories,
 }: {
   product: Product;
   index?: number;
+  subcategories?: Subcategory[];
 }) {
   const handleClick = () => {
     if (navigator.sendBeacon) {
@@ -36,57 +30,59 @@ export default function ProductCard({
     }
   };
 
+  const subcategoryLabel = product.subcategory
+    ? subcategories?.find((s) => s.id === product.subcategory)?.label
+    : null;
+
   return (
     <motion.a
       href={product.url}
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        delay: index * 0.08,
-        duration: 0.5,
+        delay: index * 0.06,
+        duration: 0.4,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
-      whileHover={{ y: -8 }}
-      className="group flex flex-col rounded-2xl bg-muted overflow-hidden"
+      className="group flex items-center gap-4 rounded-2xl bg-warm-100/60 p-4 sm:p-5 hover:bg-warm-100 transition-colors"
     >
-      {/* Image area */}
-      <div className="aspect-[4/5] bg-gradient-to-b from-transparent to-black/[0.03] flex items-center justify-center relative overflow-hidden">
-        {product.image ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={product.image}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-        ) : (
-          <span className="text-7xl font-black text-black/[0.04] group-hover:scale-125 transition-transform duration-700">
-            {product.name.charAt(0)}
+      {/* Text content */}
+      <div className="flex-1 flex flex-col items-center text-center gap-3">
+        <h3 className="font-bold text-base sm:text-lg leading-snug">
+          {product.name}
+        </h3>
+
+        {product.description && (
+          <p className="text-sm text-text-secondary line-clamp-2">
+            {product.description}
+          </p>
+        )}
+
+        {subcategoryLabel && (
+          <span className="text-xs text-text-secondary/70">
+            {subcategoryLabel}
           </span>
         )}
 
-        <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-sm">
-          <ExternalLink className="w-4 h-4" />
-        </div>
-
-        <div className="absolute bottom-4 right-4">
-          <span className="px-3 py-1 text-xs font-medium bg-white rounded-full shadow-sm">
-            {categoryLabels[product.category] || product.category}
-          </span>
-        </div>
+        <span className="inline-flex items-center justify-center px-6 py-2 rounded-full bg-rose-300 text-white text-sm font-medium group-hover:bg-rose-400 transition-colors">
+          מעבר לאתר
+        </span>
       </div>
 
-      {/* Content */}
-      <div className="p-5">
-        <h3 className="font-bold text-lg group-hover:text-text-secondary transition-colors">
-          {product.name}
-        </h3>
-        <p className="text-sm text-text-secondary mt-1 line-clamp-2">
-          {product.description}
-        </p>
-      </div>
+      {/* Image - small thumbnail */}
+      {product.image && (
+        <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-xl overflow-hidden flex-shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+      )}
     </motion.a>
   );
 }

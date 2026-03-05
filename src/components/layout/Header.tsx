@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import Logo from "@/components/ui/Logo";
 
 const navLinks = [
   { href: "/", label: "בית" },
+  { href: "/academy", label: "המכללה" },
   { href: "/products", label: "מוצרים" },
   { href: "/blog", label: "הדרכות ומתכונים" },
   { href: "/contact", label: "שיתופי פעולה" },
@@ -42,7 +42,12 @@ export default function Header() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between">
-          <Logo />
+          <Link href="/" className="group relative">
+            <span className="text-2xl font-black tracking-tighter">
+              mamy<span className="text-text-secondary">.liel</span>
+            </span>
+            <span className="absolute -bottom-1 right-0 w-0 h-[2px] bg-foreground group-hover:w-full transition-all duration-300" />
+          </Link>
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-1">
@@ -87,7 +92,9 @@ export default function Header() {
             className="fixed inset-0 z-[100] bg-white flex flex-col"
           >
             <div className="flex items-center justify-between px-6 py-5">
-              <Logo asLink={false} />
+              <span className="text-2xl font-black tracking-tighter">
+                mamy<span className="text-text-secondary">.liel</span>
+              </span>
               <motion.button
                 onClick={() => setMobileOpen(false)}
                 whileTap={{ scale: 0.9, rotate: 90 }}

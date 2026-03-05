@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { X, Instagram } from "lucide-react";
 import { useEffect } from "react";
-import Logo from "@/components/ui/Logo";
 
 interface MobileNavProps {
   open: boolean;
@@ -40,7 +39,7 @@ export default function MobileNav({ open, onClose, links }: MobileNavProps) {
         }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <Logo size="sm" asLink={false} />
+          <span className="text-lg font-bold">mamy.liel</span>
           <button onClick={onClose} className="p-2" aria-label="סגור תפריט">
             <X className="w-5 h-5" />
           </button>

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Instagram } from "lucide-react";
-import Logo from "@/components/ui/Logo";
 
 export default function Footer() {
   return (
@@ -13,7 +12,9 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between gap-10">
           {/* Brand */}
           <div>
-            <Logo asLink={false} />
+            <span className="text-2xl font-black tracking-tighter">
+              mamy<span className="text-text-secondary">.liel</span>
+            </span>
             <p className="text-sm text-text-secondary mt-2 max-w-xs">
               משתפת דברים שטובים לי ולבית שלי
             </p>

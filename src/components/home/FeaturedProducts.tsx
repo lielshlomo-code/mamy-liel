@@ -5,10 +5,11 @@ import AnimatedSection from "@/components/ui/AnimatedSection";
 import type { Product } from "@/lib/types";
 
 const categoryLabels: Record<string, string> = {
-  baby: "לתינוק",
-  home: "לבית",
-  fashion: "אופנה",
-  beauty: "טיפוח",
+  gear: "ציוד ואביזרים",
+  toys: "צעצועים ומשחקים",
+  feeding: "שולחן ואוכל",
+  home: "הבית שלנו",
+  personal: "לגן ולילדים",
 };
 
 function FeaturedProductCard({

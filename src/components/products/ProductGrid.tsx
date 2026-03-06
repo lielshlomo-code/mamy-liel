@@ -14,6 +14,7 @@ interface ProductGridProps {
 export default function ProductGrid({ products, categories }: ProductGridProps) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [openSubs, setOpenSubs] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState("");
 
   const handleCategoryChange = (id: string) => {
     setActiveCategory(id);
@@ -37,8 +38,17 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
     return subs;
   }, [categories]);
 
+  // Normalize search term
+  const searchTerm = search.trim().toLowerCase();
+  const isSearching = searchTerm.length > 0;
+
+  const matchesSearch = (p: Product) =>
+    !isSearching ||
+    p.name.toLowerCase().includes(searchTerm) ||
+    (p.description && p.description.toLowerCase().includes(searchTerm));
+
   const getSubProducts = (catId: string, subId: string) =>
-    products.filter((p) => p.category === catId && p.subcategory === subId);
+    products.filter((p) => p.category === catId && p.subcategory === subId && matchesSearch(p));
 
   const activeCat = categories.find((c) => c.id === activeCategory);
   const subcategories = activeCat?.subcategories || [];
@@ -71,8 +81,68 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
         onChange={handleCategoryChange}
       />
 
+      {/* Search bar */}
+      <div className="relative max-w-5xl mx-auto w-full">
+        <div className="relative">
+          <svg
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-light pointer-events-none"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="חיפוש מוצר..."
+            className="w-full pr-12 pl-4 py-3 rounded-2xl bg-white/70 backdrop-blur-sm border border-warm-200/50 text-sm placeholder:text-text-light focus:outline-none focus:ring-2 focus:ring-rose-200 focus:border-rose-200 transition-all"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-warm-200/60 hover:bg-warm-200 flex items-center justify-center transition-colors"
+            >
+              <svg className="w-3.5 h-3.5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Search results */}
+      {isSearching && (
+        <div className="max-w-5xl mx-auto w-full">
+          {(() => {
+            const results = products.filter(matchesSearch);
+            if (results.length === 0) {
+              return (
+                <p className="text-center text-text-secondary py-12">
+                  לא נמצאו מוצרים עבור &quot;{search}&quot;
+                </p>
+              );
+            }
+            return (
+              <>
+                <p className="text-sm text-text-secondary mb-4">
+                  נמצאו {results.length} מוצרים
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {results.map((product, i) => (
+                    <ProductCard key={product.id} product={product} index={i} subcategories={allSubcategories} />
+                  ))}
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      )}
+
       {/* Accordion for specific category */}
-      {hasSubcategories && (
+      {!isSearching && hasSubcategories && (
         <div className="flex flex-col gap-4 max-w-5xl mx-auto w-full">
           {subcategories.map((sub, idx) => {
             const subProducts = getSubProducts(activeCategory, sub.id);
@@ -105,7 +175,7 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
       )}
 
       {/* Accordion for "all" */}
-      {showAllAccordion && (
+      {!isSearching && showAllAccordion && (
         <div className="flex flex-col gap-4 max-w-5xl mx-auto w-full">
           {allCatSubcategories.map(({ sub, catId }, idx) => {
             const subProducts = getSubProducts(catId, sub.id);
@@ -127,7 +197,7 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
       )}
 
       {/* Fallback: no subcategories */}
-      {!hasSubcategories && !showAllAccordion && (
+      {!isSearching && !hasSubcategories && !showAllAccordion && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl mx-auto w-full">
             {products

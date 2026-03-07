@@ -41,20 +41,33 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { id, label } = await request.json();
+    const { id, label, categoryId } = await request.json();
 
     if (!id || !label) {
       return NextResponse.json({ error: "חסרים שדות" }, { status: 400 });
     }
 
+    const updateFields: { label: string; category_id?: string } = { label };
+    if (categoryId) {
+      updateFields.category_id = categoryId;
+    }
+
     const { data, error } = await supabase
       .from("subcategories")
-      .update({ label })
+      .update(updateFields)
       .eq("id", id)
       .select()
       .single();
 
     if (error) throw error;
+
+    // If category changed, update all products that use this subcategory
+    if (categoryId) {
+      await supabase
+        .from("products")
+        .update({ category: categoryId })
+        .eq("subcategory", id);
+    }
 
     return NextResponse.json(data);
   } catch {

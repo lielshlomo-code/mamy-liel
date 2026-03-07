@@ -351,34 +351,52 @@ export default function AdminProducts() {
                           className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-muted/30 border border-border/50"
                         >
                           {editingSubcategory?.id === sub.id ? (
-                            <>
-                              <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
-                                {sub.id}
-                              </span>
-                              <input
-                                type="text"
-                                value={editingSubcategory.label}
-                                onChange={(e) =>
-                                  setEditingSubcategory({ ...editingSubcategory, label: e.target.value })
-                                }
-                                className="flex-1 px-3 py-1 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
-                                autoFocus
-                              />
-                              <button
-                                onClick={() => handleSaveSubcategory(editingSubcategory, false)}
-                                className="p-1 rounded-lg hover:bg-green-50 transition-colors"
-                                title="שמירה"
-                              >
-                                <Save className="w-3.5 h-3.5 text-green-600" />
-                              </button>
-                              <button
-                                onClick={() => setEditingSubcategory(null)}
-                                className="p-1 rounded-lg hover:bg-muted transition-colors"
-                                title="ביטול"
-                              >
-                                <X className="w-3.5 h-3.5 text-text-secondary" />
-                              </button>
-                            </>
+                            <div className="flex flex-col gap-2 w-full">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
+                                  {sub.id}
+                                </span>
+                                <input
+                                  type="text"
+                                  value={editingSubcategory.label}
+                                  onChange={(e) =>
+                                    setEditingSubcategory({ ...editingSubcategory, label: e.target.value })
+                                  }
+                                  className="flex-1 px-3 py-1 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                                  autoFocus
+                                />
+                                <button
+                                  onClick={() => handleSaveSubcategory(editingSubcategory, false)}
+                                  className="p-1 rounded-lg hover:bg-green-50 transition-colors"
+                                  title="שמירה"
+                                >
+                                  <Save className="w-3.5 h-3.5 text-green-600" />
+                                </button>
+                                <button
+                                  onClick={() => setEditingSubcategory(null)}
+                                  className="p-1 rounded-lg hover:bg-muted transition-colors"
+                                  title="ביטול"
+                                >
+                                  <X className="w-3.5 h-3.5 text-text-secondary" />
+                                </button>
+                              </div>
+                              <div className="flex items-center gap-2 mr-[72px]">
+                                <label className="text-xs text-text-secondary whitespace-nowrap">העבר לקטגוריה:</label>
+                                <select
+                                  value={editingSubcategory.categoryId}
+                                  onChange={(e) =>
+                                    setEditingSubcategory({ ...editingSubcategory, categoryId: e.target.value })
+                                  }
+                                  className="flex-1 px-3 py-1 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                                >
+                                  {categories.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                      {c.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
                           ) : (
                             <>
                               <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">

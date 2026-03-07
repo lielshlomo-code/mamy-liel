@@ -1,14 +1,16 @@
 "use client";
 
 const ranges = [
-  { label: "7 ימים", days: 7 },
-  { label: "30 ימים", days: 30 },
-  { label: "90 ימים", days: 90 },
+  { label: "היום", value: "today" },
+  { label: "אתמול", value: "yesterday" },
+  { label: "7 ימים", value: "7" },
+  { label: "30 ימים", value: "30" },
+  { label: "90 ימים", value: "90" },
 ];
 
 interface DateRangeSelectorProps {
-  value: number;
-  onChange: (days: number) => void;
+  value: string;
+  onChange: (range: string) => void;
 }
 
 export default function DateRangeSelector({
@@ -19,10 +21,10 @@ export default function DateRangeSelector({
     <div className="flex gap-1 bg-muted rounded-lg p-1">
       {ranges.map((r) => (
         <button
-          key={r.days}
-          onClick={() => onChange(r.days)}
+          key={r.value}
+          onClick={() => onChange(r.value)}
           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-            value === r.days
+            value === r.value
               ? "bg-white text-foreground shadow-sm"
               : "text-text-secondary hover:text-foreground"
           }`}

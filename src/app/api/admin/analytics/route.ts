@@ -9,10 +9,52 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const days = parseInt(url.searchParams.get("days") || "30", 10);
-  const since = new Date();
-  since.setDate(since.getDate() - days);
+  const range = url.searchParams.get("range") || "30";
+
+  let since: Date;
+  let until: Date | null = null;
+  let daysBack: number;
+
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  if (range === "today") {
+    since = startOfToday;
+    daysBack = 0;
+  } else if (range === "yesterday") {
+    since = new Date(startOfToday);
+    since.setDate(since.getDate() - 1);
+    until = startOfToday;
+    daysBack = 1;
+  } else {
+    const days = parseInt(range, 10) || 30;
+    since = new Date();
+    since.setDate(since.getDate() - days);
+    daysBack = days;
+  }
+
   const sinceISO = since.toISOString();
+  const untilISO = until ? until.toISOString() : null;
+
+  // Helper: add upper-bound filter for bounded ranges (e.g. yesterday)
+  function clickEventsQuery(eventType: string) {
+    let q = supabase
+      .from("click_events")
+      .select("created_at")
+      .eq("event_type", eventType)
+      .gte("created_at", sinceISO);
+    if (untilISO) q = q.lt("created_at", untilISO);
+    return q.order("created_at", { ascending: true });
+  }
+
+  function contactsTimeQuery() {
+    let q = supabase
+      .from("contact_submissions")
+      .select("created_at")
+      .gte("created_at", sinceISO);
+    if (untilISO) q = q.lt("created_at", untilISO);
+    return q.order("created_at", { ascending: true });
+  }
 
   const [
     shortLinkClicks,
@@ -26,19 +68,9 @@ export async function GET(request: Request) {
     totalContacts,
     recentActivity,
   ] = await Promise.all([
-    supabase
-      .from("click_events")
-      .select("created_at")
-      .eq("event_type", "short_link")
-      .gte("created_at", sinceISO)
-      .order("created_at", { ascending: true }),
+    clickEventsQuery("short_link"),
 
-    supabase
-      .from("click_events")
-      .select("created_at")
-      .eq("event_type", "product")
-      .gte("created_at", sinceISO)
-      .order("created_at", { ascending: true }),
+    clickEventsQuery("product"),
 
     supabase
       .from("short_links")
@@ -46,13 +78,9 @@ export async function GET(request: Request) {
       .order("clicks", { ascending: false })
       .limit(10),
 
-    supabase.rpc("get_top_products_by_clicks", { days_back: days }),
+    supabase.rpc("get_top_products_by_clicks", { days_back: daysBack }),
 
-    supabase
-      .from("contact_submissions")
-      .select("created_at")
-      .gte("created_at", sinceISO)
-      .order("created_at", { ascending: true }),
+    contactsTimeQuery(),
 
     supabase
       .from("contact_submissions")
@@ -95,8 +123,8 @@ export async function GET(request: Request) {
   function buildDailySeries(grouped: Record<string, number>) {
     const series: { date: string; count: number }[] = [];
     const current = new Date(sinceISO);
-    const today = new Date();
-    while (current <= today) {
+    const end = until ? new Date(until) : new Date();
+    while (current <= end) {
       const dateStr = current.toISOString().split("T")[0];
       series.push({ date: dateStr, count: grouped[dateStr] || 0 });
       current.setDate(current.getDate() + 1);

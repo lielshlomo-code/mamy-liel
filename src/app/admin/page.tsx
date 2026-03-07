@@ -39,7 +39,7 @@ export default function AdminDashboard() {
     contactSubmissions: 0,
   });
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [days, setDays] = useState(30);
+  const [range, setRange] = useState("30");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,14 +51,14 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/admin/analytics?days=${days}`)
+    fetch(`/api/admin/analytics?range=${range}`)
       .then((r) => r.json())
       .then((data) => {
         setAnalytics(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [days]);
+  }, [range]);
 
   const typeLabels: Record<string, string> = {
     sponsored: "הדרכה ממומנת",
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-8">
         <h1 className="text-xl sm:text-2xl font-bold">דשבורד</h1>
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <DateRangeSelector value={days} onChange={setDays} />
+          <DateRangeSelector value={range} onChange={setRange} />
           <Link
             href="/"
             target="_blank"

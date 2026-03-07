@@ -303,8 +303,8 @@ function AccordionSection({
             transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="overflow-hidden"
           >
-            <div className="p-5 bg-gradient-to-b from-warm-50/80 to-white/40">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="p-3 sm:p-5 bg-gradient-to-b from-warm-50/80 to-white/40">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {products.map((product, i) => (
                   <ProductCard
                     key={product.id}

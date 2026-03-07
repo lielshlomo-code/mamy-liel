@@ -42,7 +42,7 @@ export default function ProductCard({
         duration: 0.35,
         ease: [0.25, 0.46, 0.45, 0.94],
       }}
-      className="group relative flex flex-col rounded-2xl bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 card-lift"
+      className="group relative flex flex-col rounded-2xl bg-white overflow-hidden shadow-sm hover:shadow-xl border border-warm-100/60 transition-all duration-500 card-lift"
     >
       {/* Image */}
       {product.image ? (
@@ -75,7 +75,7 @@ export default function ProductCard({
       )}
 
       {/* Info */}
-      <div className="flex flex-col gap-1.5 p-3 flex-1">
+      <div className="flex flex-col gap-1 p-3 flex-1">
         <h3 className="font-semibold text-sm leading-snug line-clamp-2">
           {product.name}
         </h3>
@@ -84,6 +84,13 @@ export default function ProductCard({
             {product.description}
           </p>
         )}
+        {/* Mobile-visible link indicator */}
+        <div className="flex items-center gap-1 mt-auto pt-1.5 md:hidden">
+          <span className="text-[10px] text-rose-400 font-medium">לצפייה</span>
+          <svg className="w-3 h-3 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+          </svg>
+        </div>
       </div>
     </motion.a>
   );

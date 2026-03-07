@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { getFeaturedProducts } from "@/lib/content";
+import { getWeeklyRandomProducts } from "@/lib/content";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import type { Product } from "@/lib/types";
 
@@ -15,21 +15,17 @@ const categoryLabels: Record<string, string> = {
 function FeaturedProductCard({
   product,
   index,
-  featured = false,
 }: {
   product: Product;
   index: number;
-  featured?: boolean;
 }) {
   return (
-    <AnimatedSection delay={index * 0.15} className={featured ? "md:row-span-2" : ""}>
+    <AnimatedSection delay={index * 0.08}>
       <a
         href={product.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`group relative block rounded-3xl overflow-hidden ${
-          featured ? "h-[350px] md:h-full" : "h-[280px]"
-        }`}
+        className="group relative block rounded-2xl overflow-hidden h-[260px] md:h-[280px]"
       >
         {/* Full-bleed image */}
         <div className="absolute inset-0">
@@ -49,27 +45,23 @@ function FeaturedProductCard({
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-500" />
 
         {/* Category badge */}
-        <div className="absolute top-4 right-4 z-10">
-          <span className="px-3 py-1.5 text-xs font-bold bg-white/90 backdrop-blur-sm rounded-full">
+        <div className="absolute top-3 right-3 z-10">
+          <span className="px-2.5 py-1 text-[10px] font-bold bg-white/90 backdrop-blur-sm rounded-full">
             {categoryLabels[product.category] || product.category}
           </span>
         </div>
 
         {/* External link icon on hover */}
-        <div className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-          <ExternalLink className="w-4 h-4 text-white" />
+        <div className="absolute top-3 left-3 z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+          <ExternalLink className="w-3.5 h-3.5 text-white" />
         </div>
 
         {/* Content at bottom */}
-        <div className="absolute bottom-0 right-0 left-0 p-6 md:p-8 z-10">
-          <h3
-            className={`font-black text-white mb-1 ${
-              featured ? "text-2xl md:text-3xl" : "text-xl"
-            }`}
-          >
+        <div className="absolute bottom-0 right-0 left-0 p-4 md:p-5 z-10">
+          <h3 className="font-black text-white text-base md:text-lg mb-0.5 line-clamp-1">
             {product.name}
           </h3>
-          <p className="text-sm text-white/60 line-clamp-2 max-w-sm group-hover:text-white/90 transition-colors duration-300">
+          <p className="text-xs text-white/60 line-clamp-1 group-hover:text-white/90 transition-colors duration-300">
             {product.description}
           </p>
         </div>
@@ -79,7 +71,7 @@ function FeaturedProductCard({
 }
 
 export default async function FeaturedProducts() {
-  const products = await getFeaturedProducts();
+  const products = await getWeeklyRandomProducts(10);
 
   if (products.length === 0) return null;
 
@@ -114,20 +106,13 @@ export default async function FeaturedProducts() {
           </AnimatedSection>
         </div>
 
-        {/* Magazine-style layout: featured + 2 stacked */}
-        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr_1fr] gap-5">
-          {products[0] && (
-            <FeaturedProductCard
-              product={products[0]}
-              index={0}
-              featured
-            />
-          )}
-          {products.slice(1, 3).map((product, i) => (
+        {/* Grid: 2 columns mobile, 3 columns tablet, 5 columns desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {products.map((product, i) => (
             <FeaturedProductCard
               key={product.id}
               product={product}
-              index={i + 1}
+              index={i}
             />
           ))}
         </div>

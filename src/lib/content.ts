@@ -87,6 +87,88 @@ export async function getFeaturedProducts(): Promise<Product[]> {
   }));
 }
 
+// Simple seeded random number generator for deterministic weekly selection
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    return s / 0x7fffffff;
+  };
+}
+
+// Get the ISO week number for consistent weekly rotation
+function getWeekNumber(): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const diff = now.getTime() - start.getTime();
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
+  return Math.floor(diff / oneWeek) + now.getFullYear() * 100;
+}
+
+export async function getWeeklyRandomProducts(count = 10): Promise<Product[]> {
+  const { data: products } = await supabase
+    .from("products")
+    .select("*")
+    .not("image", "is", null);
+
+  if (!products || products.length === 0) return [];
+
+  const mapped = products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    category: p.category,
+    subcategory: p.subcategory || undefined,
+    url: p.url,
+    image: p.image,
+    featured: p.featured,
+    dateAdded: p.date_added,
+  }));
+
+  // Group products by subcategory (use category as fallback if no subcategory)
+  const groups: Record<string, Product[]> = {};
+  for (const p of mapped) {
+    const key = p.subcategory || `_cat_${p.category}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(p);
+  }
+
+  const rand = seededRandom(getWeekNumber());
+  const groupKeys = Object.keys(groups);
+
+  // Shuffle group keys so each week picks from different subcategories first
+  for (let i = groupKeys.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [groupKeys[i], groupKeys[j]] = [groupKeys[j], groupKeys[i]];
+  }
+
+  // Pick one random product from each subcategory
+  const selected: Product[] = [];
+  for (const key of groupKeys) {
+    if (selected.length >= count) break;
+    const group = groups[key];
+    const idx = Math.floor(rand() * group.length);
+    selected.push(group[idx]);
+  }
+
+  // If we still need more products (fewer subcategories than count),
+  // pick additional random products from remaining items
+  if (selected.length < count) {
+    const selectedIds = new Set(selected.map((p) => p.id));
+    const remaining = mapped.filter((p) => !selectedIds.has(p.id));
+    for (let i = remaining.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
+    }
+    for (const p of remaining) {
+      if (selected.length >= count) break;
+      selected.push(p);
+    }
+  }
+
+  return selected;
+}
+
 export async function getSocialLinks(): Promise<SocialLink[]> {
   const { data } = await supabase.from("social_links").select("*");
   return (data || []).map((l) => ({

@@ -60,6 +60,27 @@ export default function Footer() {
                 </a>
               </div>
             </div>
+
+            <div>
+              <p className="text-xs font-bold tracking-widest uppercase mb-4">
+                מדיניות
+              </p>
+              <div className="flex flex-col gap-2">
+                {[
+                  { href: "/privacy", label: "מדיניות פרטיות" },
+                  { href: "/terms", label: "תנאי שימוש" },
+                  { href: "/cookies", label: "מדיניות קוקיז" },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-sm text-text-secondary hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

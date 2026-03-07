@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Header from "./Header";
 import Footer from "./Footer";
 import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
+import CookieConsent from "@/components/ui/CookieConsent";
 
 export default function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
       <Footer />
       <WhatsAppFloat />
+      <CookieConsent />
     </>
   );
 }

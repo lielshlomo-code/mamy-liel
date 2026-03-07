@@ -13,34 +13,30 @@ export async function GET(request: Request) {
 
   let since: Date;
   let until: Date | null = null;
-  let daysBack: number;
 
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   if (range === "today") {
     since = startOfToday;
-    daysBack = 0;
   } else if (range === "yesterday") {
     since = new Date(startOfToday);
     since.setDate(since.getDate() - 1);
     until = startOfToday;
-    daysBack = 1;
   } else {
     const days = parseInt(range, 10) || 30;
     since = new Date();
     since.setDate(since.getDate() - days);
-    daysBack = days;
   }
 
   const sinceISO = since.toISOString();
   const untilISO = until ? until.toISOString() : null;
 
-  // Helper: add upper-bound filter for bounded ranges (e.g. yesterday)
+  // Helper: add date range filter
   function clickEventsQuery(eventType: string) {
     let q = supabase
       .from("click_events")
-      .select("created_at")
+      .select("created_at, target_id")
       .eq("event_type", eventType)
       .gte("created_at", sinceISO);
     if (untilISO) q = q.lt("created_at", untilISO);
@@ -59,69 +55,43 @@ export async function GET(request: Request) {
   const [
     shortLinkClicks,
     productClicks,
-    topShortLinks,
-    topProducts,
+    shortLinksMetadata,
+    productsMetadata,
     contactSubmissions,
     recentContacts,
-    totalShortLinkClicks,
-    totalProductClicks,
-    totalContacts,
     recentActivity,
   ] = await Promise.all([
     clickEventsQuery("short_link"),
 
     clickEventsQuery("product"),
 
-    supabase
-      .from("short_links")
-      .select("code, title, clicks")
-      .order("clicks", { ascending: false })
-      .limit(10),
+    // Short links metadata for display names
+    supabase.from("short_links").select("code, title"),
 
-    supabase.rpc("get_top_products_by_clicks", { days_back: daysBack }),
+    // Products metadata for display names
+    supabase.from("products").select("id, name"),
 
     contactsTimeQuery(),
 
-    supabase
-      .from("contact_submissions")
-      .select("id, brand_name, contact_name, email, type, created_at")
-      .order("created_at", { ascending: false })
-      .limit(10),
-
-    (() => {
-      let q = supabase
-        .from("click_events")
-        .select("id", { count: "exact", head: true })
-        .eq("event_type", "short_link")
-        .gte("created_at", sinceISO);
-      if (untilISO) q = q.lt("created_at", untilISO);
-      return q;
-    })(),
-
-    (() => {
-      let q = supabase
-        .from("click_events")
-        .select("id", { count: "exact", head: true })
-        .eq("event_type", "product")
-        .gte("created_at", sinceISO);
-      if (untilISO) q = q.lt("created_at", untilISO);
-      return q;
-    })(),
-
+    // Recent contacts – filtered by date
     (() => {
       let q = supabase
         .from("contact_submissions")
-        .select("id", { count: "exact", head: true })
+        .select("id, brand_name, contact_name, email, type, created_at")
         .gte("created_at", sinceISO);
       if (untilISO) q = q.lt("created_at", untilISO);
-      return q;
+      return q.order("created_at", { ascending: false }).limit(10);
     })(),
 
-    supabase
-      .from("click_events")
-      .select("id, event_type, target_id, created_at")
-      .order("created_at", { ascending: false })
-      .limit(20),
+    // Recent activity – filtered by date
+    (() => {
+      let q = supabase
+        .from("click_events")
+        .select("id, event_type, target_id, created_at")
+        .gte("created_at", sinceISO);
+      if (untilISO) q = q.lt("created_at", untilISO);
+      return q.order("created_at", { ascending: false }).limit(20);
+    })(),
   ]);
 
   function groupByDay(
@@ -147,40 +117,50 @@ export async function GET(request: Request) {
     return series;
   }
 
-  const shortLinkDaily = buildDailySeries(
-    groupByDay(shortLinkClicks.data)
-  );
-  const productDaily = buildDailySeries(groupByDay(productClicks.data));
-  const contactDaily = buildDailySeries(
-    groupByDay(contactSubmissions.data)
-  );
+  const shortLinkRows = shortLinkClicks.data || [];
+  const productRows = productClicks.data || [];
+  const contactRows = contactSubmissions.data || [];
+
+  const shortLinkDaily = buildDailySeries(groupByDay(shortLinkRows));
+  const productDaily = buildDailySeries(groupByDay(productRows));
+  const contactDaily = buildDailySeries(groupByDay(contactRows));
+
+  // Compute top items from filtered click events
+  function topByTarget(rows: { target_id: string }[], limit = 10) {
+    const counts: Record<string, number> = {};
+    for (const r of rows) counts[r.target_id] = (counts[r.target_id] || 0) + 1;
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, limit);
+  }
+
+  // Build short-link title/code lookup
+  const slMeta: Record<string, { code: string; title: string }> = {};
+  for (const s of shortLinksMetadata.data || []) slMeta[s.code] = s;
+
+  // Build product name lookup
+  const prodMeta: Record<string, string> = {};
+  for (const p of (productsMetadata.data || []) as { id: string; name: string }[])
+    prodMeta[p.id] = p.name;
 
   return NextResponse.json({
     shortLinks: {
       daily: shortLinkDaily,
-      top: (topShortLinks.data || []).map(
-        (l: { code: string; title: string; clicks: number }) => ({
-          code: l.code,
-          title: l.title,
-          clicks: l.clicks,
-        })
-      ),
-      total: totalShortLinkClicks.count || 0,
+      top: topByTarget(shortLinkRows).map(([code, clicks]) => ({
+        code,
+        title: slMeta[code]?.title || "",
+        clicks,
+      })),
+      total: shortLinkRows.length,
     },
     products: {
       daily: productDaily,
-      top: (topProducts.data || []).map(
-        (p: {
-          product_id: string;
-          product_name: string;
-          click_count: number;
-        }) => ({
-          productId: p.product_id,
-          productName: p.product_name,
-          clickCount: Number(p.click_count),
-        })
-      ),
-      total: totalProductClicks.count || 0,
+      top: topByTarget(productRows).map(([id, count]) => ({
+        productId: id,
+        productName: prodMeta[id] || id,
+        clickCount: count,
+      })),
+      total: productRows.length,
     },
     contacts: {
       daily: contactDaily,
@@ -201,7 +181,7 @@ export async function GET(request: Request) {
           createdAt: c.created_at,
         })
       ),
-      total: totalContacts.count || 0,
+      total: contactRows.length,
     },
     activity: (recentActivity.data || []).map(
       (e: {

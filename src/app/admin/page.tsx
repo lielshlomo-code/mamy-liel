@@ -97,10 +97,18 @@ export default function AdminDashboard() {
         />
         <StatCard
           label="סה״כ לחיצות"
-          value={stats.totalClicks}
+          value={
+            analytics
+              ? analytics.shortLinks.total + analytics.products.total
+              : stats.totalClicks
+          }
           icon={MousePointerClick}
         />
-        <StatCard label="פניות" value={stats.contactSubmissions} icon={Mail} />
+        <StatCard
+          label="פניות"
+          value={analytics ? analytics.contacts.total : stats.contactSubmissions}
+          icon={Mail}
+        />
       </div>
 
       {loading || !analytics ? (

@@ -88,19 +88,34 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: false })
       .limit(10),
 
-    supabase
-      .from("click_events")
-      .select("id", { count: "exact", head: true })
-      .eq("event_type", "short_link"),
+    (() => {
+      let q = supabase
+        .from("click_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "short_link")
+        .gte("created_at", sinceISO);
+      if (untilISO) q = q.lt("created_at", untilISO);
+      return q;
+    })(),
 
-    supabase
-      .from("click_events")
-      .select("id", { count: "exact", head: true })
-      .eq("event_type", "product"),
+    (() => {
+      let q = supabase
+        .from("click_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event_type", "product")
+        .gte("created_at", sinceISO);
+      if (untilISO) q = q.lt("created_at", untilISO);
+      return q;
+    })(),
 
-    supabase
-      .from("contact_submissions")
-      .select("id", { count: "exact", head: true }),
+    (() => {
+      let q = supabase
+        .from("contact_submissions")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", sinceISO);
+      if (untilISO) q = q.lt("created_at", untilISO);
+      return q;
+    })(),
 
     supabase
       .from("click_events")
@@ -123,8 +138,8 @@ export async function GET(request: Request) {
   function buildDailySeries(grouped: Record<string, number>) {
     const series: { date: string; count: number }[] = [];
     const current = new Date(sinceISO);
-    const end = until ? new Date(until) : new Date();
-    while (current <= end) {
+    const end = until || new Date();
+    while (until ? current < end : current <= end) {
       const dateStr = current.toISOString().split("T")[0];
       series.push({ date: dateStr, count: grouped[dateStr] || 0 });
       current.setDate(current.getDate() + 1);

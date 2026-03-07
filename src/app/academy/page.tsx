@@ -18,7 +18,6 @@ export default async function AcademyPage() {
       <PageHeader
         title="המכללה הדיגיטלית"
         subtitle="קורסים מוקלטים שתוכלי ללמוד בקצב שלך, מכל מקום ובכל זמן"
-        num="07"
       />
 
       <div className="relative overflow-hidden bg-warm-gradient-reverse min-h-[60vh]">

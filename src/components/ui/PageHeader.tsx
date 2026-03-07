@@ -7,10 +7,9 @@ import FloatingShapes from "./FloatingShapes";
 interface PageHeaderProps {
   title: string;
   subtitle: string;
-  num?: string;
 }
 
-export default function PageHeader({ title, subtitle, num }: PageHeaderProps) {
+export default function PageHeader({ title, subtitle }: PageHeaderProps) {
   return (
     <div className="relative overflow-hidden bg-animated-gradient">
       {/* Animated floating shapes */}
@@ -28,31 +27,7 @@ export default function PageHeader({ title, subtitle, num }: PageHeaderProps) {
       {/* Bottom gradient fade to white */}
       <div className="absolute bottom-0 left-0 w-full h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-[3]" />
 
-      {/* Large background number */}
-      {num && (
-        <div className="absolute top-0 left-6 md:left-10 pointer-events-none select-none">
-          <motion.span
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="text-[12rem] md:text-[16rem] font-black text-warm-300/40 leading-none block"
-          >
-            {num}
-          </motion.span>
-        </div>
-      )}
-
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-12 pb-14">
-        {num && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-xs font-mono text-text-light mb-4 block"
-          >
-            {num}
-          </motion.span>
-        )}
 
         <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black tracking-tight mb-4">
           <TextReveal>{title}</TextReveal>

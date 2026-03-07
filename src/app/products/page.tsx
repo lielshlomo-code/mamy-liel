@@ -22,7 +22,6 @@ export default async function ProductsPage() {
       <PageHeader
         title="מוצרים שאני אוהבת"
         subtitle="דברים שאני משתמשת בהם ובאמת אוהבת — הכל נבדק ומומלץ אישית"
-        num="06"
       />
       <div className="relative overflow-hidden bg-warm-gradient-reverse min-h-[60vh]">
         <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />

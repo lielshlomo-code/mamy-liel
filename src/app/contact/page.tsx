@@ -13,7 +13,6 @@ export default function ContactPage() {
       <PageHeader
         title="בואו נעבוד ביחד"
         subtitle="מעוניינים בשיתוף פעולה? מלאו את הטופס ואחזור אליכם בהקדם"
-        num="03"
       />
       <div className="relative overflow-hidden bg-warm-gradient-reverse min-h-[50vh]">
         <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />

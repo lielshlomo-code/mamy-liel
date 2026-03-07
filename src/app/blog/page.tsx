@@ -18,7 +18,6 @@ export default async function BlogPage() {
       <PageHeader
         title="הדרכות ומתכונים"
         subtitle="הדרכות, מתכונים וטיפים מהחיים שלי כאמא"
-        num="02"
       />
       <div className="relative overflow-hidden bg-warm-gradient-reverse min-h-[60vh]">
         <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />

@@ -177,15 +177,21 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: categories } = await supabase
+  let { data: categories, error: catError } = await supabase
     .from("categories")
     .select("*")
-    .order("id");
+    .order("display_order");
+  if (catError) {
+    ({ data: categories } = await supabase.from("categories").select("*").order("id"));
+  }
 
-  const { data: subcategories } = await supabase
+  let { data: subcategories, error: subError } = await supabase
     .from("subcategories")
     .select("*")
-    .order("id");
+    .order("display_order");
+  if (subError) {
+    ({ data: subcategories } = await supabase.from("subcategories").select("*").order("id"));
+  }
 
   const { data: products } = await supabase
     .from("products")

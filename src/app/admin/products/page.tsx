@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save, Loader2, ImageIcon, Upload, Tag, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, Loader2, ImageIcon, Upload, Tag, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from "lucide-react";
 import type { Product, Subcategory } from "@/lib/types";
 
 const emptyProduct = {
@@ -158,6 +158,42 @@ export default function AdminProducts() {
     load();
   };
 
+  // Reorder handlers
+  const handleMoveCategoryOrder = async (catIndex: number, direction: "up" | "down") => {
+    const swapIndex = direction === "up" ? catIndex - 1 : catIndex + 1;
+    if (swapIndex < 0 || swapIndex >= categories.length) return;
+
+    const items = [
+      { id: categories[catIndex].id, display_order: swapIndex + 1 },
+      { id: categories[swapIndex].id, display_order: catIndex + 1 },
+    ];
+
+    await fetch("/api/admin/categories", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+    load();
+  };
+
+  const handleMoveSubcategoryOrder = async (cat: typeof categories[number], subIndex: number, direction: "up" | "down") => {
+    const subs = cat.subcategories || [];
+    const swapIndex = direction === "up" ? subIndex - 1 : subIndex + 1;
+    if (swapIndex < 0 || swapIndex >= subs.length) return;
+
+    const items = [
+      { id: subs[subIndex].id, display_order: swapIndex + 1 },
+      { id: subs[swapIndex].id, display_order: subIndex + 1 },
+    ];
+
+    await fetch("/api/admin/subcategories", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
+    load();
+  };
+
   const fetchImage = async () => {
     if (!editing?.url) return;
     setFetchingImage(true);
@@ -270,7 +306,7 @@ export default function AdminProducts() {
             )}
 
             <div className="space-y-2">
-              {categories.map((cat) => (
+              {categories.map((cat, catIndex) => (
                 <div key={cat.id}>
                   {/* Category row */}
                   <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/50">
@@ -305,6 +341,24 @@ export default function AdminProducts() {
                       </>
                     ) : (
                       <>
+                        <div className="flex flex-col">
+                          <button
+                            onClick={() => handleMoveCategoryOrder(catIndex, "up")}
+                            disabled={catIndex === 0}
+                            className="p-0.5 rounded hover:bg-muted transition-colors disabled:opacity-20"
+                            title="הזז למעלה"
+                          >
+                            <ArrowUp className="w-3 h-3 text-text-secondary" />
+                          </button>
+                          <button
+                            onClick={() => handleMoveCategoryOrder(catIndex, "down")}
+                            disabled={catIndex === categories.length - 1}
+                            className="p-0.5 rounded hover:bg-muted transition-colors disabled:opacity-20"
+                            title="הזז למטה"
+                          >
+                            <ArrowDown className="w-3 h-3 text-text-secondary" />
+                          </button>
+                        </div>
                         <button
                           onClick={() => setExpandedCategory(expandedCategory === cat.id ? null : cat.id)}
                           className="p-1 rounded hover:bg-muted transition-colors"
@@ -345,7 +399,7 @@ export default function AdminProducts() {
                   {/* Subcategories for this category */}
                   {expandedCategory === cat.id && (
                     <div className="mr-6 sm:mr-10 mt-1 mb-2 space-y-1.5">
-                      {cat.subcategories?.map((sub) => (
+                      {cat.subcategories?.map((sub, subIndex) => (
                         <div
                           key={sub.id}
                           className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-muted/30 border border-border/50"
@@ -399,6 +453,24 @@ export default function AdminProducts() {
                             </div>
                           ) : (
                             <>
+                              <div className="flex flex-col">
+                                <button
+                                  onClick={() => handleMoveSubcategoryOrder(cat, subIndex, "up")}
+                                  disabled={subIndex === 0}
+                                  className="p-0.5 rounded hover:bg-muted transition-colors disabled:opacity-20"
+                                  title="הזז למעלה"
+                                >
+                                  <ArrowUp className="w-2.5 h-2.5 text-text-secondary" />
+                                </button>
+                                <button
+                                  onClick={() => handleMoveSubcategoryOrder(cat, subIndex, "down")}
+                                  disabled={subIndex === (cat.subcategories?.length ?? 1) - 1}
+                                  className="p-0.5 rounded hover:bg-muted transition-colors disabled:opacity-20"
+                                  title="הזז למטה"
+                                >
+                                  <ArrowDown className="w-2.5 h-2.5 text-text-secondary" />
+                                </button>
+                              </div>
                               <span className="text-xs text-text-secondary font-mono min-w-[60px]" dir="ltr">
                                 {sub.id}
                               </span>

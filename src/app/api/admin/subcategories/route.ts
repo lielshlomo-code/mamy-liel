@@ -15,9 +15,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "חסרים שדות" }, { status: 400 });
     }
 
+    // Auto-assign display_order as max + 1 within the category
+    let nextOrder = 0;
+    const { data: maxRow, error: maxError } = await supabase
+      .from("subcategories")
+      .select("display_order")
+      .eq("category_id", categoryId)
+      .order("display_order", { ascending: false })
+      .limit(1)
+      .single();
+    if (!maxError) {
+      nextOrder = (maxRow?.display_order ?? 0) + 1;
+    }
+
+    const insertData: Record<string, unknown> = { id, label, category_id: categoryId };
+    if (!maxError) insertData.display_order = nextOrder;
+
     const { data, error } = await supabase
       .from("subcategories")
-      .insert({ id, label, category_id: categoryId })
+      .insert(insertData)
       .select()
       .single();
 
@@ -72,6 +88,29 @@ export async function PUT(request: Request) {
     return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: "שגיאה בעדכון תת-קטגוריה" }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  const isAuth = await verifySession();
+  if (!isAuth) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { items } = await request.json();
+    // items: [{ id: string, display_order: number }]
+
+    for (const item of items) {
+      await supabase
+        .from("subcategories")
+        .update({ display_order: item.display_order })
+        .eq("id", item.id);
+    }
+
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "שגיאה בעדכון סדר" }, { status: 500 });
   }
 }
 

@@ -21,15 +21,22 @@ export function getSiteConfig(): SiteConfig {
 }
 
 export async function getProductsData(): Promise<ProductsData> {
-  const { data: categories } = await supabase
+  let { data: categories, error: catError } = await supabase
     .from("categories")
     .select("*")
-    .order("id");
+    .order("display_order");
+  // Fallback if display_order column doesn't exist yet
+  if (catError) {
+    ({ data: categories } = await supabase.from("categories").select("*").order("id"));
+  }
 
-  const { data: subcategories } = await supabase
+  let { data: subcategories, error: subError } = await supabase
     .from("subcategories")
     .select("*")
-    .order("id");
+    .order("display_order");
+  if (subError) {
+    ({ data: subcategories } = await supabase.from("subcategories").select("*").order("id"));
+  }
 
   const { data: products } = await supabase
     .from("products")

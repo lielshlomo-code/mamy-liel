@@ -65,6 +65,22 @@ export default function AdminBlog() {
     load();
   };
 
+  const handleTogglePublished = async (post: BlogPost) => {
+    await fetch("/api/admin/blog", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        image: post.image,
+        tags: post.tags,
+        published: !post.published,
+      }),
+    });
+    load();
+  };
+
   const handleDelete = async (slug: string) => {
     if (!confirm("למחוק את ההדרכה?")) return;
 
@@ -356,6 +372,7 @@ export default function AdminBlog() {
                 <th className="text-right px-4 py-3 font-medium hidden sm:table-cell">
                   תאריך
                 </th>
+                <th className="text-center px-4 py-3 font-medium w-20">סטטוס</th>
                 <th className="px-4 py-3 w-24"></th>
               </tr>
             </thead>
@@ -389,6 +406,21 @@ export default function AdminBlog() {
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary">
                     {new Date(post.date).toLocaleDateString("he-IL")}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => handleTogglePublished(post)}
+                      className={`p-1.5 rounded-lg hover:bg-muted transition-colors ${
+                        post.published === false ? 'text-amber-500' : 'text-green-600'
+                      }`}
+                      title={post.published === false ? "הפעלה" : "השבתה"}
+                    >
+                      {post.published === false ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">

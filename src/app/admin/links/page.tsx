@@ -55,6 +55,22 @@ export default function AdminLinks() {
     load();
   };
 
+  const handleTogglePublished = async (link: SocialLink) => {
+    await fetch("/api/admin/links", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: link.id,
+        label: link.label,
+        url: link.url,
+        icon: link.icon,
+        internal: link.internal,
+        published: !link.published,
+      }),
+    });
+    load();
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("למחוק את הקישור?")) return;
 
@@ -197,6 +213,7 @@ export default function AdminLinks() {
                 <th className="text-right px-4 py-3 font-medium hidden sm:table-cell">
                   כתובת
                 </th>
+                <th className="text-center px-4 py-3 font-medium w-20">סטטוס</th>
                 <th className="px-4 py-3 w-24"></th>
               </tr>
             </thead>
@@ -218,6 +235,21 @@ export default function AdminLinks() {
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary truncate max-w-[200px]" dir="ltr">
                     {link.url}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => handleTogglePublished(link)}
+                      className={`p-1.5 rounded-lg hover:bg-muted transition-colors ${
+                        link.published === false ? 'text-amber-500' : 'text-green-600'
+                      }`}
+                      title={link.published === false ? "הפעלה" : "השבתה"}
+                    >
+                      {link.published === false ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">

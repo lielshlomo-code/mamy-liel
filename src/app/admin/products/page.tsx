@@ -68,6 +68,25 @@ export default function AdminProducts() {
     load();
   };
 
+  const handleTogglePublished = async (product: Product) => {
+    await fetch("/api/admin/products", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        subcategory: product.subcategory,
+        url: product.url,
+        image: product.image,
+        featured: product.featured,
+        published: !product.published,
+      }),
+    });
+    load();
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("למחוק את המוצר?")) return;
 
@@ -818,6 +837,7 @@ export default function AdminProducts() {
                 <th className="text-right px-2 sm:px-4 py-3 font-medium hidden md:table-cell">
                   מומלץ
                 </th>
+                <th className="text-center px-2 sm:px-4 py-3 font-medium w-20">סטטוס</th>
                 <th className="px-2 sm:px-4 py-3 w-20 sm:w-24"></th>
               </tr>
             </thead>
@@ -858,6 +878,21 @@ export default function AdminProducts() {
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     {p.featured ? "✓" : ""}
+                  </td>
+                  <td className="px-2 sm:px-4 py-3 text-center">
+                    <button
+                      onClick={() => handleTogglePublished(p)}
+                      className={`p-1.5 rounded-lg hover:bg-muted transition-colors ${
+                        p.published === false ? 'text-amber-500' : 'text-green-600'
+                      }`}
+                      title={p.published === false ? "הפעלה" : "השבתה"}
+                    >
+                      {p.published === false ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                   </td>
                   <td className="px-2 sm:px-4 py-3">
                     <div className="flex items-center gap-1 sm:gap-2 justify-end">

@@ -218,6 +218,7 @@ export async function GET() {
       url: p.url,
       image: p.image,
       featured: p.featured,
+      published: p.published,
       dateAdded: p.date_added,
     })),
   });
@@ -256,6 +257,7 @@ export async function POST(request: Request) {
         url: productUrl,
         image,
         featured: product.featured || false,
+        published: product.published !== false,
         date_added: dateAdded,
       })
       .select()
@@ -301,6 +303,7 @@ export async function PUT(request: Request) {
         url: productUrl,
         image,
         featured: updated.featured,
+        published: updated.published !== false,
       })
       .eq("id", updated.id)
       .select()

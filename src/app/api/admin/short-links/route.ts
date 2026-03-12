@@ -29,6 +29,7 @@ export async function GET() {
     title: link.title,
     clicks: link.clicks,
     createdAt: link.created_at,
+    published: link.published,
   }));
 
   return NextResponse.json(links);
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { targetUrl, title, code: customCode } = await request.json();
+    const { targetUrl, title, code: customCode, published } = await request.json();
 
     if (!targetUrl) {
       return NextResponse.json({ error: "כתובת URL נדרשת" }, { status: 400 });
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
         code,
         target_url: targetUrl,
         title: title || null,
+        published: published !== false,
       })
       .select()
       .single();
@@ -83,6 +85,7 @@ export async function POST(request: Request) {
       title: data.title,
       clicks: data.clicks,
       createdAt: data.created_at,
+      published: data.published,
     });
   } catch {
     return NextResponse.json({ error: "שגיאה ביצירת קישור מקוצר" }, { status: 500 });
@@ -96,13 +99,14 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { id, targetUrl, title } = await request.json();
+    const { id, targetUrl, title, published } = await request.json();
 
     const { error } = await supabase
       .from("short_links")
       .update({
         target_url: targetUrl,
         title: title || null,
+        published: published !== false,
       })
       .eq("id", id);
 

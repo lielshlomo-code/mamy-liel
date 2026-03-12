@@ -7,6 +7,7 @@ export interface Product {
   url: string;
   image?: string;
   featured?: boolean;
+  published: boolean;
   dateAdded: string;
 }
 
@@ -33,6 +34,7 @@ export interface SocialLink {
   url: string;
   icon: string;
   internal?: boolean;
+  published: boolean;
 }
 
 export interface SiteConfig {
@@ -60,6 +62,7 @@ export interface BlogPost {
   tags?: string[];
   readingTime?: string;
   content?: string;
+  published: boolean;
 }
 
 export interface ShortLink {
@@ -69,6 +72,7 @@ export interface ShortLink {
   title?: string;
   clicks: number;
   createdAt: string;
+  published: boolean;
 }
 
 export interface CourseCategory {

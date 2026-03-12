@@ -11,6 +11,7 @@ export async function GET(
     .from("short_links")
     .select("target_url")
     .eq("code", code)
+    .eq("published", true)
     .single();
 
   if (!data) {

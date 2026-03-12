@@ -41,6 +41,7 @@ export async function getProductsData(): Promise<ProductsData> {
   const { data: products } = await supabase
     .from("products")
     .select("*")
+    .eq("published", true)
     .order("date_added", { ascending: false });
 
   const allCategory = { id: "all", label: "הכל" };
@@ -64,6 +65,7 @@ export async function getProductsData(): Promise<ProductsData> {
       url: p.url,
       image: p.image,
       featured: p.featured,
+      published: p.published,
       dateAdded: p.date_added,
     })),
   };
@@ -79,6 +81,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     .from("products")
     .select("*")
     .eq("featured", true)
+    .eq("published", true)
     .order("date_added", { ascending: false });
 
   return (products || []).map((p) => ({
@@ -90,6 +93,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     url: p.url,
     image: p.image,
     featured: p.featured,
+    published: p.published,
     dateAdded: p.date_added,
   }));
 }
@@ -116,6 +120,7 @@ export async function getWeeklyRandomProducts(count = 10): Promise<Product[]> {
   const { data: products } = await supabase
     .from("products")
     .select("*")
+    .eq("published", true)
     .not("image", "is", null);
 
   if (!products || products.length === 0) return [];
@@ -129,6 +134,7 @@ export async function getWeeklyRandomProducts(count = 10): Promise<Product[]> {
     url: p.url,
     image: p.image,
     featured: p.featured,
+    published: p.published,
     dateAdded: p.date_added,
   }));
 
@@ -177,20 +183,25 @@ export async function getWeeklyRandomProducts(count = 10): Promise<Product[]> {
 }
 
 export async function getSocialLinks(): Promise<SocialLink[]> {
-  const { data } = await supabase.from("social_links").select("*");
+  const { data } = await supabase
+    .from("social_links")
+    .select("*")
+    .eq("published", true);
   return (data || []).map((l) => ({
     id: l.id,
     label: l.label,
     url: l.url,
     icon: l.icon,
     internal: l.internal,
+    published: l.published,
   }));
 }
 
 export async function getAllBlogPosts(): Promise<BlogPost[]> {
   const { data } = await supabase
     .from("blog_posts")
-    .select("slug, title, date, excerpt, image, media_url, tags, content")
+    .select("slug, title, date, excerpt, image, media_url, tags, content, published")
+    .eq("published", true)
     .order("date", { ascending: false });
 
   return (data || []).map((post) => {
@@ -203,6 +214,7 @@ export async function getAllBlogPosts(): Promise<BlogPost[]> {
       image: post.image,
       mediaUrl: post.media_url,
       tags: post.tags,
+      published: post.published,
       readingTime: stats.text.replace("read", "קריאה"),
     };
   });
@@ -215,6 +227,7 @@ export async function getBlogPost(
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
+    .eq("published", true)
     .single();
 
   if (!data) throw new Error(`Blog post not found: ${slug}`);
@@ -229,6 +242,7 @@ export async function getBlogPost(
     image: data.image,
     mediaUrl: data.media_url,
     tags: data.tags,
+    published: data.published,
     readingTime: stats.text.replace("read", "קריאה"),
     content: data.content,
   };

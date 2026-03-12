@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, Eye, EyeOff } from "lucide-react";
 import type { SocialLink } from "@/lib/types";
 
 const iconOptions = [
@@ -18,6 +18,7 @@ const emptyLink = {
   url: "",
   icon: "externalLink",
   internal: false,
+  published: true,
 };
 
 export default function AdminLinks() {
@@ -142,7 +143,7 @@ export default function AdminLinks() {
             />
           </div>
 
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-4">
             <input
               type="checkbox"
               id="internal"
@@ -154,6 +155,21 @@ export default function AdminLinks() {
             />
             <label htmlFor="internal" className="text-sm">
               קישור פנימי (בתוך האתר)
+            </label>
+          </div>
+
+          <div className="flex items-center gap-2 mb-6">
+            <input
+              type="checkbox"
+              id="published"
+              checked={editing.published !== false}
+              onChange={(e) =>
+                setEditing({ ...editing, published: e.target.checked })
+              }
+              className="w-4 h-4"
+            />
+            <label htmlFor="published" className="text-sm">
+              מפורסם (גלוי באתר)
             </label>
           </div>
 
@@ -188,9 +204,18 @@ export default function AdminLinks() {
               {links.map((link) => (
                 <tr
                   key={link.id}
-                  className="border-b border-border last:border-0"
+                  className={`border-b border-border last:border-0 ${link.published === false ? 'opacity-60' : ''}`}
                 >
-                  <td className="px-4 py-3 font-medium">{link.label}</td>
+                  <td className="px-4 py-3 font-medium">
+                    <div className="flex items-center gap-2">
+                      {link.label}
+                      {link.published === false && (
+                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">
+                          מוסתר
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary truncate max-w-[200px]" dir="ltr">
                     {link.url}
                   </td>

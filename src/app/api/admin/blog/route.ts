@@ -11,7 +11,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from("blog_posts")
-    .select("slug, title, date, excerpt, image, media_url, tags, content")
+    .select("slug, title, date, excerpt, image, media_url, tags, content, published")
     .order("date", { ascending: false });
 
   const posts = (data || []).map((post) => {
@@ -24,6 +24,7 @@ export async function GET() {
       image: post.image,
       mediaUrl: post.media_url,
       tags: post.tags,
+      published: post.published,
       readingTime: stats.text.replace("read", "קריאה"),
     };
   });
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { title, excerpt, tags, content, image, mediaUrl } = await request.json();
+    const { title, excerpt, tags, content, image, mediaUrl, published } = await request.json();
 
     const slug =
       title
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
       media_url: mediaUrl || null,
       tags: tags || [],
       content: content || "",
+      published: published !== false,
     });
 
     if (error) throw error;
@@ -74,7 +76,7 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { slug, title, excerpt, tags, content, image, mediaUrl } = await request.json();
+    const { slug, title, excerpt, tags, content, image, mediaUrl, published } = await request.json();
 
     const { error } = await supabase
       .from("blog_posts")
@@ -85,6 +87,7 @@ export async function PUT(request: Request) {
         media_url: mediaUrl || null,
         tags: tags || [],
         content: content || "",
+        published: published !== false,
       })
       .eq("slug", slug);
 

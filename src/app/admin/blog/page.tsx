@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save, ImageIcon, Upload, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, ImageIcon, Upload, Loader2, Eye, EyeOff } from "lucide-react";
 import type { BlogPost } from "@/lib/types";
 
 const emptyPost = {
@@ -11,6 +11,7 @@ const emptyPost = {
   mediaUrl: "",
   tags: [] as string[],
   content: "",
+  published: true,
 };
 
 export default function AdminBlog() {
@@ -23,6 +24,7 @@ export default function AdminBlog() {
     mediaUrl: string;
     tags: string[];
     content: string;
+    published: boolean;
   } | null>(null);
   const [isNew, setIsNew] = useState(false);
   const [tagsInput, setTagsInput] = useState("");
@@ -87,6 +89,7 @@ export default function AdminBlog() {
         mediaUrl: data.mediaUrl || "",
         tags: post.tags || [],
         content: data.content || "",
+        published: data.published !== false,
       });
       setTagsInput((post.tags || []).join(", "));
       setIsNew(false);
@@ -314,6 +317,21 @@ export default function AdminBlog() {
             </div>
           </div>
 
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="checkbox"
+              id="published"
+              checked={editing.published !== false}
+              onChange={(e) =>
+                setEditing({ ...editing, published: e.target.checked })
+              }
+              className="w-4 h-4"
+            />
+            <label htmlFor="published" className="text-sm">
+              מפורסם (גלוי באתר)
+            </label>
+          </div>
+
           <button
             onClick={handleSave}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors"
@@ -345,7 +363,7 @@ export default function AdminBlog() {
               {posts.map((post) => (
                 <tr
                   key={post.slug}
-                  className="border-b border-border last:border-0"
+                  className={`border-b border-border last:border-0 ${post.published === false ? 'opacity-60' : ''}`}
                 >
                   <td className="px-3 sm:px-4 py-3 font-medium max-w-[200px] sm:max-w-none">
                     <div className="flex items-center gap-2 sm:gap-3">
@@ -362,6 +380,11 @@ export default function AdminBlog() {
                         </div>
                       )}
                       <span className="truncate">{post.title}</span>
+                      {post.published === false && (
+                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">
+                          טיוטה
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary">

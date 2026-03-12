@@ -17,6 +17,7 @@ export async function GET() {
       url: l.url,
       icon: l.icon,
       internal: l.internal,
+      published: l.published,
     }))
   );
 }
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
         url: link.url,
         icon: link.icon,
         internal: link.internal || false,
+        published: link.published !== false,
       })
       .select()
       .single();
@@ -67,6 +69,7 @@ export async function PUT(request: Request) {
         url: updated.url,
         icon: updated.icon,
         internal: updated.internal,
+        published: updated.published !== false,
       })
       .eq("id", updated.id)
       .select()

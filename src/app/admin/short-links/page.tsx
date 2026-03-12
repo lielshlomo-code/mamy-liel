@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, X, Save, Copy, Check, ExternalLink } from "lucide-react";
+import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff } from "lucide-react";
 import type { ShortLink } from "@/lib/types";
 
 const emptyLink = {
   targetUrl: "",
   title: "",
   code: "",
+  published: true,
 };
 
 export default function AdminShortLinks() {
@@ -16,6 +17,7 @@ export default function AdminShortLinks() {
     targetUrl: string;
     title: string;
     code: string;
+    published: boolean;
   } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -68,6 +70,20 @@ export default function AdminShortLinks() {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
+    });
+    load();
+  };
+
+  const handleTogglePublished = async (link: ShortLink) => {
+    await fetch("/api/admin/short-links", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: link.id,
+        targetUrl: link.targetUrl,
+        title: link.title,
+        published: !link.published,
+      }),
     });
     load();
   };
@@ -166,6 +182,21 @@ export default function AdminShortLinks() {
             </div>
           </div>
 
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="checkbox"
+              id="published"
+              checked={editing.published !== false}
+              onChange={(e) =>
+                setEditing({ ...editing, published: e.target.checked })
+              }
+              className="w-4 h-4"
+            />
+            <label htmlFor="published" className="text-sm">
+              מפורסם (פעיל)
+            </label>
+          </div>
+
           {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
           <button
@@ -187,7 +218,7 @@ export default function AdminShortLinks() {
         ) : (
           <div className="divide-y divide-border">
             {links.map((link) => (
-              <div key={link.id} className="p-3 sm:p-4">
+              <div key={link.id} className={`p-3 sm:p-4 ${link.published === false ? 'opacity-60' : ''}`}>
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-2 flex-wrap min-w-0">
                     {link.title && (
@@ -195,11 +226,29 @@ export default function AdminShortLinks() {
                         {link.title}
                       </span>
                     )}
+                    {link.published === false && (
+                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">
+                        מושבת
+                      </span>
+                    )}
                     <span className="text-xs text-text-secondary bg-muted px-2 py-0.5 rounded-full shrink-0">
                       {link.clicks} לחיצות
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleTogglePublished(link)}
+                      className={`p-2 rounded-lg hover:bg-muted transition-colors ${
+                        link.published === false ? 'text-amber-500' : 'text-text-secondary'
+                      }`}
+                      title={link.published === false ? "הפעלה" : "השבתה"}
+                    >
+                      {link.published === false ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
                     <button
                       onClick={() => copyToClipboard(link.code, link.id)}
                       className="p-2 rounded-lg hover:bg-muted transition-colors"

@@ -36,6 +36,7 @@ export async function GET(request: Request) {
     image: data.image,
     mediaUrl: data.media_url,
     tags: data.tags,
+    published: data.published,
     readingTime: stats.text.replace("read", "קריאה"),
     content: data.content,
   });

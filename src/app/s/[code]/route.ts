@@ -82,40 +82,11 @@ export async function GET(
         .replace(/"/g, "&quot;");
 
       const html = `<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>mamy.liel</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #faf8f5 0%, #f5ebe0 100%);
-      color: #3d2c2c;
-    }
-    .card { text-align: center; padding: 48px 32px; }
-    .spinner {
-      width: 28px; height: 28px;
-      border: 3px solid #e8ddd5; border-top-color: #3d2c2c;
-      border-radius: 50%; animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-    .text { font-size: 14px; color: #8b7355; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-  </style>
-</head>
+<html>
+<head><meta charset="UTF-8"><meta name="robots" content="noindex, nofollow"></head>
 <body>
-  <div class="card">
-    <div class="spinner"></div>
-    <p class="text">...מעבירה אותך</p>
-  </div>
-  <iframe src="${cookieUrlSafe}" style="position:absolute;width:0;height:0;border:0;opacity:0" tabindex="-1" aria-hidden="true"></iframe>
-  <script>
-    setTimeout(function() { window.location.href = ${targetUrlJson}; }, 1500);
-  </script>
+<iframe src="${cookieUrlSafe}" style="position:absolute;width:0;height:0;border:0;opacity:0" tabindex="-1" aria-hidden="true"></iframe>
+<script>setTimeout(function(){window.location.href=${targetUrlJson}},500)</script>
 </body>
 </html>`;
 

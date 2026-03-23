@@ -87,7 +87,7 @@ export async function GET(
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>mamy.liel — ממשיכים לדף</title>
+  <title>mamy.liel</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -96,48 +96,25 @@ export async function GET(
       background: linear-gradient(135deg, #faf8f5 0%, #f5ebe0 100%);
       color: #3d2c2c;
     }
-    .card {
-      text-align: center; padding: 48px 32px; max-width: 400px;
-      background: white; border-radius: 24px;
-      box-shadow: 0 4px 24px rgba(61,44,44,0.08);
-    }
-    .logo { font-size: 20px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-    .sub { font-size: 14px; color: #8b7355; margin-bottom: 32px; }
-    .btn {
-      display: inline-block; padding: 16px 48px;
-      background: #3d2c2c; color: white; border: none;
-      border-radius: 50px; font-size: 16px; font-weight: 600;
-      cursor: pointer; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(61,44,44,0.2); }
-    .btn:active { transform: translateY(0); }
-    .note { font-size: 11px; color: #b8a080; margin-top: 24px; }
+    .card { text-align: center; padding: 48px 32px; }
     .spinner {
-      display: none; width: 24px; height: 24px;
+      width: 28px; height: 28px;
       border: 3px solid #e8ddd5; border-top-color: #3d2c2c;
       border-radius: 50%; animation: spin 0.8s linear infinite;
-      margin: 24px auto 0;
+      margin: 0 auto 16px;
     }
+    .text { font-size: 14px; color: #8b7355; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="logo">mamy.liel</div>
-    <p class="sub">עוד רגע מעבירה אותך</p>
-    <iframe src="${cookieUrlSafe}" style="position:absolute;width:0;height:0;border:0;opacity:0" tabindex="-1" aria-hidden="true"></iframe>
-    <button class="btn" id="go">קחי אותי לדף ←</button>
-    <div class="spinner" id="spinner"></div>
-    <p class="note">לחצי על הכפתור כדי להמשיך</p>
+    <div class="spinner"></div>
+    <p class="text">...מעבירה אותך</p>
   </div>
+  <iframe src="${cookieUrlSafe}" style="position:absolute;width:0;height:0;border:0;opacity:0" tabindex="-1" aria-hidden="true"></iframe>
   <script>
-    var target = ${targetUrlJson};
-    document.getElementById('go').addEventListener('click', function() {
-      this.style.display = 'none';
-      document.getElementById('spinner').style.display = 'block';
-      setTimeout(function() { window.location.href = target; }, 800);
-    });
+    setTimeout(function() { window.location.href = ${targetUrlJson}; }, 1500);
   </script>
 </body>
 </html>`;

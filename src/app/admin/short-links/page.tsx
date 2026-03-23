@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie } from "lucide-react";
 import type { ShortLink } from "@/lib/types";
 
 const emptyLink = {
   targetUrl: "",
+  paintCookies: false,
   title: "",
   code: "",
   published: true,
@@ -15,6 +16,7 @@ export default function AdminShortLinks() {
   const [links, setLinks] = useState<ShortLink[]>([]);
   const [editing, setEditing] = useState<{
     targetUrl: string;
+    paintCookies: boolean;
     title: string;
     code: string;
     published: boolean;
@@ -81,8 +83,24 @@ export default function AdminShortLinks() {
       body: JSON.stringify({
         id: link.id,
         targetUrl: link.targetUrl,
+        paintCookies: link.paintCookies,
         title: link.title,
         published: !link.published,
+      }),
+    });
+    load();
+  };
+
+  const handleTogglePaintCookies = async (link: ShortLink) => {
+    await fetch("/api/admin/short-links", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: link.id,
+        targetUrl: link.targetUrl,
+        paintCookies: !link.paintCookies,
+        title: link.title,
+        published: link.published,
       }),
     });
     load();
@@ -132,7 +150,7 @@ export default function AdminShortLinks() {
                 onChange={(e) =>
                   setEditing({ ...editing, targetUrl: e.target.value })
                 }
-                placeholder="https://mamy-liel.com/blog/..."
+                placeholder="https://www.aliexpress.com/item/..."
                 className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
               />
             </div>
@@ -182,19 +200,39 @@ export default function AdminShortLinks() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="checkbox"
-              id="published"
-              checked={editing.published !== false}
-              onChange={(e) =>
-                setEditing({ ...editing, published: e.target.checked })
-              }
-              className="w-4 h-4"
-            />
-            <label htmlFor="published" className="text-sm">
-              מפורסם (פעיל)
-            </label>
+          <div className="flex flex-col gap-3 mb-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="published"
+                checked={editing.published !== false}
+                onChange={(e) =>
+                  setEditing({ ...editing, published: e.target.checked })
+                }
+                className="w-4 h-4"
+              />
+              <label htmlFor="published" className="text-sm">
+                מפורסם (פעיל)
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="paintCookies"
+                checked={editing.paintCookies}
+                onChange={(e) =>
+                  setEditing({ ...editing, paintCookies: e.target.checked })
+                }
+                className="w-4 h-4"
+              />
+              <label htmlFor="paintCookies" className="text-sm">
+                צביעת קוקיז (שיווק שותפים)
+              </label>
+              <span className="text-xs text-text-secondary">
+                — דף ביניים עם צביעת קוקיז לפני ההפניה
+              </span>
+            </div>
           </div>
 
           {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
@@ -231,11 +269,25 @@ export default function AdminShortLinks() {
                         מושבת
                       </span>
                     )}
+                    {link.paintCookies && (
+                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 font-medium">
+                        קוקיז
+                      </span>
+                    )}
                     <span className="text-xs text-text-secondary bg-muted px-2 py-0.5 rounded-full shrink-0">
                       {link.clicks} לחיצות
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleTogglePaintCookies(link)}
+                      className={`p-2 rounded-lg hover:bg-muted transition-colors ${
+                        link.paintCookies ? 'text-orange-500' : 'text-text-secondary'
+                      }`}
+                      title={link.paintCookies ? "ביטול צביעת קוקיז" : "הפעלת צביעת קוקיז"}
+                    >
+                      <Cookie className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => handleTogglePublished(link)}
                       className={`p-2 rounded-lg hover:bg-muted transition-colors ${

@@ -26,6 +26,7 @@ export async function GET() {
     id: link.id,
     code: link.code,
     targetUrl: link.target_url,
+    paintCookies: link.paint_cookies || false,
     title: link.title,
     clicks: link.clicks,
     createdAt: link.created_at,
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { targetUrl, title, code: customCode, published } = await request.json();
+    const { targetUrl, title, code: customCode, published, paintCookies } = await request.json();
 
     if (!targetUrl) {
       return NextResponse.json({ error: "כתובת URL נדרשת" }, { status: 400 });
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
       .insert({
         code,
         target_url: targetUrl,
+        paint_cookies: paintCookies || false,
         title: title || null,
         published: published !== false,
       })
@@ -82,6 +84,7 @@ export async function POST(request: Request) {
       id: data.id,
       code: data.code,
       targetUrl: data.target_url,
+      paintCookies: data.paint_cookies || false,
       title: data.title,
       clicks: data.clicks,
       createdAt: data.created_at,
@@ -99,12 +102,13 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { id, targetUrl, title, published } = await request.json();
+    const { id, targetUrl, title, published, paintCookies } = await request.json();
 
     const { error } = await supabase
       .from("short_links")
       .update({
         target_url: targetUrl,
+        paint_cookies: paintCookies || false,
         title: title || null,
         published: published !== false,
       })

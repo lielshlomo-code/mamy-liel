@@ -76,7 +76,7 @@ export default async function FeaturedProducts() {
   if (products.length === 0) return null;
 
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-animated-gradient section-curve-top section-curve-bottom">
+    <section className="py-14 md:py-20 relative overflow-hidden bg-animated-gradient section-curve-top section-curve-bottom">
       {/* Decorative background elements */}
       <div className="absolute inset-0 dot-grid opacity-10 pointer-events-none" />
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-l from-transparent via-warm-300/60 to-transparent" />

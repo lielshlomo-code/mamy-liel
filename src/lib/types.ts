@@ -50,6 +50,7 @@ export interface SiteConfig {
   contact: {
     email: string;
   };
+  affiliateCookieUrl?: string;
 }
 
 export interface BlogPost {
@@ -69,6 +70,7 @@ export interface ShortLink {
   id: string;
   code: string;
   targetUrl: string;
+  paintCookies: boolean;
   title?: string;
   clicks: number;
   createdAt: string;

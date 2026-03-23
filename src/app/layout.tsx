@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import "./globals.css";
 import SiteShell from "@/components/layout/SiteShell";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const heebo = Heebo({
@@ -34,7 +35,7 @@ export default function RootLayout({
     <html lang="he" dir="rtl" className={heebo.variable}>
       <body className="font-sans min-h-screen flex flex-col antialiased">
         <AuthProvider>
-          <SiteShell>{children}</SiteShell>
+          <SiteShell featuredProducts={<FeaturedProducts />}>{children}</SiteShell>
         </AuthProvider>
       </body>
     </html>

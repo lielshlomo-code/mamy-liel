@@ -39,6 +39,11 @@ const stores: StoreItem[] = [
     coupon: "15FS",
     gradient: "from-violet-400 to-purple-500",
   },
+  {
+    name: "מבצעים אלי אקספרס",
+    url: "https://s.click.aliexpress.com/e/_c4lfajWT",
+    gradient: "from-red-400 to-orange-500",
+  },
 ];
 
 export default function HeroSection() {

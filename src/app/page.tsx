@@ -9,9 +9,9 @@ import InstagramCTA from "@/components/home/InstagramCTA";
 export default function Home() {
   return (
     <>
+      <StoreLinks />
       <HeroSection />
       <Marquee />
-      <StoreLinks />
       <QuickLinks />
       <InstagramCTA />
     </>

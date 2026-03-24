@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "mamyliel2026";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "10203040";
 const SESSION_COOKIE = "admin_session";
 const SESSION_TOKEN = "authenticated";
 

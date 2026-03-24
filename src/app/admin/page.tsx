@@ -10,6 +10,8 @@ import {
   Eye,
   MousePointerClick,
   Mail,
+  Camera,
+  Loader2,
 } from "lucide-react";
 import type { AnalyticsData } from "@/lib/types";
 
@@ -41,13 +43,52 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [range, setRange] = useState("30");
   const [loading, setLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/stats")
       .then((r) => r.json())
       .then(setStats)
       .catch(() => {});
+
+    fetch("/api/settings?key=profile_image")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.value) setProfileImage(data.value);
+      })
+      .catch(() => {});
   }, []);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const uploadRes = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const { url } = await uploadRes.json();
+      if (!url) throw new Error("Upload failed");
+
+      await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "profile_image", value: url }),
+      });
+
+      setProfileImage(url);
+    } catch {
+      alert("שגיאה בהעלאת התמונה");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -82,6 +123,40 @@ export default function AdminDashboard() {
             <Eye className="w-4 h-4" />
             צפייה באתר
           </Link>
+        </div>
+      </div>
+
+      {/* Profile image */}
+      <div className="bg-white rounded-xl border border-border p-4 sm:p-6 mb-8">
+        <h3 className="font-semibold mb-4">תמונת פרופיל (דף הבית)</h3>
+        <div className="flex items-center gap-4">
+          <div className="relative w-20 h-20 rounded-full bg-foreground text-white flex items-center justify-center text-2xl font-black overflow-hidden shrink-0">
+            {profileImage ? (
+              <img src={profileImage} alt="פרופיל" className="w-full h-full object-cover" />
+            ) : (
+              "ל"
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors cursor-pointer">
+              {uploadingImage ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Camera className="w-4 h-4" />
+              )}
+              {uploadingImage ? "מעלה..." : profileImage ? "החלפת תמונה" : "העלאת תמונה"}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploadingImage}
+                className="hidden"
+              />
+            </label>
+            <p className="text-xs text-text-secondary">
+              מומלץ תמונה מרובעת, עד 5MB
+            </p>
+          </div>
         </div>
       </div>
 

@@ -58,6 +58,7 @@ interface HomepageLink {
 export default function HeroSection() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [stores, setStores] = useState<StoreItem[]>(fallbackStores);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const { scrollY } = useScroll();
 
   useEffect(() => {
@@ -73,6 +74,13 @@ export default function HeroSection() {
             gradient: link.color || "from-warm-300 to-rose-400",
           }))
         );
+      })
+      .catch(() => {});
+
+    fetch("/api/settings?key=profile_image")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.value) setProfileImage(data.value);
       })
       .catch(() => {});
   }, []);
@@ -117,9 +125,17 @@ export default function HeroSection() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="mx-auto mb-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-foreground text-white flex items-center justify-center text-3xl sm:text-4xl font-black"
+          className="mx-auto mb-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-foreground text-white flex items-center justify-center text-3xl sm:text-4xl font-black overflow-hidden"
         >
-          ל
+          {profileImage ? (
+            <img
+              src={profileImage}
+              alt="ליאל שלמה"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            "ל"
+          )}
         </motion.div>
 
         {/* Main headline */}

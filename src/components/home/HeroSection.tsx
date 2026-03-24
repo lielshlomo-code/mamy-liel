@@ -71,18 +71,6 @@ export default function HeroSection() {
         style={{ opacity, scale, y }}
         className="relative z-10 max-w-5xl mx-auto px-6 md:px-10 text-center pt-24"
       >
-        {/* Small tag */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="mb-8"
-        >
-          <span className="inline-block px-4 py-1.5 text-xs font-medium tracking-widest uppercase border border-black/10 rounded-full">
-            יוצרת תוכן · אמהות · השראה
-          </span>
-        </motion.div>
-
         {/* Main headline */}
         <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter mb-6">
           <TextReveal delay={0.3}>ליאל</TextReveal>

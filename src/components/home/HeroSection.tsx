@@ -2,11 +2,47 @@
 
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Copy, Check, ExternalLink } from "lucide-react";
+import { useState } from "react";
 import TextReveal from "@/components/ui/TextReveal";
 
+const stores = [
+  {
+    name: "Shiptanbul",
+    url: "https://shiptanbul.com/?ref=barshlomo",
+    coupon: "liel15",
+    couponNote: "יוון ואנגליה",
+    gradient: "from-orange-400 to-rose-400",
+  },
+  {
+    name: "Shiptanbul",
+    url: "https://shiptanbul.com/?ref=barshlomo",
+    coupon: "liel20",
+    couponNote: "ארה״ב",
+    gradient: "from-orange-400 to-rose-400",
+  },
+  {
+    name: "סופר פארם",
+    url: "https://go.scrmgo.com/23LWNBNG/2QZRGT1/?url=https://shop.super-pharm.co.il/baby",
+    gradient: "from-green-400 to-emerald-500",
+  },
+  {
+    name: "טרמינל X",
+    url: "https://s.humanz.ai/terminalbids/741575/192",
+    coupon: "15FS",
+    gradient: "from-violet-400 to-purple-500",
+  },
+];
+
 export default function HeroSection() {
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const { scrollY } = useScroll();
+
+  const copyCoupon = (coupon: string, index: number) => {
+    navigator.clipboard.writeText(coupon);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
   const opacity = useTransform(scrollY, [0, 500], [1, 0]);
   const scale = useTransform(scrollY, [0, 500], [1, 0.9]);
   const y = useTransform(scrollY, [0, 500], [0, 100]);
@@ -107,6 +143,74 @@ export default function HeroSection() {
             <span className="relative z-10">כל הקישורים</span>
             <span className="absolute inset-0 bg-foreground transform scale-y-0 group-hover:scale-y-100 transition-transform origin-bottom duration-300" />
           </Link>
+        </motion.div>
+
+        {/* Store Links */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.8, duration: 0.6 }}
+          className="mt-12 w-full max-w-md mx-auto"
+        >
+          <p className="text-xs font-medium text-text-light uppercase tracking-widest mb-4">
+            הנחות וקופונים
+          </p>
+          <div className="flex flex-col gap-2.5">
+            {stores.map((store, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 2 + i * 0.1, duration: 0.4 }}
+              >
+                <a
+                  href={store.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-black/[0.06] bg-white/60 backdrop-blur-sm hover:bg-white hover:border-black/10 hover:shadow-sm transition-all duration-300"
+                >
+                  <div
+                    className={`w-8 h-8 rounded-lg bg-gradient-to-br ${store.gradient} flex items-center justify-center shrink-0`}
+                  >
+                    <ShoppingBag className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0 text-right">
+                    <span className="font-semibold text-sm block leading-tight">
+                      {store.name}
+                    </span>
+                    {store.couponNote && (
+                      <span className="text-[11px] text-text-secondary">
+                        {store.couponNote}
+                      </span>
+                    )}
+                  </div>
+                  {store.coupon ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        copyCoupon(store.coupon!, i);
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-black/[0.04] border border-dashed border-black/10 hover:bg-black/[0.08] transition-colors shrink-0"
+                      title="העתקת קוד קופון"
+                    >
+                      <span className="text-[11px] font-bold tracking-wider" dir="ltr">
+                        {store.coupon}
+                      </span>
+                      {copiedIndex === i ? (
+                        <Check className="w-3 h-3 text-green-600" />
+                      ) : (
+                        <Copy className="w-3 h-3 text-text-secondary" />
+                      )}
+                    </button>
+                  ) : (
+                    <ExternalLink className="w-3.5 h-3.5 text-text-light group-hover:text-foreground transition-colors shrink-0" />
+                  )}
+                </a>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </motion.div>
 

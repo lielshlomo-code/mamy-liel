@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
     if (!verifyPassword(password)) {
       return NextResponse.json(
-        { error: "סיסמה שגויה", hint: process.env.ADMIN_PASSWORD ? "env" : "default" },
+        { error: "סיסמה שגויה" },
         { status: 401 }
       );
     }

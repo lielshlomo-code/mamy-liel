@@ -143,8 +143,14 @@
     </div>
 
     <script>
-        document.getElementById('whatsapp-cta').addEventListener('click', function() {
-            fbq('track', 'Lead');
+        document.getElementById('whatsapp-cta').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'Lead');
+            }
+            setTimeout(function() {
+                window.location.href = 'https://chat.whatsapp.com/LWfnDZ6hKyV414XT1YKHwX?mode=gi_t';
+            }, 300);
         });
     </script>
 </body>

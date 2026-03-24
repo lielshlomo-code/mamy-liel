@@ -36,6 +36,7 @@ export interface SocialLink {
   internal?: boolean;
   published: boolean;
   showInPopup: boolean;
+  paintCookies: boolean;
 }
 
 export interface SiteConfig {

@@ -19,6 +19,7 @@ export async function GET() {
       internal: l.internal,
       published: l.published,
       showInPopup: l.show_in_popup || false,
+      paintCookies: l.paint_cookies || false,
     }))
   );
 }
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
         internal: link.internal || false,
         published: link.published !== false,
         show_in_popup: link.showInPopup || false,
+        paint_cookies: link.paintCookies || false,
       })
       .select()
       .single();
@@ -73,6 +75,7 @@ export async function PUT(request: Request) {
         internal: updated.internal,
         published: updated.published !== false,
         show_in_popup: updated.showInPopup || false,
+        paint_cookies: updated.paintCookies || false,
       })
       .eq("id", updated.id)
       .select()

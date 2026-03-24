@@ -190,11 +190,12 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
   return (data || []).map((l) => ({
     id: l.id,
     label: l.label,
-    url: l.url,
+    url: l.paint_cookies ? `/go?url=${encodeURIComponent(l.url)}` : l.url,
     icon: l.icon,
     internal: l.internal,
     published: l.published,
     showInPopup: l.show_in_popup || false,
+    paintCookies: l.paint_cookies || false,
   }));
 }
 

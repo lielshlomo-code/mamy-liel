@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save, Eye, EyeOff, Megaphone } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, Eye, EyeOff, Megaphone, Cookie } from "lucide-react";
 import type { SocialLink } from "@/lib/types";
 
 const iconOptions = [
@@ -20,6 +20,7 @@ const emptyLink = {
   internal: false,
   published: true,
   showInPopup: false,
+  paintCookies: false,
 };
 
 export default function AdminLinks() {
@@ -57,34 +58,16 @@ export default function AdminLinks() {
   };
 
   const handleTogglePublished = async (link: SocialLink) => {
-    await fetch("/api/admin/links", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: link.id,
-        label: link.label,
-        url: link.url,
-        icon: link.icon,
-        internal: link.internal,
-        published: !link.published,
-        showInPopup: link.showInPopup,
-      }),
-    });
-    load();
+    await toggleField(link, "published", !link.published);
   };
 
-  const handleToggleShowInPopup = async (link: SocialLink) => {
+  const toggleField = async (link: SocialLink, field: string, value: unknown) => {
     await fetch("/api/admin/links", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: link.id,
-        label: link.label,
-        url: link.url,
-        icon: link.icon,
-        internal: link.internal,
-        published: link.published,
-        showInPopup: !link.showInPopup,
+        ...link,
+        [field]: value,
       }),
     });
     load();
@@ -208,6 +191,24 @@ export default function AdminLinks() {
             </label>
           </div>
 
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="checkbox"
+              id="paintCookies"
+              checked={editing.paintCookies || false}
+              onChange={(e) =>
+                setEditing({ ...editing, paintCookies: e.target.checked })
+              }
+              className="w-4 h-4"
+            />
+            <label htmlFor="paintCookies" className="text-sm">
+              צביעת קוקיז (שיווק שותפים)
+            </label>
+            <span className="text-xs text-text-secondary">
+              — דף ביניים עם צביעת קוקיז לפני ההפניה
+            </span>
+          </div>
+
           <div className="flex items-center gap-2 mb-6">
             <input
               type="checkbox"
@@ -221,9 +222,6 @@ export default function AdminLinks() {
             <label htmlFor="showInPopup" className="text-sm">
               הצגה בפופאפ
             </label>
-            <span className="text-xs text-text-secondary">
-              — יופיע בפופאפ ההנחות בכניסה לאתר
-            </span>
           </div>
 
           <button
@@ -268,6 +266,11 @@ export default function AdminLinks() {
                           מוסתר
                         </span>
                       )}
+                      {link.paintCookies && (
+                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 font-medium">
+                          קוקיז
+                        </span>
+                      )}
                       {link.showInPopup && (
                         <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
                           פופאפ
@@ -296,7 +299,16 @@ export default function AdminLinks() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
                       <button
-                        onClick={() => handleToggleShowInPopup(link)}
+                        onClick={() => toggleField(link, "paintCookies", !link.paintCookies)}
+                        className={`p-1.5 rounded-lg hover:bg-muted transition-colors ${
+                          link.paintCookies ? 'text-orange-500' : 'text-text-secondary'
+                        }`}
+                        title={link.paintCookies ? "ביטול צביעת קוקיז" : "הפעלת צביעת קוקיז"}
+                      >
+                        <Cookie className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => toggleField(link, "showInPopup", !link.showInPopup)}
                         className={`p-1.5 rounded-lg hover:bg-muted transition-colors ${
                           link.showInPopup ? 'text-purple-500' : 'text-text-secondary'
                         }`}

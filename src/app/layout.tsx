@@ -17,10 +17,10 @@ export const metadata: Metadata = {
     template: "%s | mamy.liel",
   },
   description:
-    "אמא של מיה ורנה | יוצרת תוכן | משתפת דברים שטובים לי ולבית שלי",
+    "ליאל שלמה | אמא של מיה ורנה | קופונים, הנחות והמלצות למוצרי תינוקות, בית ולייפסטייל",
   openGraph: {
     title: "mamy.liel | ליאל שלמה",
-    description: "יוצרת תוכן | אמהות ותינוקות",
+    description: "קופונים, הנחות והמלצות למוצרי תינוקות, בית ולייפסטייל",
     locale: "he_IL",
     type: "website",
   },

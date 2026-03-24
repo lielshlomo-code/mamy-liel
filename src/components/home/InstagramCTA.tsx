@@ -42,8 +42,8 @@ export default function InstagramCTA() {
       })}
 
       {/* Gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-rose-500/8 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] bg-purple-500/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-rose-300/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] bg-warm-300/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 md:px-10 text-center">
         {/* Glass card */}

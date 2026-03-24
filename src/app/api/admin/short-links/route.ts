@@ -32,6 +32,10 @@ export async function GET() {
     createdAt: link.created_at,
     published: link.published,
     showInPopup: link.show_in_popup || false,
+    showOnHomepage: link.show_on_homepage || false,
+    couponCode: link.coupon_code || "",
+    couponNote: link.coupon_note || "",
+    color: link.color || "",
   }));
 
   return NextResponse.json(links);
@@ -44,7 +48,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { targetUrl, title, code: customCode, published, paintCookies, showInPopup } = await request.json();
+    const { targetUrl, title, code: customCode, published, paintCookies, showInPopup, showOnHomepage, couponCode, couponNote, color } = await request.json();
 
     if (!targetUrl) {
       return NextResponse.json({ error: "כתובת URL נדרשת" }, { status: 400 });
@@ -76,6 +80,10 @@ export async function POST(request: Request) {
         title: title || null,
         published: published !== false,
         show_in_popup: showInPopup || false,
+        show_on_homepage: showOnHomepage || false,
+        coupon_code: couponCode || null,
+        coupon_note: couponNote || null,
+        color: color || null,
       })
       .select()
       .single();
@@ -92,6 +100,10 @@ export async function POST(request: Request) {
       createdAt: data.created_at,
       published: data.published,
       showInPopup: data.show_in_popup || false,
+      showOnHomepage: data.show_on_homepage || false,
+      couponCode: data.coupon_code || "",
+      couponNote: data.coupon_note || "",
+      color: data.color || "",
     });
   } catch {
     return NextResponse.json({ error: "שגיאה ביצירת קישור מקוצר" }, { status: 500 });
@@ -105,7 +117,7 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { id, targetUrl, title, published, paintCookies, showInPopup } = await request.json();
+    const { id, targetUrl, title, published, paintCookies, showInPopup, showOnHomepage, couponCode, couponNote, color } = await request.json();
 
     const { error } = await supabase
       .from("short_links")
@@ -115,6 +127,10 @@ export async function PUT(request: Request) {
         title: title || null,
         published: published !== false,
         show_in_popup: showInPopup || false,
+        show_on_homepage: showOnHomepage || false,
+        coupon_code: couponCode || null,
+        coupon_note: couponNote || null,
+        color: color || null,
       })
       .eq("id", id);
 

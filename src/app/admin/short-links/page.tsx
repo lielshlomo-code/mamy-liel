@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie, Megaphone } from "lucide-react";
+import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie, Megaphone, Home } from "lucide-react";
 import type { ShortLink } from "@/lib/types";
 
 const emptyLink = {
@@ -11,18 +11,15 @@ const emptyLink = {
   code: "",
   published: true,
   showInPopup: false,
+  showOnHomepage: false,
+  couponCode: "",
+  couponNote: "",
+  color: "",
 };
 
 export default function AdminShortLinks() {
   const [links, setLinks] = useState<ShortLink[]>([]);
-  const [editing, setEditing] = useState<{
-    targetUrl: string;
-    paintCookies: boolean;
-    title: string;
-    code: string;
-    published: boolean;
-    showInPopup: boolean;
-  } | null>(null);
+  const [editing, setEditing] = useState<typeof emptyLink | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -78,39 +75,7 @@ export default function AdminShortLinks() {
     load();
   };
 
-  const handleTogglePublished = async (link: ShortLink) => {
-    await fetch("/api/admin/short-links", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: link.id,
-        targetUrl: link.targetUrl,
-        paintCookies: link.paintCookies,
-        title: link.title,
-        published: !link.published,
-        showInPopup: link.showInPopup,
-      }),
-    });
-    load();
-  };
-
-  const handleTogglePaintCookies = async (link: ShortLink) => {
-    await fetch("/api/admin/short-links", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: link.id,
-        targetUrl: link.targetUrl,
-        paintCookies: !link.paintCookies,
-        title: link.title,
-        published: link.published,
-        showInPopup: link.showInPopup,
-      }),
-    });
-    load();
-  };
-
-  const handleToggleShowInPopup = async (link: ShortLink) => {
+  const toggleField = async (link: ShortLink, field: string, value: unknown) => {
     await fetch("/api/admin/short-links", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -120,7 +85,12 @@ export default function AdminShortLinks() {
         paintCookies: link.paintCookies,
         title: link.title,
         published: link.published,
-        showInPopup: !link.showInPopup,
+        showInPopup: link.showInPopup,
+        showOnHomepage: link.showOnHomepage,
+        couponCode: link.couponCode,
+        couponNote: link.couponNote,
+        color: link.color,
+        [field]: value,
       }),
     });
     load();
@@ -184,7 +154,7 @@ export default function AdminShortLinks() {
                   onChange={(e) =>
                     setEditing({ ...editing, title: e.target.value })
                   }
-                  placeholder="למשל: מתכון שוקולד חמה"
+                  placeholder="למשל: סופר פארם"
                   className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
                 />
               </div>
@@ -216,6 +186,41 @@ export default function AdminShortLinks() {
                     className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 flex-1"
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium">
+                  קוד קופון{" "}
+                  <span className="text-text-secondary font-normal">(אופציונלי)</span>
+                </label>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={editing.couponCode}
+                  onChange={(e) =>
+                    setEditing({ ...editing, couponCode: e.target.value })
+                  }
+                  placeholder="LIEL20"
+                  className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium">
+                  הערת קופון{" "}
+                  <span className="text-text-secondary font-normal">(אופציונלי)</span>
+                </label>
+                <input
+                  type="text"
+                  value={editing.couponNote}
+                  onChange={(e) =>
+                    setEditing({ ...editing, couponNote: e.target.value })
+                  }
+                  placeholder="יוון ואנגליה"
+                  className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                />
               </div>
             </div>
           </div>
@@ -257,6 +262,24 @@ export default function AdminShortLinks() {
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
+                id="showOnHomepage"
+                checked={editing.showOnHomepage}
+                onChange={(e) =>
+                  setEditing({ ...editing, showOnHomepage: e.target.checked })
+                }
+                className="w-4 h-4"
+              />
+              <label htmlFor="showOnHomepage" className="text-sm">
+                הצגה בדף הבית
+              </label>
+              <span className="text-xs text-text-secondary">
+                — יופיע בסקשן החנויות בדף הראשי
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
                 id="showInPopup"
                 checked={editing.showInPopup}
                 onChange={(e) =>
@@ -267,9 +290,6 @@ export default function AdminShortLinks() {
               <label htmlFor="showInPopup" className="text-sm">
                 הצגה בפופאפ
               </label>
-              <span className="text-xs text-text-secondary">
-                — יופיע בפופאפ ההנחות בכניסה לאתר
-              </span>
             </div>
           </div>
 
@@ -312,9 +332,19 @@ export default function AdminShortLinks() {
                         קוקיז
                       </span>
                     )}
+                    {link.showOnHomepage && (
+                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-medium">
+                        דף הבית
+                      </span>
+                    )}
                     {link.showInPopup && (
                       <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
                         פופאפ
+                      </span>
+                    )}
+                    {link.couponCode && (
+                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium font-mono" dir="ltr">
+                        {link.couponCode}
                       </span>
                     )}
                     <span className="text-xs text-text-secondary bg-muted px-2 py-0.5 rounded-full shrink-0">
@@ -323,7 +353,16 @@ export default function AdminShortLinks() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button
-                      onClick={() => handleToggleShowInPopup(link)}
+                      onClick={() => toggleField(link, "showOnHomepage", !link.showOnHomepage)}
+                      className={`p-2 rounded-lg hover:bg-muted transition-colors ${
+                        link.showOnHomepage ? 'text-blue-500' : 'text-text-secondary'
+                      }`}
+                      title={link.showOnHomepage ? "הסרה מדף הבית" : "הצגה בדף הבית"}
+                    >
+                      <Home className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => toggleField(link, "showInPopup", !link.showInPopup)}
                       className={`p-2 rounded-lg hover:bg-muted transition-colors ${
                         link.showInPopup ? 'text-purple-500' : 'text-text-secondary'
                       }`}
@@ -332,7 +371,7 @@ export default function AdminShortLinks() {
                       <Megaphone className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleTogglePaintCookies(link)}
+                      onClick={() => toggleField(link, "paintCookies", !link.paintCookies)}
                       className={`p-2 rounded-lg hover:bg-muted transition-colors ${
                         link.paintCookies ? 'text-orange-500' : 'text-text-secondary'
                       }`}
@@ -341,7 +380,7 @@ export default function AdminShortLinks() {
                       <Cookie className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleTogglePublished(link)}
+                      onClick={() => toggleField(link, "published", !link.published)}
                       className={`p-2 rounded-lg hover:bg-muted transition-colors ${
                         link.published === false ? 'text-amber-500' : 'text-text-secondary'
                       }`}

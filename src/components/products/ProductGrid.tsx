@@ -257,7 +257,7 @@ function AccordionSection({
           {/* Animated dot indicator */}
           <div className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
             isOpen
-              ? "bg-rose-400 shadow-[0_0_10px_rgba(244,114,182,0.5)] scale-110"
+              ? "bg-rose-400 shadow-[0_0_10px_rgba(201,153,154,0.5)] scale-110"
               : "bg-warm-300 group-hover:bg-rose-300"
           }`} />
 

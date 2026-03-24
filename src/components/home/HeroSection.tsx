@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ShoppingBag, Copy, Check, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextReveal from "@/components/ui/TextReveal";
 
 interface Coupon {
@@ -18,7 +18,8 @@ interface StoreItem {
   gradient: string;
 }
 
-const stores: StoreItem[] = [
+/* Hardcoded fallback — shown immediately while API loads */
+const fallbackStores: StoreItem[] = [
   {
     name: "Shiptanbul",
     url: "https://shiptanbul.com/?ref=barshlomo",
@@ -26,35 +27,62 @@ const stores: StoreItem[] = [
       { code: "liel15", note: "יוון ואנגליה" },
       { code: "liel20", note: "ארה״ב" },
     ],
-    gradient: "from-orange-400 to-rose-400",
+    gradient: "from-warm-300 to-rose-400",
   },
   {
     name: "סופר פארם",
     url: "https://go.scrmgo.com/23LWNBNG/2QZRGT1/?url=https://shop.super-pharm.co.il/baby",
-    gradient: "from-green-400 to-emerald-500",
+    gradient: "from-foreground to-foreground/80",
   },
   {
     name: "טרמינל X",
     url: "https://s.humanz.ai/terminalbids/741575/192",
     coupon: "15FS",
-    gradient: "from-violet-400 to-purple-500",
+    gradient: "from-rose-400 to-rose-500",
   },
   {
     name: "מבצעים אלי אקספרס",
     url: "https://s.click.aliexpress.com/e/_c4lfajWT",
-    gradient: "from-red-400 to-orange-500",
+    gradient: "from-warm-200 to-warm-300",
   },
 ];
 
+interface HomepageLink {
+  title: string;
+  url: string;
+  couponCode: string;
+  couponNote: string;
+  color: string;
+}
+
 export default function HeroSection() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [stores, setStores] = useState<StoreItem[]>(fallbackStores);
   const { scrollY } = useScroll();
+
+  useEffect(() => {
+    fetch("/api/homepage-links")
+      .then((r) => r.json())
+      .then((data: HomepageLink[]) => {
+        if (data.length === 0) return;
+        setStores(
+          data.map((link) => ({
+            name: link.title,
+            url: link.url,
+            coupon: link.couponCode || undefined,
+            gradient: link.color || "from-warm-300 to-rose-400",
+          }))
+        );
+      })
+      .catch(() => {});
+  }, []);
 
   const copyCoupon = (coupon: string, key: string) => {
     navigator.clipboard.writeText(coupon);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
+
   const opacity = useTransform(scrollY, [0, 500], [1, 0]);
   const scale = useTransform(scrollY, [0, 500], [1, 0.9]);
   const y = useTransform(scrollY, [0, 500], [0, 100]);
@@ -84,6 +112,16 @@ export default function HeroSection() {
         style={{ opacity, scale, y }}
         className="relative z-10 max-w-5xl mx-auto px-6 md:px-10 text-center pt-20 sm:pt-24"
       >
+        {/* Profile avatar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto mb-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-foreground text-white flex items-center justify-center text-3xl sm:text-4xl font-black"
+        >
+          ל
+        </motion.div>
+
         {/* Main headline */}
         <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter mb-6">
           <TextReveal delay={0.3}>ליאל</TextReveal>
@@ -109,7 +147,7 @@ export default function HeroSection() {
                 <a
                   href={store.url}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer sponsored"
                   className="group flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-black/[0.06] bg-white/60 backdrop-blur-sm hover:bg-white hover:border-black/10 hover:shadow-sm transition-all duration-300"
                 >
                   <div
@@ -139,7 +177,7 @@ export default function HeroSection() {
                               {c.code}
                             </span>
                             {copiedKey === c.code ? (
-                              <Check className="w-3 h-3 text-green-600" />
+                              <Check className="w-3 h-3 text-success" />
                             ) : (
                               <Copy className="w-3 h-3 text-text-secondary" />
                             )}
@@ -165,7 +203,7 @@ export default function HeroSection() {
                         {store.coupon}
                       </span>
                       {copiedKey === store.coupon ? (
-                        <Check className="w-3 h-3 text-green-600" />
+                        <Check className="w-3 h-3 text-success" />
                       ) : (
                         <Copy className="w-3 h-3 text-text-secondary" />
                       )}
@@ -177,26 +215,6 @@ export default function HeroSection() {
               </motion.div>
             ))}
           </div>
-        </motion.div>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.5 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-6 h-10 border-2 border-black/20 rounded-full flex justify-center pt-2"
-        >
-          <motion.div
-            animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-1 h-1 bg-foreground rounded-full"
-          />
         </motion.div>
       </motion.div>
     </section>

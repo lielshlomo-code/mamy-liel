@@ -16,11 +16,17 @@
   --color-warm-200: #e4d8c8;
   --color-warm-300: #d4c4ad;
 
-  /* Rose accent — soft pink */
-  --color-rose-50: #fdf2f4;
-  --color-rose-100: #fce4e8;
-  --color-rose-200: #f9ced5;
-  --color-rose-300: #f2a5b3;
+  /* Rose accent — refined dusty rose */
+  --color-rose-50: #faf5f5;
+  --color-rose-100: #f5e8e8;
+  --color-rose-200: #edd6d6;
+  --color-rose-300: #ddb8b8;
+  --color-rose-400: #c9999a;
+  --color-rose-500: #b07d7e;
+  --color-rose-600: #956668;
+
+  /* Success — muted sage */
+  --color-success: #7a9680;
 
   --font-sans: var(--font-heebo);
 }
@@ -228,8 +234,8 @@ body {
 
 /* Pulse glow animation */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(244, 114, 182, 0.2); transform: scale(1); }
-  50% { box-shadow: 0 0 40px rgba(244, 114, 182, 0.4); transform: scale(1.05); }
+  0%, 100% { box-shadow: 0 0 20px rgba(201, 153, 154, 0.2); transform: scale(1); }
+  50% { box-shadow: 0 0 40px rgba(201, 153, 154, 0.4); transform: scale(1.05); }
 }
 .animate-pulse-glow {
   animation: pulseGlow 2.5s ease-in-out infinite;

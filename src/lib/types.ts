@@ -77,6 +77,10 @@ export interface ShortLink {
   createdAt: string;
   published: boolean;
   showInPopup: boolean;
+  showOnHomepage: boolean;
+  couponCode?: string;
+  couponNote?: string;
+  color?: string;
 }
 
 export interface CourseCategory {

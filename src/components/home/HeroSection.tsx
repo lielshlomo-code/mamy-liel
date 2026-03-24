@@ -125,7 +125,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="mx-auto mb-6 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-foreground text-white flex items-center justify-center text-3xl sm:text-4xl font-black overflow-hidden"
+          className="mx-auto mb-6 w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-foreground text-white flex items-center justify-center text-4xl sm:text-5xl font-black overflow-hidden"
         >
           {profileImage ? (
             <img

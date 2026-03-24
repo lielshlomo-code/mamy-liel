@@ -47,7 +47,7 @@ export default function HeroSection() {
   const y = useTransform(scrollY, [0, 500], [0, 100]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[80vh] sm:min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -69,7 +69,7 @@ export default function HeroSection() {
 
       <motion.div
         style={{ opacity, scale, y }}
-        className="relative z-10 max-w-5xl mx-auto px-6 md:px-10 text-center pt-24"
+        className="relative z-10 max-w-5xl mx-auto px-6 md:px-10 text-center pt-20 sm:pt-24"
       >
         {/* Main headline */}
         <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter mb-6">

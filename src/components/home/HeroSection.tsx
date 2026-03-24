@@ -5,19 +5,27 @@ import { ShoppingBag, Copy, Check, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import TextReveal from "@/components/ui/TextReveal";
 
-const stores = [
+interface Coupon {
+  code: string;
+  note: string;
+}
+
+interface StoreItem {
+  name: string;
+  url: string;
+  coupon?: string;
+  coupons?: Coupon[];
+  gradient: string;
+}
+
+const stores: StoreItem[] = [
   {
     name: "Shiptanbul",
     url: "https://shiptanbul.com/?ref=barshlomo",
-    coupon: "liel15",
-    couponNote: "יוון ואנגליה",
-    gradient: "from-orange-400 to-rose-400",
-  },
-  {
-    name: "Shiptanbul",
-    url: "https://shiptanbul.com/?ref=barshlomo",
-    coupon: "liel20",
-    couponNote: "ארה״ב",
+    coupons: [
+      { code: "liel15", note: "יוון ואנגליה" },
+      { code: "liel20", note: "ארה״ב" },
+    ],
     gradient: "from-orange-400 to-rose-400",
   },
   {
@@ -34,13 +42,13 @@ const stores = [
 ];
 
 export default function HeroSection() {
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const { scrollY } = useScroll();
 
-  const copyCoupon = (coupon: string, index: number) => {
+  const copyCoupon = (coupon: string, key: string) => {
     navigator.clipboard.writeText(coupon);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
   };
   const opacity = useTransform(scrollY, [0, 500], [1, 0]);
   const scale = useTransform(scrollY, [0, 500], [1, 0.9]);
@@ -104,23 +112,46 @@ export default function HeroSection() {
                   >
                     <ShoppingBag className="w-4 h-4 text-white" />
                   </div>
-                  <div className="flex-1 min-w-0 text-right">
-                    <span className="font-semibold text-sm block leading-tight">
-                      {store.name}
-                    </span>
-                    {store.couponNote && (
-                      <span className="text-[11px] text-text-secondary">
-                        {store.couponNote}
-                      </span>
-                    )}
-                  </div>
-                  {store.coupon ? (
+                  <span className="font-semibold text-sm flex-1 min-w-0 text-right">
+                    {store.name}
+                  </span>
+                  {store.coupons ? (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {store.coupons.map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            copyCoupon(c.code, c.code);
+                          }}
+                          className="flex flex-col items-center px-2.5 py-1 rounded-md bg-black/[0.04] border border-dashed border-black/10 hover:bg-black/[0.08] transition-colors"
+                          title={`העתקת קוד ${c.code}`}
+                        >
+                          <span className="flex items-center gap-1">
+                            <span className="text-[11px] font-bold tracking-wider" dir="ltr">
+                              {c.code}
+                            </span>
+                            {copiedKey === c.code ? (
+                              <Check className="w-3 h-3 text-green-600" />
+                            ) : (
+                              <Copy className="w-3 h-3 text-text-secondary" />
+                            )}
+                          </span>
+                          <span className="text-[9px] text-text-secondary leading-tight">
+                            {c.note}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : store.coupon ? (
                     <button
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        copyCoupon(store.coupon!, i);
+                        copyCoupon(store.coupon!, store.coupon!);
                       }}
                       className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-black/[0.04] border border-dashed border-black/10 hover:bg-black/[0.08] transition-colors shrink-0"
                       title="העתקת קוד קופון"
@@ -128,7 +159,7 @@ export default function HeroSection() {
                       <span className="text-[11px] font-bold tracking-wider" dir="ltr">
                         {store.coupon}
                       </span>
-                      {copiedIndex === i ? (
+                      {copiedKey === store.coupon ? (
                         <Check className="w-3 h-3 text-green-600" />
                       ) : (
                         <Copy className="w-3 h-3 text-text-secondary" />

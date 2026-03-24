@@ -18,6 +18,7 @@ export async function GET() {
       icon: l.icon,
       internal: l.internal,
       published: l.published,
+      showInPopup: l.show_in_popup || false,
     }))
   );
 }
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
         icon: link.icon,
         internal: link.internal || false,
         published: link.published !== false,
+        show_in_popup: link.showInPopup || false,
       })
       .select()
       .single();
@@ -70,6 +72,7 @@ export async function PUT(request: Request) {
         icon: updated.icon,
         internal: updated.internal,
         published: updated.published !== false,
+        show_in_popup: updated.showInPopup || false,
       })
       .eq("id", updated.id)
       .select()

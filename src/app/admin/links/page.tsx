@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Save, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, Eye, EyeOff, Megaphone } from "lucide-react";
 import type { SocialLink } from "@/lib/types";
 
 const iconOptions = [
@@ -19,6 +19,7 @@ const emptyLink = {
   icon: "externalLink",
   internal: false,
   published: true,
+  showInPopup: false,
 };
 
 export default function AdminLinks() {
@@ -66,6 +67,24 @@ export default function AdminLinks() {
         icon: link.icon,
         internal: link.internal,
         published: !link.published,
+        showInPopup: link.showInPopup,
+      }),
+    });
+    load();
+  };
+
+  const handleToggleShowInPopup = async (link: SocialLink) => {
+    await fetch("/api/admin/links", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: link.id,
+        label: link.label,
+        url: link.url,
+        icon: link.icon,
+        internal: link.internal,
+        published: link.published,
+        showInPopup: !link.showInPopup,
       }),
     });
     load();
@@ -174,7 +193,7 @@ export default function AdminLinks() {
             </label>
           </div>
 
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-4">
             <input
               type="checkbox"
               id="published"
@@ -187,6 +206,24 @@ export default function AdminLinks() {
             <label htmlFor="published" className="text-sm">
               מפורסם (גלוי באתר)
             </label>
+          </div>
+
+          <div className="flex items-center gap-2 mb-6">
+            <input
+              type="checkbox"
+              id="showInPopup"
+              checked={editing.showInPopup || false}
+              onChange={(e) =>
+                setEditing({ ...editing, showInPopup: e.target.checked })
+              }
+              className="w-4 h-4"
+            />
+            <label htmlFor="showInPopup" className="text-sm">
+              הצגה בפופאפ
+            </label>
+            <span className="text-xs text-text-secondary">
+              — יופיע בפופאפ ההנחות בכניסה לאתר
+            </span>
           </div>
 
           <button
@@ -231,6 +268,11 @@ export default function AdminLinks() {
                           מוסתר
                         </span>
                       )}
+                      {link.showInPopup && (
+                        <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                          פופאפ
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-3 hidden sm:table-cell text-text-secondary truncate max-w-[200px]" dir="ltr">
@@ -253,6 +295,15 @@ export default function AdminLinks() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2 justify-end">
+                      <button
+                        onClick={() => handleToggleShowInPopup(link)}
+                        className={`p-1.5 rounded-lg hover:bg-muted transition-colors ${
+                          link.showInPopup ? 'text-purple-500' : 'text-text-secondary'
+                        }`}
+                        title={link.showInPopup ? "הסרה מפופאפ" : "הצגה בפופאפ"}
+                      >
+                        <Megaphone className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => {
                           setEditing({ ...link });

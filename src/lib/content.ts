@@ -194,6 +194,7 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
     icon: l.icon,
     internal: l.internal,
     published: l.published,
+    showInPopup: l.show_in_popup || false,
   }));
 }
 

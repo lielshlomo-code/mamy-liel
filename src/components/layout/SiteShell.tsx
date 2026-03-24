@@ -5,6 +5,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import WhatsAppFloat from "@/components/ui/WhatsAppFloat";
 import CookieConsent from "@/components/ui/CookieConsent";
+import PromoPopup from "@/components/ui/PromoPopup";
 
 export default function SiteShell({
   children,
@@ -31,6 +32,7 @@ export default function SiteShell({
       <Footer />
       <WhatsAppFloat />
       <CookieConsent />
+      <PromoPopup />
     </>
   );
 }

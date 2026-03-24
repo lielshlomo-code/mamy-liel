@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie } from "lucide-react";
+import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie, Megaphone } from "lucide-react";
 import type { ShortLink } from "@/lib/types";
 
 const emptyLink = {
@@ -10,6 +10,7 @@ const emptyLink = {
   title: "",
   code: "",
   published: true,
+  showInPopup: false,
 };
 
 export default function AdminShortLinks() {
@@ -20,6 +21,7 @@ export default function AdminShortLinks() {
     title: string;
     code: string;
     published: boolean;
+    showInPopup: boolean;
   } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -86,6 +88,7 @@ export default function AdminShortLinks() {
         paintCookies: link.paintCookies,
         title: link.title,
         published: !link.published,
+        showInPopup: link.showInPopup,
       }),
     });
     load();
@@ -101,6 +104,23 @@ export default function AdminShortLinks() {
         paintCookies: !link.paintCookies,
         title: link.title,
         published: link.published,
+        showInPopup: link.showInPopup,
+      }),
+    });
+    load();
+  };
+
+  const handleToggleShowInPopup = async (link: ShortLink) => {
+    await fetch("/api/admin/short-links", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: link.id,
+        targetUrl: link.targetUrl,
+        paintCookies: link.paintCookies,
+        title: link.title,
+        published: link.published,
+        showInPopup: !link.showInPopup,
       }),
     });
     load();
@@ -233,6 +253,24 @@ export default function AdminShortLinks() {
                 — דף ביניים עם צביעת קוקיז לפני ההפניה
               </span>
             </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="showInPopup"
+                checked={editing.showInPopup}
+                onChange={(e) =>
+                  setEditing({ ...editing, showInPopup: e.target.checked })
+                }
+                className="w-4 h-4"
+              />
+              <label htmlFor="showInPopup" className="text-sm">
+                הצגה בפופאפ
+              </label>
+              <span className="text-xs text-text-secondary">
+                — יופיע בפופאפ ההנחות בכניסה לאתר
+              </span>
+            </div>
           </div>
 
           {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
@@ -274,11 +312,25 @@ export default function AdminShortLinks() {
                         קוקיז
                       </span>
                     )}
+                    {link.showInPopup && (
+                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                        פופאפ
+                      </span>
+                    )}
                     <span className="text-xs text-text-secondary bg-muted px-2 py-0.5 rounded-full shrink-0">
                       {link.clicks} לחיצות
                     </span>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleToggleShowInPopup(link)}
+                      className={`p-2 rounded-lg hover:bg-muted transition-colors ${
+                        link.showInPopup ? 'text-purple-500' : 'text-text-secondary'
+                      }`}
+                      title={link.showInPopup ? "הסרה מפופאפ" : "הצגה בפופאפ"}
+                    >
+                      <Megaphone className="w-4 h-4" />
+                    </button>
                     <button
                       onClick={() => handleTogglePaintCookies(link)}
                       className={`p-2 rounded-lg hover:bg-muted transition-colors ${

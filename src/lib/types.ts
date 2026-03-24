@@ -35,6 +35,7 @@ export interface SocialLink {
   icon: string;
   internal?: boolean;
   published: boolean;
+  showInPopup: boolean;
 }
 
 export interface SiteConfig {
@@ -75,6 +76,7 @@ export interface ShortLink {
   clicks: number;
   createdAt: string;
   published: boolean;
+  showInPopup: boolean;
 }
 
 export interface CourseCategory {

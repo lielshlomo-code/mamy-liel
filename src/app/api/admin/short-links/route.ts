@@ -31,6 +31,7 @@ export async function GET() {
     clicks: link.clicks,
     createdAt: link.created_at,
     published: link.published,
+    showInPopup: link.show_in_popup || false,
   }));
 
   return NextResponse.json(links);
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { targetUrl, title, code: customCode, published, paintCookies } = await request.json();
+    const { targetUrl, title, code: customCode, published, paintCookies, showInPopup } = await request.json();
 
     if (!targetUrl) {
       return NextResponse.json({ error: "כתובת URL נדרשת" }, { status: 400 });
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
         paint_cookies: paintCookies || false,
         title: title || null,
         published: published !== false,
+        show_in_popup: showInPopup || false,
       })
       .select()
       .single();
@@ -89,6 +91,7 @@ export async function POST(request: Request) {
       clicks: data.clicks,
       createdAt: data.created_at,
       published: data.published,
+      showInPopup: data.show_in_popup || false,
     });
   } catch {
     return NextResponse.json({ error: "שגיאה ביצירת קישור מקוצר" }, { status: 500 });
@@ -102,7 +105,7 @@ export async function PUT(request: Request) {
   }
 
   try {
-    const { id, targetUrl, title, published, paintCookies } = await request.json();
+    const { id, targetUrl, title, published, paintCookies, showInPopup } = await request.json();
 
     const { error } = await supabase
       .from("short_links")
@@ -111,6 +114,7 @@ export async function PUT(request: Request) {
         paint_cookies: paintCookies || false,
         title: title || null,
         published: published !== false,
+        show_in_popup: showInPopup || false,
       })
       .eq("id", id);
 

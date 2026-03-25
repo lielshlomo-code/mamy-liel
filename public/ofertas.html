@@ -143,11 +143,24 @@
     </div>
 
     <script>
+        // Track page view
+        fetch('/api/track/landing', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: 'ofertas', event: 'view' })
+        }).catch(function() {});
+
         document.getElementById('whatsapp-cta').addEventListener('click', function(e) {
             e.preventDefault();
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'Lead');
             }
+            // Track lead
+            fetch('/api/track/landing', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ page: 'ofertas', event: 'lead' })
+            }).catch(function() {});
             setTimeout(function() {
                 window.location.href = 'https://chat.whatsapp.com/LWfnDZ6hKyV414XT1YKHwX?mode=gi_t';
             }, 300);

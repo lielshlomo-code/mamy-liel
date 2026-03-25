@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Users,
   Mail,
+  Megaphone,
   LogOut,
   Menu,
   X,
@@ -26,6 +27,7 @@ const sidebarLinks = [
   { href: "/admin/blog", label: "הדרכות ומתכונים", icon: PenLine },
   { href: "/admin/links", label: "קישורים", icon: Link2 },
   { href: "/admin/short-links", label: "קיצור לינקים", icon: Scissors },
+  { href: "/admin/landing-pages", label: "דפי נחיתה", icon: Megaphone },
 ];
 
 export default function AdminLayout({

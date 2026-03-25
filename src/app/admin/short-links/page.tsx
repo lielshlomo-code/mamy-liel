@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie, Megaphone, Home } from "lucide-react";
+import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie, Megaphone, Home, Pencil } from "lucide-react";
 import type { ShortLink } from "@/lib/types";
 
 const emptyLink = {
@@ -20,6 +20,7 @@ const emptyLink = {
 export default function AdminShortLinks() {
   const [links, setLinks] = useState<ShortLink[]>([]);
   const [editing, setEditing] = useState<typeof emptyLink | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -48,20 +49,39 @@ export default function AdminShortLinks() {
       return;
     }
 
+    const isUpdate = !!editingId;
     const res = await fetch("/api/admin/short-links", {
-      method: "POST",
+      method: isUpdate ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editing),
+      body: JSON.stringify(isUpdate ? { ...editing, id: editingId } : editing),
     });
 
     if (!res.ok) {
       const data = await res.json();
-      setError(data.error || "שגיאה ביצירת קישור");
+      setError(data.error || (isUpdate ? "שגיאה בעדכון קישור" : "שגיאה ביצירת קישור"));
       return;
     }
 
     setEditing(null);
+    setEditingId(null);
     load();
+  };
+
+  const startEdit = (link: ShortLink) => {
+    setEditingId(link.id);
+    setEditing({
+      targetUrl: link.targetUrl,
+      paintCookies: link.paintCookies,
+      title: link.title || "",
+      code: link.code,
+      published: link.published,
+      showInPopup: link.showInPopup,
+      showOnHomepage: link.showOnHomepage,
+      couponCode: link.couponCode || "",
+      couponNote: link.couponNote || "",
+      color: link.color || "",
+    });
+    setError("");
   };
 
   const handleDelete = async (id: string) => {
@@ -109,6 +129,7 @@ export default function AdminShortLinks() {
         <button
           onClick={() => {
             setEditing({ ...emptyLink });
+            setEditingId(null);
             setError("");
           }}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors"
@@ -122,8 +143,8 @@ export default function AdminShortLinks() {
       {editing && (
         <div className="bg-white rounded-xl border border-border p-4 sm:p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">קישור מקוצר חדש</h2>
-            <button onClick={() => setEditing(null)}>
+            <h2 className="font-semibold">{editingId ? "עריכת קישור" : "קישור מקוצר חדש"}</h2>
+            <button onClick={() => { setEditing(null); setEditingId(null); }}>
               <X className="w-5 h-5 text-text-secondary" />
             </button>
           </div>
@@ -163,7 +184,7 @@ export default function AdminShortLinks() {
                 <label className="text-sm font-medium">
                   קוד מותאם אישית{" "}
                   <span className="text-text-secondary font-normal">
-                    (אופציונלי)
+                    {editingId ? "(לא ניתן לשינוי)" : "(אופציונלי)"}
                   </span>
                 </label>
                 <div className="flex items-center gap-2">
@@ -174,6 +195,7 @@ export default function AdminShortLinks() {
                     type="text"
                     dir="ltr"
                     value={editing.code}
+                    disabled={!!editingId}
                     onChange={(e) =>
                       setEditing({
                         ...editing,
@@ -183,7 +205,7 @@ export default function AdminShortLinks() {
                       })
                     }
                     placeholder="abc123"
-                    className="px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 flex-1"
+                    className={`px-4 py-2.5 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20 flex-1 ${editingId ? "bg-muted text-text-secondary cursor-not-allowed" : ""}`}
                   />
                 </div>
               </div>
@@ -300,7 +322,7 @@ export default function AdminShortLinks() {
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors"
           >
             <Save className="w-4 h-4" />
-            יצירת קישור
+            {editingId ? "שמירת שינויים" : "יצירת קישור"}
           </button>
         </div>
       )}
@@ -412,6 +434,13 @@ export default function AdminShortLinks() {
                     >
                       <ExternalLink className="w-4 h-4 text-text-secondary" />
                     </a>
+                    <button
+                      onClick={() => startEdit(link)}
+                      className="p-2 rounded-lg hover:bg-muted transition-colors"
+                      title="עריכה"
+                    >
+                      <Pencil className="w-4 h-4 text-text-secondary" />
+                    </button>
                     <button
                       onClick={() => handleDelete(link.id)}
                       className="p-2 rounded-lg hover:bg-red-50 transition-colors"

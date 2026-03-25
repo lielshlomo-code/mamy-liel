@@ -18,35 +18,6 @@ interface StoreItem {
   gradient: string;
 }
 
-/* Hardcoded fallback — shown immediately while API loads */
-const fallbackStores: StoreItem[] = [
-  {
-    name: "Shiptanbul",
-    url: "https://shiptanbul.com/?ref=barshlomo",
-    coupons: [
-      { code: "liel15", note: "יוון ואנגליה" },
-      { code: "liel20", note: "ארה״ב" },
-    ],
-    gradient: "from-warm-300 to-rose-400",
-  },
-  {
-    name: "סופר פארם",
-    url: "https://go.scrmgo.com/23LWNBNG/2QZRGT1/?url=https://shop.super-pharm.co.il/baby",
-    gradient: "from-foreground to-foreground/80",
-  },
-  {
-    name: "טרמינל X",
-    url: "https://s.humanz.ai/terminalbids/741575/192",
-    coupon: "15FS",
-    gradient: "from-rose-400 to-rose-500",
-  },
-  {
-    name: "מבצעים אלי אקספרס",
-    url: "https://s.click.aliexpress.com/e/_c4lfajWT",
-    gradient: "from-warm-200 to-warm-300",
-  },
-];
-
 interface HomepageLink {
   title: string;
   url: string;
@@ -57,7 +28,7 @@ interface HomepageLink {
 
 export default function HeroSection() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [stores, setStores] = useState<StoreItem[]>(fallbackStores);
+  const [stores, setStores] = useState<StoreItem[]>([]);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const { scrollY } = useScroll();
 
@@ -65,7 +36,6 @@ export default function HeroSection() {
     fetch("/api/homepage-links")
       .then((r) => r.json())
       .then((data: HomepageLink[]) => {
-        if (data.length === 0) return;
         setStores(
           data.map((link) => ({
             name: link.title,

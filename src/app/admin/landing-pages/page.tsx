@@ -135,6 +135,12 @@ const LANDING_PAGES = [
     description: "דף נחיתה לקבוצת ווטסאפ - מבצעים לאמהות",
     path: "/ofertas.html",
   },
+  {
+    slug: "whatsapp-il",
+    label: "קבוצת WhatsApp (עברית)",
+    description: "דף נחיתה לקבוצת ווטסאפ - עברית",
+    path: "/whatsapp-il.html",
+  },
 ];
 
 const PAGE_LABELS: Record<string, string> = {};

@@ -13,6 +13,7 @@ import {
   Users,
   Mail,
   Megaphone,
+  Briefcase,
   LogOut,
   Menu,
   X,
@@ -20,6 +21,7 @@ import {
 
 const sidebarLinks = [
   { href: "/admin", label: "דשבורד", icon: LayoutDashboard },
+  { href: "/admin/clients", label: "לקוחות", icon: Briefcase },
   { href: "/admin/academy", label: "המכללה", icon: GraduationCap },
   { href: "/admin/users", label: "משתמשים", icon: Users },
   { href: "/admin/mailing", label: "דיוור", icon: Mail },

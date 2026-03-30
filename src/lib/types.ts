@@ -123,6 +123,57 @@ export interface AcademyData {
   courses: Course[];
 }
 
+// Client CRM types
+
+export interface Client {
+  id: string;
+  clientName: string;
+  companyName: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  collaborationType: string;
+  monthlyVideos: number;
+  monthlyStories: number;
+  monthlyReels: number;
+  monthlyPosts: number;
+  paymentAmount: number;
+  paymentDay?: number;
+  currency: string;
+  status: string;
+  notes?: string;
+  startDate?: string;
+  endDate?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ClientContentItem {
+  id: string;
+  clientId: string;
+  contentType: string;
+  title?: string;
+  description?: string;
+  scheduledDate: string;
+  scheduledTime?: string;
+  platform: string;
+  status: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface ClientPayment {
+  id: string;
+  clientId: string;
+  amount: number;
+  currency: string;
+  dueDate: string;
+  paidDate?: string;
+  status: string;
+  invoiceNumber?: string;
+  notes?: string;
+  createdAt: string;
+}
+
 // Analytics types
 
 export interface DailyCount {

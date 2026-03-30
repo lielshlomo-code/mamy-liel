@@ -12,6 +12,7 @@ import {
   Mail,
   Camera,
   Loader2,
+  Briefcase,
 } from "lucide-react";
 import type { AnalyticsData } from "@/lib/types";
 
@@ -29,6 +30,7 @@ interface Stats {
   shortLinks: number;
   totalClicks: number;
   contactSubmissions: number;
+  activeClients: number;
 }
 
 export default function AdminDashboard() {
@@ -39,6 +41,7 @@ export default function AdminDashboard() {
     shortLinks: 0,
     totalClicks: 0,
     contactSubmissions: 0,
+    activeClients: 0,
   });
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [range, setRange] = useState("30");
@@ -161,7 +164,8 @@ export default function AdminDashboard() {
       </div>
 
       {/* Summary stat cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-8">
+        <StatCard label="לקוחות פעילים" value={stats.activeClients} icon={Briefcase} />
         <StatCard label="מוצרים" value={stats.products} icon={Package} />
         <StatCard label="הדרכות" value={stats.posts} icon={PenLine} />
         <StatCard label="קישורים" value={stats.links} icon={Link2} />
@@ -291,6 +295,12 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-xl border border-border p-4 sm:p-6">
               <h3 className="font-semibold mb-4">פעולות מהירות</h3>
               <div className="flex flex-col gap-2">
+                <Link
+                  href="/admin/clients"
+                  className="px-4 py-2.5 rounded-lg bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors text-center"
+                >
+                  ניהול לקוחות
+                </Link>
                 <Link
                   href="/admin/products?new=true"
                   className="px-4 py-2.5 rounded-lg bg-foreground text-white text-sm font-medium hover:bg-accent-hover transition-colors text-center"

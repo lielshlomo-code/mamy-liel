@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [products, posts, links, shortLinks, totalClicks, contactCount] =
+  const [products, posts, links, shortLinks, totalClicks, contactCount, activeClients] =
     await Promise.all([
       supabase.from("products").select("id", { count: "exact", head: true }),
       supabase.from("blog_posts").select("slug", { count: "exact", head: true }),
@@ -16,6 +16,7 @@ export async function GET() {
       supabase.from("short_links").select("id", { count: "exact", head: true }),
       supabase.from("click_events").select("id", { count: "exact", head: true }),
       supabase.from("contact_submissions").select("id", { count: "exact", head: true }),
+      supabase.from("clients").select("id", { count: "exact", head: true }).eq("status", "active"),
     ]);
 
   return NextResponse.json({
@@ -25,5 +26,6 @@ export async function GET() {
     shortLinks: shortLinks.count || 0,
     totalClicks: totalClicks.count || 0,
     contactSubmissions: contactCount.count || 0,
+    activeClients: activeClients.count || 0,
   });
 }

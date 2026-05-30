@@ -141,6 +141,12 @@ const LANDING_PAGES = [
     description: "דף נחיתה לקבוצת ווטסאפ - עברית",
     path: "/whatsapp-il.html",
   },
+  {
+    slug: "mivtzaim",
+    label: "מבצעים WhatsApp (עברית)",
+    description: "דף נחיתה לקבוצת ווטסאפ - עברית (פיקסל נפרד)",
+    path: "/mivtzaim.html",
+  },
 ];
 
 const PAGE_LABELS: Record<string, string> = {};

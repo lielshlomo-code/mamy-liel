@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getSiteConfig } from "@/lib/content";
+import { LANDING_WA_DEFAULTS } from "@/lib/landing-pages";
 
 const BOT_PATTERNS = [
   /bot/i, /crawl/i, /spider/i, /slurp/i, /mediapartners/i,
@@ -46,12 +47,30 @@ export async function GET(
   // Bot detection — redirect bots straight to target (no cookie painting)
   const botDetected = isBot(userAgent);
 
-  const { data } = await supabase
+  let { data } = await supabase
     .from("short_links")
     .select("target_url, paint_cookies")
     .eq("code", code)
     .eq("published", true)
     .single();
+
+  // Landing-page WhatsApp links: auto-provision the row on first hit so the
+  // group link becomes editable from admin/landing-pages (no code/redeploy).
+  // The DB row always wins once created — these are only first-run defaults.
+  if (!data && LANDING_WA_DEFAULTS[code]) {
+    const target_url = LANDING_WA_DEFAULTS[code];
+    await supabase
+      .from("short_links")
+      .insert({
+        code,
+        target_url,
+        title: `קבוצת וואטסאפ — ${code.replace(/^wa-/, "")}`,
+        paint_cookies: true,
+        published: true,
+      })
+      .then(() => {}, () => {}); // ignore duplicate/race errors
+    data = { target_url, paint_cookies: true };
+  }
 
   if (!data) {
     return NextResponse.redirect(new URL("/", request.url));

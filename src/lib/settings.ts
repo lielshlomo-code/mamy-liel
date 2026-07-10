@@ -5,6 +5,10 @@ import { getSiteConfig } from "./content";
 // in a hidden iframe to paint the affiliate cookie before redirecting.
 // Editable from admin/short-links; falls back to site-config.json when unset.
 export const AFFILIATE_COOKIE_URL_KEY = "affiliate_cookie_url";
+// Free-text metadata about the affiliate link above — for the admin's reference
+// only (not used by the redirect logic).
+export const AFFILIATE_ACCOUNT_KEY = "affiliate_account";
+export const AFFILIATE_TRACKING_ID_KEY = "affiliate_tracking_id";
 
 export async function getAffiliateCookieUrl(): Promise<string> {
   const { data } = await supabase

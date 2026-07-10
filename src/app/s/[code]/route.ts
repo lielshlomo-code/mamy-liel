@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { getSiteConfig } from "@/lib/content";
+import { getAffiliateCookieUrl } from "@/lib/settings";
 import { LANDING_WA_DEFAULTS } from "@/lib/landing-pages";
 
 const BOT_PATTERNS = [
@@ -91,8 +91,7 @@ export async function GET(
 
   // If paint_cookies is enabled AND it's a real user AND not rate-limited
   if (data.paint_cookies && !botDetected && !isRateLimited(ip)) {
-    const config = getSiteConfig();
-    const cookieUrl = config.affiliateCookieUrl;
+    const cookieUrl = await getAffiliateCookieUrl();
 
     if (cookieUrl) {
       const targetUrlJson = JSON.stringify(data.target_url);

@@ -38,6 +38,14 @@ export const LANDING_PAGES: LandingPage[] = [
     code: "wa-mivtzaim",
     defaultWhatsapp: "https://chat.whatsapp.com/EV9OARjJdWR5lGCBrd0HpS",
   },
+  {
+    slug: "ali-deals",
+    label: "דילים אלי אקספרס (עברית)",
+    description: "דף נחיתה לקהילת הדילים של אלי אקספרס - קרוסלת מוצרים",
+    path: "/ali-deals.html",
+    code: "wa-ali-deals",
+    defaultWhatsapp: "https://chat.whatsapp.com/JFrHLbnBDtwIN8bSEH5OjD",
+  },
 ];
 
 // code -> default WhatsApp URL, consumed by the /s/[code] auto-provision fallback.

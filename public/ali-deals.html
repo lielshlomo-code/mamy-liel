@@ -92,13 +92,13 @@
             margin-inline: calc(50% - 50vw);
             margin-bottom: 28px;
             overflow: hidden;
+            direction: ltr;      /* עוגן את הרצועה לשמאל — אחרת ב‑RTL היא נדחפת החוצה וה‑‎-50%‎ מרוקן את המסך */
             -webkit-mask: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
                     mask: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
         }
         .track {
-            display: inline-flex;
-            direction: ltr;      /* strip flows one direction regardless of RTL page */
-            white-space: nowrap;
+            display: flex;
+            width: max-content;
             will-change: transform;
             /* לולאה אינסופית: סט כפול + הזזה של בדיוק ‎-50%‎ = מעבר חלק בלי סוף */
             animation: scroll 30s linear infinite;

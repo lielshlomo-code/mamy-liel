@@ -157,47 +157,25 @@
             100% { box-shadow: 0 0 0 0 rgba(169,138,98,0); }
         }
 
-        /* שלוש שורות בהיררכיה קבועה — כך ביטוי ההדגשה לא נשבר באמצע בשום רוחב */
+        /* הלוגו נושא את שם המותג, ולכן הכותרת נושאת רק את ההבטחה */
+        .logo {
+            display: block;
+            width: clamp(116px, 31vw, 146px);
+            height: auto;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            box-shadow: 0 8px 22px rgba(38, 35, 33, .15);
+        }
         h1 {
-            margin-bottom: 22px;
-            letter-spacing: -0.5px;
-        }
-        h1 span { display: block; }
-        /* מחקה את מבנה הלוגו: "דילים" גדול בפחם, ומתחתיו "מתחת לראדר" בזהב עם קווי צד */
-        h1 .name {
-            font-size: clamp(40px, 11.5vw, 56px);
+            font-size: clamp(21px, 5.7vw, 26px);
             font-weight: 900;
+            line-height: 1.3;
             color: var(--ink);
-            line-height: 1.02;
-            letter-spacing: -1.5px;
-        }
-        h1 .tagline {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: clamp(14px, 3.8vw, 17px);
-            font-weight: 800;
-            color: var(--gold);
-            letter-spacing: 2.2px;
-            margin: 7px 0 13px;
-        }
-        /* הקווים מתקצרים לבד במסכים צרים כי הם flex-1 עם רוחב מקסימלי */
-        h1 .tagline::before,
-        h1 .tagline::after {
-            content: '';
-            flex: 1;
-            max-width: 46px;
-            height: 1px;
-            background: var(--gold);
-            opacity: .55;
-        }
-        h1 .sub {
-            font-size: clamp(16.5px, 4.4vw, 19.5px);
-            font-weight: 700;
-            line-height: 1.35;
+            letter-spacing: -0.4px;
+            margin-bottom: 22px;
             text-wrap: balance;
         }
+        h1 .hl { color: var(--gold-deep); }
 
         /* ---- שורות היתרון ---- */
         .benefits {
@@ -304,6 +282,8 @@
             .slide { scroll-snap-align: center; }
         }
     </style>
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/logo-radar-32.png" />
+    <link rel="apple-touch-icon" href="/images/logo-radar-180.png" />
     <meta name="theme-color" content="#EFE7DA" />
 </head>
 <body>
@@ -330,12 +310,13 @@
 
     <div class="card anim d1">
 
-        <div class="badge anim d2"><span class="label"><span class="dot"></span> קהילה חדשה נפתחה עכשיו</span></div>
+        <img class="logo anim d1" src="/images/logo-radar.png" width="480" height="480"
+             alt="דילים מתחת לראדר">
+
+        <div class="badge anim d2"><span class="dot"></span> קהילה חדשה נפתחה עכשיו</div>
 
         <h1 class="anim d2">
-            <span class="name">דילים</span>
-            <span class="tagline">מתחת לראדר</span>
-            <span class="sub">הצטרפו וגלו את המבצעים לפני כולם!</span>
+            הצטרפו וגלו את המבצעים <span class="hl">לפני כולם!</span>
         </h1>
 
         <div class="benefits anim d3">

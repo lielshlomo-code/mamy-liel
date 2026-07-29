@@ -17,10 +17,15 @@
 
         :root {
             --bg1: #FCF8F2;
-            --bg2: #F0E5D5;
-            --text: #37302A;
-            --muted: #8A7B6B;
-            --accent: #E8683A;
+            --bg2: #EFE6D6;
+            --text: #332B23;
+            --muted: #8E8071;
+            /* פלטת סהרה — הגוון הכהה נושא את ההדגשות כדי לשמור על ניגודיות על לבן,
+               הבהיר משמש למסגרות, אייקונים והדגשות רכות */
+            --sahara: #A8804F;
+            --sahara-deep: #7C5B33;
+            --sand: #EDE2CE;
+            --sand-line: #DFD0B4;
             --green: #25D366;
         }
 
@@ -107,28 +112,38 @@
                 0 4px 14px rgba(35, 22, 10, .14);
         }
 
+        /* ---- התג: כותרת עילית עם קווי צד, במקום גלולה ---- */
         .badge {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            background: #FBF5EC;
-            border: 1px solid #EADBC6;
-            color: #6E5F4E;
-            font-size: 13px;
-            font-weight: 700;
-            padding: 7px 16px;
-            border-radius: 50px;
-            margin-bottom: 16px;
+            justify-content: center;
+            gap: 10px;
+            color: var(--sahara-deep);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            margin-bottom: 18px;
         }
+        /* הקווים מתקצרים לבד במסכים צרים כי הם flex-1 עם רוחב מקסימלי */
+        .badge::before,
+        .badge::after {
+            content: '';
+            flex: 1;
+            max-width: 52px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--sand-line));
+        }
+        .badge::after { background: linear-gradient(270deg, transparent, var(--sand-line)); }
+        .badge .label { display: inline-flex; align-items: center; gap: 8px; }
         .badge .dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: var(--green);
-            animation: live 1.8s infinite;
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--sahara);
+            animation: live 2.2s infinite;
         }
         @keyframes live {
-            0%   { box-shadow: 0 0 0 0 rgba(37,211,102,.6); }
-            70%  { box-shadow: 0 0 0 8px rgba(37,211,102,0); }
-            100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+            0%   { box-shadow: 0 0 0 0 rgba(168,128,79,.55); }
+            70%  { box-shadow: 0 0 0 7px rgba(168,128,79,0); }
+            100% { box-shadow: 0 0 0 0 rgba(168,128,79,0); }
         }
 
         /* שלוש שורות בהיררכיה קבועה — כך ביטוי ההדגשה לא נשבר באמצע בשום רוחב */
@@ -140,13 +155,13 @@
         h1 .lead {
             font-size: clamp(18px, 4.9vw, 22px);
             font-weight: 800;
-            color: #6B5D4E;
+            color: #8B7A66;
             letter-spacing: -0.2px;
         }
         h1 .main {
             font-size: clamp(29px, 7.8vw, 37px);
             font-weight: 900;
-            color: var(--accent);
+            color: var(--sahara-deep);
             line-height: 1.15;
             margin: 3px 0 9px;
         }
@@ -178,12 +193,18 @@
             flex-shrink: 0;
             width: 27px; height: 27px;
             border-radius: 50%;
-            background: rgba(232, 104, 58, .12);
+            background: var(--sand);
+            border: 1px solid var(--sand-line);
             display: grid;
             place-items: center;
         }
-        .benefit .ic svg { width: 13px; height: 13px; fill: var(--accent); }
-        .benefit strong { color: var(--text); font-weight: 800; }
+        .benefit .ic svg { width: 13px; height: 13px; fill: var(--sahara-deep); }
+        /* ההדגשה נשענת על משקל וקו חול תחתון במקום על צבע צועק */
+        .benefit strong {
+            color: var(--text);
+            font-weight: 800;
+            background: linear-gradient(180deg, transparent 63%, rgba(168, 128, 79, .26) 63%);
+        }
 
         /* ---- CTA ---- */
         .cta {
@@ -207,7 +228,7 @@
         .cta svg { width: 24px; height: 24px; fill: #fff; flex-shrink: 0; }
 
         .proof { margin-top: 13px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
-        .proof strong { color: #5C4E3F; }
+        .proof strong { color: var(--sahara-deep); font-weight: 800; }
 
         /* ---- קרוסלה מתחת לכרטיס ---- */
         .carousel {
@@ -256,7 +277,7 @@
             .slide { scroll-snap-align: center; }
         }
     </style>
-    <meta name="theme-color" content="#F0E5D5" />
+    <meta name="theme-color" content="#EFE6D6" />
 </head>
 <body>
 
@@ -282,7 +303,7 @@
 
     <div class="card anim d1">
 
-        <div class="badge anim d2"><span class="dot"></span> קהילה חדשה נפתחה עכשיו</div>
+        <div class="badge anim d2"><span class="label"><span class="dot"></span> קהילה חדשה נפתחה עכשיו</span></div>
 
         <h1 class="anim d2">
             <span class="lead">הצטרפו למועדון</span>

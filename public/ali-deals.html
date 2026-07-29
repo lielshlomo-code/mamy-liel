@@ -215,18 +215,18 @@
             margin-inline: calc(50% - 50vw);
             margin-top: 30px;
             overflow: hidden;
+            direction: ltr;      /* עוגן את הרצועה לשמאל — אחרת ב‑RTL היא נדחפת החוצה וה‑‎-50%‎ מרוקן את המסך */
             -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
                     mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
         }
         .track {
-            display: inline-flex;
-            direction: ltr;      /* הרצועה זורמת בכיוון אחד ללא תלות ב‑RTL של העמוד */
-            white-space: nowrap;
+            display: flex;
+            width: max-content;
             will-change: transform;
             /* לולאה אינסופית: סט כפול + הזזה של בדיוק ‎-50%‎ = מעבר חלק בלי סוף */
             animation: scroll 34s linear infinite;
         }
-        .slide { flex-shrink: 0; margin-right: 14px; text-align: center; }
+        .slide { flex-shrink: 0; margin-right: 14px; }
         .slide img {
             width: 132px;
             height: 132px;
@@ -235,14 +235,6 @@
             background: #fff;
             box-shadow: 0 12px 26px rgba(20, 12, 5, .38);
             border: 3px solid rgba(255, 255, 255, .92);
-        }
-        .slide .name {
-            margin-top: 9px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            /* הרקע מאחורי הקרוסלה הוא תצלום — הצללה שומרת על קריאות */
-            text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
         }
         @keyframes scroll {
             from { transform: translateX(0); }
@@ -324,23 +316,23 @@
 
     <div class="carousel anim d5">
         <div class="track">
-            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="נעליים"><div class="name">נעלי ספורט</div></div>
-            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="תיק"><div class="name">תיק מעוצב</div></div>
-            <div class="slide"><img src="/images/ali/earrings.jpg" alt="עגילים"><div class="name">עגילי יהלום</div></div>
-            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="נעליים"><div class="name">נעלי אדידס</div></div>
-            <div class="slide"><img src="/images/ali/headbands.jpg" alt="גומיות"><div class="name">סט גומיות</div></div>
-            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="מברשת שיער"><div class="name">מברשת חשמלית</div></div>
-            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="טופ"><div class="name">טופ ספורט</div></div>
-            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="צמיד"><div class="name">צמיד יהלומים</div></div>
+            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="נעליים"></div>
+            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="תיק"></div>
+            <div class="slide"><img src="/images/ali/earrings.jpg" alt="עגילים"></div>
+            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="נעליים"></div>
+            <div class="slide"><img src="/images/ali/headbands.jpg" alt="גומיות"></div>
+            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="מברשת שיער"></div>
+            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="טופ"></div>
+            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="צמיד"></div>
             <!-- סט כפול ליצירת לולאה חלקה -->
-            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="" aria-hidden="true"><div class="name">נעלי ספורט</div></div>
-            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="" aria-hidden="true"><div class="name">תיק מעוצב</div></div>
-            <div class="slide"><img src="/images/ali/earrings.jpg" alt="" aria-hidden="true"><div class="name">עגילי יהלום</div></div>
-            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="" aria-hidden="true"><div class="name">נעלי אדידס</div></div>
-            <div class="slide"><img src="/images/ali/headbands.jpg" alt="" aria-hidden="true"><div class="name">סט גומיות</div></div>
-            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="" aria-hidden="true"><div class="name">מברשת חשמלית</div></div>
-            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="" aria-hidden="true"><div class="name">טופ ספורט</div></div>
-            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="" aria-hidden="true"><div class="name">צמיד יהלומים</div></div>
+            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/earrings.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/headbands.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="" aria-hidden="true"></div>
         </div>
     </div>
 

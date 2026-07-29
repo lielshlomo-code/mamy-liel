@@ -209,10 +209,59 @@
         .proof { margin-top: 13px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
         .proof strong { color: #5C4E3F; }
 
+        /* ---- קרוסלה מתחת לכרטיס ---- */
+        .carousel {
+            width: 100vw;
+            margin-inline: calc(50% - 50vw);
+            margin-top: 30px;
+            overflow: hidden;
+            -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+                    mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+        }
+        .track {
+            display: inline-flex;
+            direction: ltr;      /* הרצועה זורמת בכיוון אחד ללא תלות ב‑RTL של העמוד */
+            white-space: nowrap;
+            will-change: transform;
+            /* לולאה אינסופית: סט כפול + הזזה של בדיוק ‎-50%‎ = מעבר חלק בלי סוף */
+            animation: scroll 34s linear infinite;
+        }
+        .slide { flex-shrink: 0; margin-right: 14px; text-align: center; }
+        .slide img {
+            width: 132px;
+            height: 132px;
+            object-fit: cover;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 12px 26px rgba(20, 12, 5, .38);
+            border: 3px solid rgba(255, 255, 255, .92);
+        }
+        .slide .name {
+            margin-top: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            /* הרקע מאחורי הקרוסלה הוא תצלום — הצללה שומרת על קריאות */
+            text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+        }
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
         @media (prefers-reduced-motion: reduce) {
-            .anim, .badge .dot { animation: none !important; }
+            .track, .anim, .badge .dot { animation: none !important; }
             .anim { opacity: 1; }
             .cta { transition: none; }
+            /* בלי אנימציה — הקרוסלה נגללת ידנית כדי שכל התמונות עדיין נגישות */
+            .carousel {
+                overflow-x: auto;
+                -webkit-mask: none; mask: none;
+                scroll-snap-type: x mandatory;
+                -ms-overflow-style: none; scrollbar-width: none;
+            }
+            .carousel::-webkit-scrollbar { display: none; }
+            .slide { scroll-snap-align: center; }
         }
     </style>
     <meta name="theme-color" content="#F0E5D5" />
@@ -271,6 +320,28 @@
 
         <p class="proof anim d5">קהילה פתוחה · <strong>מבצעים חדשים כל יום</strong></p>
 
+    </div>
+
+    <div class="carousel anim d5">
+        <div class="track">
+            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="נעליים"><div class="name">נעלי ספורט</div></div>
+            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="תיק"><div class="name">תיק מעוצב</div></div>
+            <div class="slide"><img src="/images/ali/earrings.jpg" alt="עגילים"><div class="name">עגילי יהלום</div></div>
+            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="נעליים"><div class="name">נעלי אדידס</div></div>
+            <div class="slide"><img src="/images/ali/headbands.jpg" alt="גומיות"><div class="name">סט גומיות</div></div>
+            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="מברשת שיער"><div class="name">מברשת חשמלית</div></div>
+            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="טופ"><div class="name">טופ ספורט</div></div>
+            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="צמיד"><div class="name">צמיד יהלומים</div></div>
+            <!-- סט כפול ליצירת לולאה חלקה -->
+            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="" aria-hidden="true"><div class="name">נעלי ספורט</div></div>
+            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="" aria-hidden="true"><div class="name">תיק מעוצב</div></div>
+            <div class="slide"><img src="/images/ali/earrings.jpg" alt="" aria-hidden="true"><div class="name">עגילי יהלום</div></div>
+            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="" aria-hidden="true"><div class="name">נעלי אדידס</div></div>
+            <div class="slide"><img src="/images/ali/headbands.jpg" alt="" aria-hidden="true"><div class="name">סט גומיות</div></div>
+            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="" aria-hidden="true"><div class="name">מברשת חשמלית</div></div>
+            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="" aria-hidden="true"><div class="name">טופ ספורט</div></div>
+            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="" aria-hidden="true"><div class="name">צמיד יהלומים</div></div>
+        </div>
     </div>
 
     <script>

@@ -232,6 +232,47 @@
         .social-proof strong {
             color: #555;
         }
+
+        /* ---- גלריית מוצרים רצה בתחתית הכרטיס ---- */
+        .gallery {
+            margin-top: 22px;
+            overflow: hidden;
+            /* דהייה בשני הקצוות כדי שהרצועה לא תיחתך בחדות */
+            -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+        }
+
+        .gallery-track {
+            display: flex;
+            width: max-content;
+            animation: slide 26s linear infinite;
+        }
+
+        .gallery:hover .gallery-track {
+            animation-play-state: paused;
+        }
+
+        /* מרווח דרך margin ולא gap, כדי ש-50% יהיה בדיוק עותק אחד ולולאה תיראה רציפה */
+        .gallery-track img {
+            width: 76px;
+            height: 76px;
+            margin-inline-end: 8px;
+            object-fit: cover;
+            border-radius: 14px;
+            background: #fff;
+            flex-shrink: 0;
+            border: 1px solid rgba(232, 62, 140, 0.12);
+            box-shadow: 0 3px 10px rgba(180, 90, 120, 0.13);
+        }
+
+        @keyframes slide {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gallery-track { animation: none; }
+        }
     </style>
 </head>
 <body>
@@ -319,6 +360,31 @@
         </a>
 
         <p class="social-proof">כבר <strong>מעל 3,000 אמהות</strong> בקהילה</p>
+
+        <div class="gallery" aria-hidden="true">
+            <div class="gallery-track">
+                <img src="/images/baby/c4EldVDt.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4Wga9yX.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4XbXnGB.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4avJ1J5.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4bCxiWf.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4enrUjp.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4l3uUjt.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4msEhMJ.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4nMAoEX.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4qKFz0r.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4EldVDt.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4Wga9yX.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4XbXnGB.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4avJ1J5.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4bCxiWf.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4enrUjp.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4l3uUjt.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4msEhMJ.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4nMAoEX.jpg" alt="" width="76" height="76" decoding="async">
+                <img src="/images/baby/c4qKFz0r.jpg" alt="" width="76" height="76" decoding="async">
+            </div>
+        </div>
     </div>
 
     <script>

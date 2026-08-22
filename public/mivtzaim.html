@@ -41,17 +41,104 @@
             justify-content: center;
             background: linear-gradient(160deg, #FFF0F3 0%, #FDE8EF 40%, #F5E6F0 100%);
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ---- רקע: מוזאיקת מוצרי תינוקות ---- */
+        .mosaic {
+            position: fixed;
+            inset: -10%;
+            z-index: 0;
+            pointer-events: none;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            transform: rotate(-6deg) scale(1.06);
+            transform-origin: center;
+            animation: drift 46s ease-in-out infinite alternate;
+        }
+
+        .mosaic img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 16px;
+            background: #fff;
+        }
+
+        @keyframes drift {
+            from { transform: rotate(-6deg) scale(1.06) translate3d(0, 0, 0); }
+            to   { transform: rotate(-6deg) scale(1.12) translate3d(-14px, -22px, 0); }
+        }
+
+        /* שכבת הצללה ורודה שמשאירה את הכרטיס קריא */
+        .scrim {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 62% 48% at 50% 50%, rgba(255, 246, 249, 0.46) 0%, rgba(255, 240, 244, 0.22) 55%, rgba(250, 232, 240, 0.10) 100%),
+                linear-gradient(160deg, rgba(255, 240, 243, 0.20) 0%, rgba(253, 232, 239, 0.16) 40%, rgba(245, 230, 240, 0.22) 100%);
+            backdrop-filter: blur(2px) saturate(1.05);
+            -webkit-backdrop-filter: blur(2px) saturate(1.05);
+        }
+
+        @media (min-width: 700px) {
+            .mosaic { grid-template-columns: repeat(6, 1fr); }
+        }
+
+        @media (min-width: 1100px) {
+            .mosaic { grid-template-columns: repeat(8, 1fr); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mosaic { animation: none; }
+            .cta-button { animation: none; }
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.86);
+            backdrop-filter: blur(24px) saturate(1.1);
+            -webkit-backdrop-filter: blur(24px) saturate(1.1);
+            border: 1px solid rgba(255, 255, 255, 0.9);
             border-radius: 32px;
-            padding: 44px 32px 36px;
+            padding: 36px 32px 36px;
             max-width: 420px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 8px 40px rgba(200, 100, 130, 0.1);
+            box-shadow: 0 18px 60px rgba(180, 90, 120, 0.18);
+        }
+
+        /* ---- שבב AliExpress ---- */
+        .ali-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #FF6A00 0%, #E62E04 100%);
+            color: #fff;
+            padding: 8px 16px 8px 14px;
+            border-radius: 999px;
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1;
+            box-shadow: 0 6px 18px rgba(230, 46, 4, 0.28);
+            margin-bottom: 20px;
+        }
+
+        .ali-chip svg {
+            width: 17px;
+            height: 17px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        .ali-chip b {
+            font-weight: 800;
+            letter-spacing: 0.2px;
         }
 
         h1 {
@@ -145,17 +232,76 @@
         .social-proof strong {
             color: #555;
         }
-
-        .emojis {
-            margin-top: 24px;
-            font-size: 22px;
-            letter-spacing: 6px;
-        }
     </style>
 </head>
 <body>
 
+    <div class="mosaic" aria-hidden="true">
+        <img src="/images/baby/c2Qed2On.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3AZcHwT.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3p9w5xH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c43k5d3l.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2wJVNRH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3cXOVbV.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3wfkW6R.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2uGLs2n.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3C74hF5.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3sWaDFH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c44sHF8X.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c30gZbgn.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3eLSQ2R.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3zwxarp.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2ul6Ocb.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3LLmu5N.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3t72LyR.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c4CvgMRh.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c34zWSeJ.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3gF6ozN.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c402UZhp.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2wGCRyR.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3WO0T0B.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3u8yGyx.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2Qed2On.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3AZcHwT.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3p9w5xH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c43k5d3l.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2wJVNRH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3cXOVbV.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3wfkW6R.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2uGLs2n.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3C74hF5.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3sWaDFH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c44sHF8X.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c30gZbgn.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3eLSQ2R.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3zwxarp.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2ul6Ocb.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3LLmu5N.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3t72LyR.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c4CvgMRh.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c34zWSeJ.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3gF6ozN.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c402UZhp.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2wGCRyR.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3WO0T0B.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3u8yGyx.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2Qed2On.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3AZcHwT.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3p9w5xH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c43k5d3l.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2wJVNRH.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3cXOVbV.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c3wfkW6R.jpg" alt="" width="200" height="200" decoding="async">
+        <img src="/images/baby/c2uGLs2n.jpg" alt="" width="200" height="200" decoding="async">
+    </div>
+    <div class="scrim" aria-hidden="true"></div>
+
     <div class="card">
+        <div class="ali-chip">
+            <svg viewBox="0 0 24 24"><path d="M8 7V6a4 4 0 0 1 8 0v1h3.05a1 1 0 0 1 .997 1.075l-.92 12A2 2 0 0 1 17.133 22H6.867a2 2 0 0 1-1.994-1.847l-.92-12A1 1 0 0 1 4.95 7H8Zm2 0h4V6a2 2 0 1 0-4 0v1Zm-2 4a1 1 0 1 0-2 0 6 6 0 0 0 12 0 1 1 0 1 0-2 0 4 4 0 0 1-8 0Z"/></svg>
+            <span>הדילים הכי שווים מ־<b>AliExpress</b></span>
+        </div>
+
         <h1>
             הצטרפי ל<span class="highlight">קהילה של אלפי אמהות</span>
             עם דילים שווים ואיכותיים למוצרי תינוקות מאלי אקספרס
@@ -172,9 +318,7 @@
             להצטרפות לקהילה
         </a>
 
-        <p class="social-proof">כבר <strong>+2,500 אמהות</strong> בקהילה</p>
-
-        <div class="emojis">💕 🍼 💕</div>
+        <p class="social-proof">כבר <strong>מעל 3,000 אמהות</strong> בקהילה</p>
     </div>
 
     <script>

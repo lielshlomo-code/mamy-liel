@@ -23,14 +23,6 @@ export const LANDING_PAGES: LandingPage[] = [
     defaultWhatsapp: "https://chat.whatsapp.com/LWfnDZ6hKyV414XT1YKHwX?mode=gi_t",
   },
   {
-    slug: "whatsapp-il",
-    label: "קבוצת WhatsApp (עברית)",
-    description: "דף נחיתה לקבוצת ווטסאפ - עברית",
-    path: "/whatsapp-il.html",
-    code: "wa-il",
-    defaultWhatsapp: "https://chat.whatsapp.com/EV9OARjJdWR5lGCBrd0HpS",
-  },
-  {
     slug: "mivtzaim",
     label: "מבצעים WhatsApp (עברית)",
     description: "דף נחיתה לקבוצת ווטסאפ - עברית (פיקסל נפרד)",

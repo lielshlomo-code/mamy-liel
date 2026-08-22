@@ -180,8 +180,11 @@
             body: JSON.stringify({ page: 'ofertas', event: 'view' })
         }).catch(function() {});
 
+        var leadFired = false;
         document.getElementById('whatsapp-cta').addEventListener('click', function(e) {
             e.preventDefault();
+            if (leadFired) return; // מונע לידים כפולים מהקשות חוזרות עד לניווט
+            leadFired = true;
             if (typeof fbq !== 'undefined') {
                 fbq('track', 'Lead');
             }

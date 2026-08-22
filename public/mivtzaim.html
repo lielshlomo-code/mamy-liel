@@ -331,7 +331,9 @@
 
         document.getElementById('whatsapp-cta').addEventListener('click', function(e) {
             e.preventDefault();
-            // אירוע הליד מוגדר ידנית ב-Events Manager ואינו נורה מהקוד
+            if (typeof fbq !== 'undefined') {
+                fbq('track', 'Lead');
+            }
             // Track lead
             fetch('/api/track/landing', {
                 method: 'POST',

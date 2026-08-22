@@ -378,7 +378,7 @@
             e.preventDefault();
             if (leadFired) return; // מונע לידים כפולים מהקשות חוזרות עד לניווט
             leadFired = true;
-            if (typeof fbq !== 'undefined') { fbq('track', 'Lead'); }
+            // אירוע הליד מוגדר ידנית ב-Events Manager ואינו נורה מהקוד
             // רישום ליד
             fetch('/api/track/landing', {
                 method: 'POST',

@@ -89,8 +89,14 @@ export async function GET(
       .then(() => {});
   }
 
+  // קישורי הקבוצות של דפי הנחיתה מדלגים על דף הביניים שצובע את עוגיית
+  // השותפים: המשתמשת עוברת לוואטסאפ ולא לאלי אקספרס, כך שהעוגייה חסרת
+  // ערך שם ודף הביניים רק הוסיף השהיה במסלול ממומן. קישורי מוצרים
+  // ופופאפים ממשיכים לצבוע כרגיל לפי הדגל paint_cookies.
+  const isLandingWhatsApp = code in LANDING_WA_DEFAULTS;
+
   // If paint_cookies is enabled AND it's a real user AND not rate-limited
-  if (data.paint_cookies && !botDetected && !isRateLimited(ip)) {
+  if (!isLandingWhatsApp && data.paint_cookies && !botDetected && !isRateLimited(ip)) {
     const cookieUrl = await getAffiliateCookieUrl();
 
     if (cookieUrl) {
@@ -118,5 +124,8 @@ export async function GET(
     }
   }
 
-  return NextResponse.redirect(data.target_url);
+  // הפניה זמנית במכוון ולא 301: יעד הקישור נערך מ-admin/landing-pages, ודפדפן
+  // ששמר 301 במטמון ימשיך לשלוח לקבוצה הישנה גם אחרי שמחליפים את הקישור,
+  // בלי שום דרך לתקן את זה מהשרת. המהירות זהה — קפיצה אחת בשני המקרים.
+  return NextResponse.redirect(data.target_url, 302);
 }

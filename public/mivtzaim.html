@@ -29,6 +29,8 @@
     <!-- End Meta Pixel Code -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="image" href="/images/baby/mosaic.webp" fetchpriority="high">
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,25 +48,18 @@
         }
 
         /* ---- רקע: מוזאיקת מוצרי תינוקות ---- */
+        /* קובץ אחד שנפרס בחזרה, במקום עשרות תגי img */
         .mosaic {
             position: fixed;
             inset: -10%;
             z-index: 0;
             pointer-events: none;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            background-image: url('/images/baby/mosaic.webp');
+            background-repeat: repeat;
+            background-size: 150% auto;   /* 6 עמודות בקובץ => 4 גלויות ברוחב המכל */
             transform: rotate(-6deg) scale(1.06);
             transform-origin: center;
             animation: drift 46s ease-in-out infinite alternate;
-        }
-
-        .mosaic img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 16px;
-            background: #fff;
         }
 
         @keyframes drift {
@@ -86,11 +81,11 @@
         }
 
         @media (min-width: 700px) {
-            .mosaic { grid-template-columns: repeat(6, 1fr); }
+            .mosaic { background-size: 100% auto; }   /* 6 עמודות */
         }
 
         @media (min-width: 1100px) {
-            .mosaic { grid-template-columns: repeat(8, 1fr); }
+            .mosaic { background-size: 75% auto; }    /* 8 עמודות */
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -236,6 +231,7 @@
         /* ---- גלריית מוצרים רצה בתחתית הכרטיס ---- */
         .gallery {
             margin-top: 22px;
+            height: 76px;
             overflow: hidden;
             /* דהייה בשני הקצוות כדי שהרצועה לא תיחתך בחדות */
             -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
@@ -243,8 +239,11 @@
         }
 
         .gallery-track {
-            display: flex;
-            width: max-content;
+            height: 76px;
+            width: 1680px;
+            background-image: url('/images/baby/strip.webp');
+            background-repeat: repeat-x;
+            background-size: 840px 76px;   /* הקובץ 1680x152, מוצג בחצי => חד במסכי רטינה */
             animation: slide 26s linear infinite;
         }
 
@@ -252,22 +251,9 @@
             animation-play-state: paused;
         }
 
-        /* מרווח דרך margin ולא gap, כדי ש-50% יהיה בדיוק עותק אחד ולולאה תיראה רציפה */
-        .gallery-track img {
-            width: 76px;
-            height: 76px;
-            margin-inline-end: 8px;
-            object-fit: cover;
-            border-radius: 14px;
-            background: #fff;
-            flex-shrink: 0;
-            border: 1px solid rgba(232, 62, 140, 0.12);
-            box-shadow: 0 3px 10px rgba(180, 90, 120, 0.13);
-        }
-
         @keyframes slide {
             from { transform: translateX(0); }
-            to   { transform: translateX(-50%); }
+            to   { transform: translateX(-840px); }   /* בדיוק רוחב רצועה אחת => לולאה רציפה */
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -277,64 +263,7 @@
 </head>
 <body>
 
-    <div class="mosaic" aria-hidden="true">
-        <img src="/images/baby/c2Qed2On.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3AZcHwT.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3p9w5xH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c43k5d3l.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2wJVNRH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3cXOVbV.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3wfkW6R.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2uGLs2n.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3C74hF5.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3sWaDFH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c44sHF8X.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c30gZbgn.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3eLSQ2R.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3zwxarp.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2ul6Ocb.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3LLmu5N.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3t72LyR.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c4CvgMRh.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c34zWSeJ.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3gF6ozN.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c402UZhp.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2wGCRyR.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3WO0T0B.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3u8yGyx.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2Qed2On.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3AZcHwT.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3p9w5xH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c43k5d3l.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2wJVNRH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3cXOVbV.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3wfkW6R.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2uGLs2n.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3C74hF5.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3sWaDFH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c44sHF8X.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c30gZbgn.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3eLSQ2R.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3zwxarp.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2ul6Ocb.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3LLmu5N.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3t72LyR.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c4CvgMRh.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c34zWSeJ.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3gF6ozN.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c402UZhp.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2wGCRyR.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3WO0T0B.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3u8yGyx.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2Qed2On.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3AZcHwT.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3p9w5xH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c43k5d3l.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2wJVNRH.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3cXOVbV.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c3wfkW6R.jpg" alt="" width="200" height="200" decoding="async">
-        <img src="/images/baby/c2uGLs2n.jpg" alt="" width="200" height="200" decoding="async">
-    </div>
+    <div class="mosaic" aria-hidden="true"></div>
     <div class="scrim" aria-hidden="true"></div>
 
     <div class="card">
@@ -362,28 +291,7 @@
         <p class="social-proof">כבר <strong>מעל 3,000 אמהות</strong> בקהילה</p>
 
         <div class="gallery" aria-hidden="true">
-            <div class="gallery-track">
-                <img src="/images/baby/c4EldVDt.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4Wga9yX.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4XbXnGB.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4avJ1J5.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4bCxiWf.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4enrUjp.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4l3uUjt.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4msEhMJ.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4nMAoEX.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4qKFz0r.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4EldVDt.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4Wga9yX.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4XbXnGB.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4avJ1J5.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4bCxiWf.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4enrUjp.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4l3uUjt.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4msEhMJ.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4nMAoEX.jpg" alt="" width="76" height="76" decoding="async">
-                <img src="/images/baby/c4qKFz0r.jpg" alt="" width="76" height="76" decoding="async">
-            </div>
+            <div class="gallery-track"></div>
         </div>
     </div>
 

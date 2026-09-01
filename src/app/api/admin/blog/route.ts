@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import readingTime from "reading-time";
+import { revalidateSite } from "@/lib/revalidate";
 
 export async function GET() {
   const isAuth = await verifySession();
@@ -63,6 +64,7 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ slug, title, date });
   } catch {
     return NextResponse.json({ error: "שגיאה ביצירת הדרכה" }, { status: 500 });
@@ -93,6 +95,7 @@ export async function PUT(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ slug, title });
   } catch {
     return NextResponse.json({ error: "שגיאה בעדכון הדרכה" }, { status: 500 });
@@ -115,6 +118,7 @@ export async function DELETE(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "שגיאה במחיקת הדרכה" }, { status: 500 });

@@ -1,0 +1,32 @@
+# Nothing behind these paths is worth indexing, and every crawl of them wakes a
+# server-rendered page — which is what ate the Vercel Fluid CPU allowance.
+User-agent: *
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+Disallow: /academy
+Crawl-delay: 10
+
+# SEO backlink scrapers. They crawl the whole site on a loop and send no
+# visitors. AI assistants (GPTBot, ClaudeBot, PerplexityBot) are left alone on
+# purpose — those do send referrals.
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /

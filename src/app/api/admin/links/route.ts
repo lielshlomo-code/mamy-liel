@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { revalidateSite } from "@/lib/revalidate";
 
 export async function GET() {
   const isAuth = await verifySession();
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: "שגיאה בהוספת קישור" }, { status: 500 });
@@ -86,6 +88,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "קישור לא נמצא" }, { status: 404 });
     }
 
+    revalidateSite();
     return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: "שגיאה בעדכון קישור" }, { status: 500 });
@@ -108,6 +111,7 @@ export async function DELETE(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "שגיאה במחיקת קישור" }, { status: 500 });

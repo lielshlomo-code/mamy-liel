@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { revalidateSite } from "@/lib/revalidate";
 
 export async function POST(request: Request) {
   const isAuth = await verifySession();
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
       throw error;
     }
 
+    revalidateSite();
     return NextResponse.json(data);
   } catch {
     return NextResponse.json(
@@ -58,6 +60,7 @@ export async function PUT(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json(data);
   } catch {
     return NextResponse.json(
@@ -95,6 +98,7 @@ export async function DELETE(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ success: true });
   } catch (e) {
     const message =

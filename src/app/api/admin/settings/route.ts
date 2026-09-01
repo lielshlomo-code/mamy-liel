@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { revalidateSite } from "@/lib/revalidate";
 
 export async function PUT(request: Request) {
   const isAuth = await verifySession();
@@ -21,6 +22,7 @@ export async function PUT(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "שגיאה בעדכון הגדרה" }, { status: 500 });

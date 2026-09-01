@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { revalidateSite } from "@/lib/revalidate";
 
 export async function GET() {
   const isAuth = await verifySession();
@@ -93,6 +94,7 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({
       id: data.id,
       title: data.title,
@@ -145,6 +147,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "קורס לא נמצא" }, { status: 404 });
     }
 
+    revalidateSite();
     return NextResponse.json({
       id: data.id,
       title: data.title,
@@ -181,6 +184,7 @@ export async function DELETE(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "שגיאה במחיקת קורס" }, { status: 500 });

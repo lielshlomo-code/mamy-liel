@@ -5,11 +5,11 @@ import { getAllBlogPosts, getBlogPost } from "@/lib/content";
 import { compileMDX } from "next-mdx-remote/rsc";
 import InstagramEmbed from "@/components/blog/InstagramEmbed";
 
-// Cached for five minutes. This page has no per-user state, so rendering it
-// fresh on every request bought nothing and burned Vercel Fluid CPU — the
-// whole team shares a 4h/month allowance and overrunning it pauses the sites.
-// Admin edits show up within the window.
-export const revalidate = 300;
+// Cached for a day. This page has no per-user state, and the five-minute window
+// it used to sit on regenerated six pages 288 times a day — most of the team's
+// 4h/month Vercel Fluid CPU allowance, and running out pauses every site.
+// Admin edits don't wait for the window; they call revalidateSite() themselves.
+export const revalidate = 86400;
 
 interface PageProps {
   params: Promise<{ slug: string }>;

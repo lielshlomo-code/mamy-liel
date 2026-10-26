@@ -41,8 +41,19 @@ export async function proxy(request: NextRequest) {
   return supabaseResponse;
 }
 
+// Runs only where it is needed: the Supabase session refresh for the academy
+// and its login pages, and the crm.* host rewrite. Every public page, bot hit
+// and font request used to boot this Node function and call Supabase auth,
+// spending the Vercel CPU allowance this account shares with six other sites.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/academy/:path*",
+    "/auth/:path*",
+    "/api/academy/:path*",
+    "/api/auth/:path*",
+    {
+      source: "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff2?|ico|json|txt|xml)$).*)",
+      has: [{ type: "host", value: "crm\\..*" }],
+    },
   ],
 };

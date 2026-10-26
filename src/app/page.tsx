@@ -1,4 +1,8 @@
-export const dynamic = "force-dynamic";
+// Cached for a day. This page has no per-user state, and the five-minute window
+// it used to sit on regenerated six pages 288 times a day — most of the team's
+// 4h/month Vercel Fluid CPU allowance, and running out pauses every site.
+// Admin edits don't wait for the window; they call revalidateSite() themselves.
+export const revalidate = 86400;
 
 import HeroSection from "@/components/home/HeroSection";
 import QuickLinks from "@/components/home/QuickLinks";

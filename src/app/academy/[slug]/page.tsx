@@ -7,7 +7,11 @@ import {
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import CoursePageClient from "./CoursePageClient";
 
-export const dynamic = "force-dynamic";
+// No force-dynamic here. The course-access check below reads the session
+// cookie, which already makes this route render per request; declaring it
+// again only opted the data fetches out of caching as well. The academy is
+// idle right now, and crawlers are kept off /academy in robots.txt so an
+// unused page stops spending the shared Vercel Fluid CPU allowance.
 
 interface PageProps {
   params: Promise<{ slug: string }>;

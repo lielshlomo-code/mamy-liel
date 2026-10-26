@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, X, Save, Copy, Check, ExternalLink, Eye, EyeOff, Cookie, Megaphone, Home, Pencil } from "lucide-react";
 import type { ShortLink } from "@/lib/types";
+import AffiliateCookieSetting from "@/components/admin/AffiliateCookieSetting";
 
 const emptyLink = {
   targetUrl: "",
@@ -138,6 +139,9 @@ export default function AdminShortLinks() {
           קישור חדש
         </button>
       </div>
+
+      {/* Global affiliate cookie-painting URL */}
+      <AffiliateCookieSetting />
 
       {/* Create form */}
       {editing && (

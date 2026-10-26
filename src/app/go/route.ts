@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getSiteConfig } from "@/lib/content";
+import { getAffiliateCookieUrl } from "@/lib/settings";
 
 const BOT_PATTERNS = [
   /bot/i, /crawl/i, /spider/i, /slurp/i, /mediapartners/i,
@@ -26,8 +26,7 @@ export async function GET(request: Request) {
   const userAgent = request.headers.get("user-agent") || null;
 
   if (!isBot(userAgent)) {
-    const config = getSiteConfig();
-    const cookieUrl = config.affiliateCookieUrl;
+    const cookieUrl = await getAffiliateCookieUrl();
 
     if (cookieUrl) {
       const targetUrlJson = JSON.stringify(targetUrl);

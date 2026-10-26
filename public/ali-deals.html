@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>דילים מתחת לראדר</title>
+    <meta name="description" content="בכל יום אנחנו מאתרים עבורכם דילים שווים, מוצרים טרנדיים והנחות מיוחדות על מותגים נבחרים — הצטרפו לקבוצת הוואטסאפ">
+    <meta property="og:title" content="דילים מתחת לראדר">
+    <meta property="og:description" content="דילים שווים, מוצרים טרנדיים והנחות מיוחדות על מותגים נבחרים — הכל במקום אחד">
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '516560591054083');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=516560591054083&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg1: #FCF8F2;
+            --bg2: #EFE7DA;
+            /* פלטת הלוגו: פחם, זהב-חול וקרם.
+               --gold-deep הוא גרסה כהה של הזהב, לטקסט קטן שזקוק לניגודיות על לבן */
+            --ink: #262321;
+            --gold: #A98A62;
+            --gold-deep: #8A6B45;
+            --sand: #F0E8DB;
+            --sand-line: #DDCFB8;
+            --cream: #F5EFE6;
+            --text: var(--ink);
+            --muted: #8E8071;
+            --green: #25D366;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            color: var(--text);
+            background: var(--bg2);
+            min-height: 100dvh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 26px 20px calc(26px + env(safe-area-inset-bottom));
+        }
+
+        /* ---- רקע: קולאז' מוצרים חד ---- */
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bg-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 25%;
+            width: 100%;
+            height: 100%;
+            /* טשטוש קל בלבד — מספיק כדי שכיתוב על אריזות לא יתחרה בכרטיס,
+               ועדיין נמוך מספיק כדי שהמוצרים יישארו מזוהים */
+            transform: scale(1.06);
+            filter: blur(5px) saturate(1.1);
+        }
+        .bg-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        /* ויניאטה מכהה — נותנת עומק ומבליטה את הכרטיס בלי לטשטש את המוצרים */
+        .bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(105% 75% at 50% 46%,
+                    rgba(30, 20, 12, .34) 0%,
+                    rgba(30, 20, 12, .74) 100%),
+                linear-gradient(180deg,
+                    rgba(48, 33, 20, .34) 0%,
+                    rgba(48, 33, 20, .44) 100%);
+        }
+        @media (min-width: 700px) {
+            .bg-grid { grid-template-columns: repeat(5, 1fr); grid-auto-rows: 34%; }
+        }
+
+        /* entrance */
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .anim { opacity: 0; animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+        .d1 { animation-delay: .05s; }
+        .d2 { animation-delay: .16s; }
+        .d3 { animation-delay: .28s; }
+        .d4 { animation-delay: .40s; }
+        .d5 { animation-delay: .52s; }
+
+        /* ---- הכרטיס ---- */
+        .card {
+            width: 100%;
+            max-width: 430px;
+            background: rgba(255, 255, 255, .95);
+            -webkit-backdrop-filter: blur(10px);
+                    backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, .75);
+            border-radius: 30px;
+            padding: 30px 24px 26px;
+            box-shadow:
+                0 32px 70px rgba(35, 22, 10, .34),
+                0 4px 14px rgba(35, 22, 10, .14);
+        }
+
+        /* ---- התג: גלולת חול קומפקטית. קווי הצד שמורים ל‑tagline שמחקה את הלוגו ---- */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--sand);
+            border: 1px solid var(--sand-line);
+            color: var(--gold-deep);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .3px;
+            padding: 7px 15px;
+            border-radius: 50px;
+            margin-bottom: 18px;
+        }
+        .badge .dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--gold);
+            animation: live 2.2s infinite;
+        }
+        @keyframes live {
+            0%   { box-shadow: 0 0 0 0 rgba(169,138,98,.55); }
+            70%  { box-shadow: 0 0 0 7px rgba(169,138,98,0); }
+            100% { box-shadow: 0 0 0 0 rgba(169,138,98,0); }
+        }
+
+        /* הלוגו נושא את שם המותג, ולכן הכותרת נושאת רק את ההבטחה */
+        .logo {
+            display: block;
+            width: clamp(116px, 31vw, 146px);
+            height: auto;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            box-shadow: 0 8px 22px rgba(38, 35, 33, .15);
+        }
+        h1 {
+            font-size: clamp(21px, 5.7vw, 26px);
+            font-weight: 900;
+            line-height: 1.3;
+            color: var(--ink);
+            letter-spacing: -0.4px;
+            margin-bottom: 22px;
+            text-wrap: balance;
+        }
+        h1 .hl { color: var(--gold-deep); }
+
+        /* ---- שורות היתרון ---- */
+        .benefits {
+            display: grid;
+            gap: 11px;
+            text-align: right;
+            margin-bottom: 24px;
+            padding: 0 2px;
+        }
+        .benefit {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            font-size: clamp(14.5px, 3.9vw, 16px);
+            font-weight: 600;
+            color: #5B4E42;
+            line-height: 1.4;
+        }
+        .benefit .ic {
+            flex-shrink: 0;
+            width: 27px; height: 27px;
+            border-radius: 50%;
+            background: var(--sand);
+            border: 1px solid var(--sand-line);
+            display: grid;
+            place-items: center;
+        }
+        .benefit .ic svg { width: 13px; height: 13px; fill: var(--gold-deep); }
+        /* ההדגשה נשענת על משקל וקו חול תחתון במקום על צבע צועק */
+        .benefit strong {
+            color: var(--text);
+            font-weight: 800;
+            background: linear-gradient(180deg, transparent 63%, rgba(169, 138, 98, .30) 63%);
+        }
+
+        /* ---- CTA ---- */
+        .cta {
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            gap: 11px;
+            width: 100%;
+            background: var(--green);
+            color: #fff;
+            text-decoration: none;
+            padding: 18px 24px;
+            border-radius: 50px;
+            font-size: clamp(17px, 4.6vw, 20px);
+            font-weight: 900;
+            border: none; cursor: pointer;
+            box-shadow: 0 12px 26px rgba(37, 211, 102, .36);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .cta:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(37, 211, 102, .44); }
+        .cta:active { transform: translateY(0); }
+        .cta svg { width: 24px; height: 24px; fill: #fff; flex-shrink: 0; }
+
+        .proof { margin-top: 13px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+        .proof strong { color: var(--gold-deep); font-weight: 800; }
+
+        /* ---- קרוסלה מתחת לכרטיס ---- */
+        .carousel {
+            width: 100vw;
+            margin-inline: calc(50% - 50vw);
+            margin-top: 30px;
+            overflow: hidden;
+            direction: ltr;      /* עוגן את הרצועה לשמאל — אחרת ב‑RTL היא נדחפת החוצה וה‑‎-50%‎ מרוקן את המסך */
+            -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+                    mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+        }
+        .track {
+            display: flex;
+            width: max-content;
+            will-change: transform;
+            /* לולאה אינסופית: סט כפול + הזזה של בדיוק ‎-50%‎ = מעבר חלק בלי סוף */
+            animation: scroll 34s linear infinite;
+        }
+        .slide { flex-shrink: 0; margin-right: 14px; }
+        .slide img {
+            width: 132px;
+            height: 132px;
+            object-fit: cover;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 12px 26px rgba(20, 12, 5, .38);
+            border: 3px solid rgba(255, 255, 255, .92);
+        }
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .track, .anim, .badge .dot { animation: none !important; }
+            .anim { opacity: 1; }
+            .cta { transition: none; }
+            /* בלי אנימציה — הקרוסלה נגללת ידנית כדי שכל התמונות עדיין נגישות */
+            .carousel {
+                overflow-x: auto;
+                -webkit-mask: none; mask: none;
+                scroll-snap-type: x mandatory;
+                -ms-overflow-style: none; scrollbar-width: none;
+            }
+            .carousel::-webkit-scrollbar { display: none; }
+            .slide { scroll-snap-align: center; }
+        }
+    </style>
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/logo-radar-32.png" />
+    <link rel="apple-touch-icon" href="/images/logo-radar-180.png" />
+    <meta name="theme-color" content="#EFE7DA" />
+</head>
+<body>
+
+    <div class="bg" aria-hidden="true">
+        <div class="bg-grid">
+            <img src="/images/ali/bag-gucci.jpg" alt="">
+            <img src="/images/ali/shoes-nike.jpg" alt="">
+            <img src="/images/ali/earrings.jpg" alt="">
+            <img src="/images/ali/top-alo.jpg" alt="">
+            <img src="/images/ali/hair-brush.jpg" alt="">
+            <img src="/images/ali/headbands.jpg" alt="">
+            <img src="/images/ali/shoes-adidas.jpg" alt="">
+            <img src="/images/ali/bracelet.jpg" alt="">
+            <img src="/images/ali/bag-gucci.jpg" alt="">
+            <img src="/images/ali/earrings.jpg" alt="">
+            <img src="/images/ali/shoes-nike.jpg" alt="">
+            <img src="/images/ali/top-alo.jpg" alt="">
+            <img src="/images/ali/headbands.jpg" alt="">
+            <img src="/images/ali/bracelet.jpg" alt="">
+            <img src="/images/ali/hair-brush.jpg" alt="">
+        </div>
+    </div>
+
+    <div class="card anim d1">
+
+        <img class="logo anim d1" src="/images/logo-radar.png" width="480" height="480"
+             alt="דילים מתחת לראדר">
+
+        <div class="badge anim d2"><span class="dot"></span> קהילה חדשה נפתחה עכשיו</div>
+
+        <h1 class="anim d2">
+            הצטרפו וגלו את המבצעים <span class="hl">לפני כולם!</span>
+        </h1>
+
+        <div class="benefits anim d3">
+            <div class="benefit">
+                <span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+                <span><strong>דילים שווים</strong> ומוצרים טרנדיים, כל יום</span>
+            </div>
+            <div class="benefit">
+                <span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+                <span><strong>הנחות מיוחדות</strong> על מותגים נבחרים</span>
+            </div>
+            <div class="benefit">
+                <span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+                <span>כל הקישורים וההמלצות <strong>במקום אחד</strong></span>
+            </div>
+        </div>
+
+        <a href="/s/wa-ali-deals" class="cta anim d4" id="whatsapp-cta">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            להצטרפות לקבוצת הוואטסאפ
+        </a>
+
+        <p class="proof anim d5">קהילה פתוחה · <strong>מבצעים חדשים כל יום</strong></p>
+
+    </div>
+
+    <div class="carousel anim d5">
+        <div class="track">
+            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="נעליים"></div>
+            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="תיק"></div>
+            <div class="slide"><img src="/images/ali/earrings.jpg" alt="עגילים"></div>
+            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="נעליים"></div>
+            <div class="slide"><img src="/images/ali/headbands.jpg" alt="גומיות"></div>
+            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="מברשת שיער"></div>
+            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="טופ"></div>
+            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="צמיד"></div>
+            <!-- סט כפול ליצירת לולאה חלקה -->
+            <div class="slide"><img src="/images/ali/shoes-nike.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/bag-gucci.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/earrings.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/shoes-adidas.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/headbands.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/hair-brush.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/top-alo.jpg" alt="" aria-hidden="true"></div>
+            <div class="slide"><img src="/images/ali/bracelet.jpg" alt="" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <script>
+        // רישום כניסה לעמוד
+        fetch('/api/track/landing', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ page: 'ali-deals', event: 'view' })
+        }).catch(function () {});
+
+        var leadFired = false;
+        document.getElementById('whatsapp-cta').addEventListener('click', function (e) {
+            e.preventDefault();
+            if (leadFired) return; // מונע לידים כפולים מהקשות חוזרות עד לניווט
+            leadFired = true;
+            if (typeof fbq !== 'undefined') { fbq('track', 'Lead'); }
+            // רישום ליד
+            fetch('/api/track/landing', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ page: 'ali-deals', event: 'lead' })
+            }).catch(function () {});
+            // short-link נערך (/s/wa-ali-deals) — קישור הקבוצה מנוהל מ‑admin/landing-pages ומפיל עוגיית שותפים
+            var target = '/s/wa-ali-deals';
+            setTimeout(function () {
+                window.location.href = target;
+            }, 300);
+        });
+    </script>
+</body>
+</html>

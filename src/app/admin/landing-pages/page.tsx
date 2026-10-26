@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Eye, MousePointerClick, Percent, ExternalLink, Copy, Check } from "lucide-react";
+import { Eye, MousePointerClick, Percent, ExternalLink } from "lucide-react";
 
 import StatCard from "@/components/admin/analytics/StatCard";
 import ChartCard from "@/components/admin/analytics/ChartCard";
 import TopList from "@/components/admin/analytics/TopList";
 import DateRangeSelector from "@/components/admin/analytics/DateRangeSelector";
+import LandingWhatsAppLinks from "@/components/admin/LandingWhatsAppLinks";
+import { LANDING_PAGES } from "@/lib/landing-pages";
 
 interface LandingDaily {
   date: string;
@@ -128,27 +130,6 @@ function LandingChart({ data }: { data: LandingDaily[] }) {
   );
 }
 
-const LANDING_PAGES = [
-  {
-    slug: "ofertas",
-    label: "Ofertas WhatsApp (ספרדית)",
-    description: "דף נחיתה לקבוצת ווטסאפ - מבצעים לאמהות",
-    path: "/ofertas.html",
-  },
-  {
-    slug: "whatsapp-il",
-    label: "קבוצת WhatsApp (עברית)",
-    description: "דף נחיתה לקבוצת ווטסאפ - עברית",
-    path: "/whatsapp-il.html",
-  },
-  {
-    slug: "mivtzaim",
-    label: "מבצעים WhatsApp (עברית)",
-    description: "דף נחיתה לקבוצת ווטסאפ - עברית (פיקסל נפרד)",
-    path: "/mivtzaim.html",
-  },
-];
-
 const PAGE_LABELS: Record<string, string> = {};
 for (const p of LANDING_PAGES) PAGE_LABELS[p.slug] = p.label;
 
@@ -156,14 +137,6 @@ export default function LandingPagesAdmin() {
   const [analytics, setAnalytics] = useState<LandingAnalytics | null>(null);
   const [range, setRange] = useState("30");
   const [loading, setLoading] = useState(true);
-  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
-
-  const copyLink = (slug: string, path: string) => {
-    const url = `https://www.mamy-liel.com${path}`;
-    navigator.clipboard.writeText(url);
-    setCopiedSlug(slug);
-    setTimeout(() => setCopiedSlug(null), 2000);
-  };
 
   useEffect(() => {
     setLoading(true);
@@ -184,53 +157,8 @@ export default function LandingPagesAdmin() {
         <DateRangeSelector value={range} onChange={setRange} />
       </div>
 
-      {/* Landing pages list */}
-      <div className="bg-white rounded-xl border border-border p-4 sm:p-6 mb-8">
-        <h3 className="font-semibold mb-4">דפי נחיתה פעילים</h3>
-        <div className="flex flex-col gap-3">
-          {LANDING_PAGES.map((lp) => (
-            <div
-              key={lp.slug}
-              className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm">{lp.label}</p>
-                <p className="text-xs text-text-secondary mt-0.5">{lp.description}</p>
-                <p className="text-xs text-text-light mt-0.5 font-mono" dir="ltr">
-                  mamy-liel.com{lp.path}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => copyLink(lp.slug, lp.path)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-muted transition-colors"
-                >
-                  {copiedSlug === lp.slug ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-green-600" />
-                      <span className="text-green-600">הועתק!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      העתק קישור
-                    </>
-                  )}
-                </button>
-                <a
-                  href={lp.path}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground text-white text-xs font-medium hover:bg-accent-hover transition-colors"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  פתח
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Landing pages list + editable name & WhatsApp group link per page */}
+      <LandingWhatsAppLinks />
 
       {loading || !analytics ? (
         <div className="flex justify-center py-12">

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { revalidateSite } from "@/lib/revalidate";
 
 const ALI_API_URL =
   "https://aliexpress-services-2-barshlom95.onrender.com/api/ali/product-info";
@@ -265,6 +266,7 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({
       ...data,
       dateAdded: data.date_added,
@@ -314,6 +316,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "מוצר לא נמצא" }, { status: 404 });
     }
 
+    revalidateSite();
     return NextResponse.json({
       ...data,
       dateAdded: data.date_added,
@@ -339,6 +342,7 @@ export async function DELETE(request: Request) {
 
     if (error) throw error;
 
+    revalidateSite();
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "שגיאה במחיקת מוצר" }, { status: 500 });
